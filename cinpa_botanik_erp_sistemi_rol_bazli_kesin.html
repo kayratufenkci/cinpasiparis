@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÇİNPA BOTANİK - Özel Yetkilendirilmiş Operasyon & Sipariş Paneli</title>
+    <!-- Tailwind CSS CDN -->
+    <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=A60jviUkCergQ9lELF5u7qjJxTJF8R0kGVO7Ij8vR6RWiRBvb841fiD8C2y6QrYOvNngQaO_gXXKDFKaEpolkwZyPnaLGs8W6hnXlCPzlmcQmU9lCrIh-I_qmKGvustg2iCkHiuM5vlCMOxGazy5MA_Y-4hhx-ejJ6e-CfTpJ1Mz9EWz52fzcV8eKUZ1t5qCFGMZoqWliZHrhdprZENQHXWuGdw1ZWdAwmxzXaMt9yyu8xQusIVCxafl2iLFR3c2PThVyYxvfeU5T22YmPqJXyAeos3Iem2rmXvQopI7DXowdc6fqeXfygUpagRLtqudid221qIVmpPnD6SmifVf02Y5asPOS4dB0lA8gDr46X8" charset="UTF-8"></script><script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cinpa: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .step-circle { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 9999px; font-weight: 800; font-size: 13px; }
+        
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; }
+        }
+        .print-only { display: none; }
+        
+        #toast {
+            visibility: hidden;
+            min-width: 280px;
+            transform: translateX(-50%) translateY(100px);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        #toast.show {
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col antialiased">
+
+    <!-- Toast Bildirimi -->
+    <div id="toast" class="fixed bottom-6 left-1/2 z-50 bg-slate-900 text-white text-xs sm:text-sm font-bold px-5 py-3.5 rounded-2xl shadow-2xl flex items-center space-x-3 no-print">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toast-msg">İşlem başarıyla gerçekleştirildi.</span>
+    </div>
+
+    <!-- ================= 1. GİRİŞ EKRANI (LOGIN SCREEN) ================= -->
+    <section id="view-login" class="min-h-screen flex items-center justify-center p-4 bg-slate-950 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950">
+        <div class="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl space-y-6">
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 rounded-2xl bg-cinpa-700 mx-auto flex items-center justify-center text-white font-black text-3xl shadow-xl shadow-cinpa-900/40">
+                    Ç
+                </div>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">ÇİNPA BOTANİK</h1>
+                <p class="text-xs text-slate-500 font-medium">Rol ve Görev Bazlı Yetkili Giriş Portalı</p>
+            </div>
+
+            <div class="space-y-3 pt-2">
+                <label class="block text-xs font-extrabold text-slate-400 uppercase tracking-wider text-center">Giriş Yapmak İstediğiniz Profil</label>
+                <div class="grid grid-cols-1 gap-2.5">
+                    
+                    <!-- Satış Profili -->
+                    <button onclick="loginAs('satis')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 transition group text-left">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
+                                <i class="fa-solid fa-file-signature"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs font-black text-slate-900">Satış Uzmanı (Selin Yılmaz)</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Sadece Fiş Girişi Görür (Depoya iletince kilitlenir)</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-blue-600 transition text-xs"></i>
+                    </button>
+
+                    <!-- Depo Profili -->
+                    <button onclick="loginAs('depo')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-amber-500 hover:bg-amber-50/50 transition group text-left">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
+                                <i class="fa-solid fa-boxes-packing"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs font-black text-slate-900">Depocu (Kamber Usta)</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Sadece Depo Hazırlık & İkame Değişikliği Görür</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-amber-600 transition text-xs"></i>
+                    </button>
+
+                    <!-- Saha Profili -->
+                    <button onclick="loginAs('saha')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-purple-500 hover:bg-purple-50/50 transition group text-left">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
+                                <i class="fa-solid fa-helmet-safety"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs font-black text-slate-900">Saha Ekibi (Sefa Usta)</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Sadece Mal Kabul, İade & İlave Ekranını Görür</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-purple-600 transition text-xs"></i>
+                    </button>
+
+                    <!-- Muhasebe Profili -->
+                    <button onclick="loginAs('muhasebe')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
+                                <i class="fa-solid fa-receipt"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs font-black text-slate-900">Muhasebe (Gökhan)</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Hepsini Görür (İlk 3'ü Salt Okunur, 4.'yü Değiştirir)</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-600 transition text-xs"></i>
+                    </button>
+
+                    <!-- Admin Profili -->
+                    <button onclick="loginAs('admin')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-800 bg-slate-900 text-white hover:bg-black transition group text-left">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-slate-800 text-emerald-400 flex items-center justify-center font-bold text-base">
+                                <i class="fa-solid fa-crown"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs font-black text-white">Sistem Yöneticisi (Admin)</div>
+                                <div class="text-[11px] text-slate-400 font-medium">Hepsini Görür ve Her Aşamayı Değiştirme Yetkisi Vardır</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-arrow-right-to-bracket text-emerald-400 text-xs"></i>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= 2. ANA UYGULAMA PANELİ (AUTHENTICATED APP) ================= -->
+    <div id="view-app" class="hidden flex-1 flex flex-col min-h-screen">
+        
+        <!-- Üst Menü / Navbar -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm no-print">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-3 cursor-pointer" onclick="returnToDashboard()">
+                        <div class="w-10 h-10 rounded-xl bg-cinpa-700 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-cinpa-200">
+                            Ç
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h1 class="text-base font-black tracking-tight text-slate-900 leading-none">ÇİNPA BOTANİK</h1>
+                                <span class="bg-cinpa-100 text-cinpa-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-cinpa-200" id="header-role-badge">SATIŞ PANELİ</span>
+                            </div>
+                            <p class="text-xs text-slate-500 font-medium mt-0.5" id="header-user-desc">Kullanıcı: Selin Yılmaz</p>
+                        </div>
+                    </div>
+
+                    <!-- Sağ Aksiyon Butonları -->
+                    <div class="flex items-center space-x-3">
+                        <!-- Sadece Satış veya Admin Yeni Sipariş Başlatabilir -->
+                        <button onclick="createNewOrderModal()" id="btn-header-new-order" class="px-4 py-2 bg-cinpa-700 hover:bg-cinpa-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-cinpa-200 transition flex items-center space-x-2">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Yeni Sipariş Başlat</span>
+                        </button>
+
+                        <!-- Katalog Yönetimi (Sadece Admin ve Satış) -->
+                        <button onclick="openCatalogModal()" id="btn-header-catalog" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-200 transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-boxes-stacked text-cinpa-700"></i>
+                            <span class="hidden sm:inline">Katalog & Fiyatlar</span>
+                        </button>
+
+                        <!-- Çıkış Yap Butonu -->
+                        <button onclick="logout()" title="Oturumu Kapat / Profil Değiştir" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs rounded-xl border border-red-200 transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            <span class="hidden sm:inline">Çıkış Yap</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Ana Gövde -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+            <!-- Kullanıcı Bilgi Bandı -->
+            <div id="role-welcome-banner" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center space-x-3.5">
+                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold" id="role-avatar-box">
+                        <i class="fa-solid fa-user-tie" id="role-avatar-icon"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Yetkili Oturum</div>
+                        <h2 class="text-base font-extrabold text-slate-900" id="role-welcome-name">Selin Yılmaz (Satış Uzmanı)</h2>
+                    </div>
+                </div>
+                <div class="text-xs font-semibold px-3.5 py-2 rounded-xl border" id="role-duty-badge">
+                    Görev Tanımı
+                </div>
+            </div>
+
+            <!-- SİPARİŞLER DASHBOARD LİSTESİ -->
+            <section id="section-dashboard" class="space-y-6">
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-base font-extrabold text-slate-900" id="dashboard-table-title">Sipariş Dosyaları</h2>
+                            <p class="text-xs text-slate-500">İlgili siparişin üzerine tıklayarak işlem ekranına geçebilirsiniz.</p>
+                        </div>
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                            <input type="text" id="search-input" onkeyup="filterOrders()" placeholder="Sipariş no veya müşteri ara..." class="text-xs pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-cinpa-600 w-full sm:w-72">
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-600 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+                                <tr>
+                                    <th class="p-4">İş No / Dosya</th>
+                                    <th class="p-4">Müşteri / Proje</th>
+                                    <th class="p-4">Satış Uzmanı</th>
+                                    <th class="p-4">Tarih</th>
+                                    <th class="p-4">Aşama</th>
+                                    <th class="p-4 text-right">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DETAYLI OPERASYON & FORMLAR EKRANI -->
+            <section id="section-order-detail" class="hidden space-y-6">
+
+                <!-- Başlık Çubuğu -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex items-center space-x-4">
+                        <button onclick="returnToDashboard()" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition" title="Geri Dön">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-md bg-slate-900 text-white font-mono" id="detail-order-code">CNP-2026-084</span>
+                                <span class="text-xs font-bold text-slate-500" id="detail-order-date">20 Ağustos 2026</span>
+                            </div>
+                            <h2 class="text-lg font-black text-slate-900 mt-1" id="detail-customer-name">Müşteri Adı</h2>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <button onclick="sendWhatsAppNotification()" class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold flex items-center space-x-1.5 transition">
+                            <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i>
+                            <span>WhatsApp Durum Gönder</span>
+                        </button>
+                        <button onclick="window.print()" class="px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs font-bold flex items-center space-x-1.5 transition">
+                            <i class="fa-solid fa-print text-sm"></i>
+                            <span>Yazdır</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Süreç Sekmeleri (YALNIZCA YETKİSİ OLAN SEKMELER GÖRÜNÜR) -->
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto" id="stepper-nav-bar">
+                    <div class="flex space-x-2 min-w-[600px]" id="stepper-buttons-container">
+                        <!-- JS Dinamik olarak role uygun sekmeleri yerleştirir -->
+                    </div>
+                </div>
+
+                <!-- ================= 1. ADIM: SATIŞ FORMU (Sadece Satış, Muhasebe ve Admin Görür) ================= -->
+                <div id="content-step-1" class="hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
+                            <div>
+                                <span class="bg-blue-100 text-blue-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">Evrak 1: Satış Sipariş Formu</span>
+                                <h3 class="text-lg font-black text-slate-900 mt-1">Müşteri Talebi ve Sipariş Kalemleri</h3>
+                            </div>
+                            <div class="text-xs text-slate-500 font-medium">
+                                <i class="fa-solid fa-user-tie mr-1 text-slate-400"></i> Satış Uzmanı: <strong id="step1-sales-rep" class="text-slate-800">Selin Yılmaz</strong>
+                            </div>
+                        </div>
+
+                        <!-- Kilitlenme Uyarısı (Depoya gittiyse) -->
+                        <div id="step1-lock-alert" class="hidden bg-slate-100 border-l-4 border-slate-500 p-3.5 rounded-r-xl text-xs text-slate-700 flex items-center space-x-2">
+                            <i class="fa-solid fa-lock text-slate-500 text-sm"></i>
+                            <div><strong>Fiş Kilitlendi:</strong> Bu sipariş depoya iletildiği için satış fişi üzerinde değişiklik yapılamaz (Salt Okunur).</div>
+                        </div>
+
+                        <!-- Ürün Tablosu -->
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 text-slate-600 text-xs font-bold uppercase border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-3.5">Ürün Kodu & Tanımı</th>
+                                        <th class="p-3.5 text-center w-32">Talep Adedi</th>
+                                        <th class="p-3.5 text-right w-36">Birim Fiyat (TL)</th>
+                                        <th class="p-3.5 text-right w-36">Toplam Tutar</th>
+                                        <th class="p-3.5 text-center w-16" id="th-satis-action">Sil</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="step1-items-tbody" class="divide-y divide-slate-100 font-medium text-slate-800"></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Ürün Ekleme Paneli (Sadece Satış Adım 1'deyken veya Admin ise görünür) -->
+                        <div id="step1-add-product-panel" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="text-xs font-extrabold text-slate-800 uppercase flex items-center">
+                                    <i class="fa-solid fa-circle-plus text-cinpa-700 mr-1.5 text-sm"></i> Fişe Ürün Ekle
+                                </div>
+                                <div class="flex bg-slate-200 p-0.5 rounded-lg text-xs font-bold">
+                                    <button type="button" onclick="toggleAddMode('catalog')" id="btn-mode-catalog" class="px-3 py-1 rounded-md bg-white text-slate-900 shadow-sm">Katalogdan Seç</button>
+                                    <button type="button" onclick="toggleAddMode('manual')" id="btn-mode-manual" class="px-3 py-1 rounded-md text-slate-600">Manuel Ürün & Fiyat Yaz</button>
+                                </div>
+                            </div>
+
+                            <!-- Katalogdan Seçim -->
+                            <div id="add-mode-catalog-box" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                                <div class="sm:col-span-8">
+                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Kayıtlı Ürün</label>
+                                    <select id="step1-select-product" onchange="syncSelectedCatalogPrice()" class="w-full text-xs font-semibold p-3 rounded-xl border border-slate-300 bg-white"></select>
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Birim Fiyat (TL)</label>
+                                    <input type="number" id="step1-catalog-price" min="0" step="any" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 bg-white text-right">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Adet</label>
+                                    <input type="number" id="step1-catalog-qty" value="1" min="1" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 text-center bg-white">
+                                </div>
+                                <div class="sm:col-span-12 flex justify-end">
+                                    <button onclick="addItemFromCatalog()" class="px-5 py-2.5 bg-cinpa-700 hover:bg-cinpa-800 text-white text-xs font-bold rounded-xl transition flex items-center space-x-1.5 shadow-md">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <span>Katalogdan Fişe Ekle</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Manuel Giriş -->
+                            <div id="add-mode-manual-box" class="hidden grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                                <div class="sm:col-span-3">
+                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Ürün Kodu</label>
+                                    <input type="text" id="manual-code" placeholder="Örn: ÇNP-888" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 bg-white">
+                                </div>
+                                <div class="sm:col-span-5">
+                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Ürün Adı</label>
+                                    <input type="text" id="manual-name" placeholder="Örn: 240cm Özel Akçaağaç" class="w-full text-xs font-semibold p-3 rounded-xl border border-slate-300 bg-white">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Birim Fiyat (TL)</label>
+                                    <input type="number" id="manual-price" placeholder="0" min="0" step="any" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 bg-white text-right">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Adet</label>
+                                    <input type="number" id="manual-qty" value="1" min="1" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 text-center bg-white">
+                                </div>
+                                <div class="sm:col-span-12 flex justify-between items-center pt-2">
+                                    <label class="flex items-center space-x-2 text-xs text-slate-600 font-semibold cursor-pointer">
+                                        <input type="checkbox" id="chk-save-to-master" checked class="w-4 h-4 text-cinpa-700 rounded">
+                                        <span>Ürünü kalıcı kataloğa da kaydet</span>
+                                    </label>
+                                    <button onclick="addItemManual()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition flex items-center space-x-1.5 shadow-md">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <span>Özel Ürünü Fişe Ekle</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Toplam ve Depoya Devir Butonu -->
+                        <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-slate-100 gap-4">
+                            <div>
+                                <span class="text-xs text-slate-500 font-bold uppercase">Sipariş Taslak Toplamı:</span>
+                                <div class="text-2xl font-black text-slate-900" id="step1-total-amount">0,00 ₺</div>
+                            </div>
+                            <div id="step1-action-buttons">
+                                <button onclick="forwardToWarehouse()" class="px-6 py-3.5 bg-cinpa-700 hover:bg-cinpa-800 text-white font-bold text-sm rounded-xl shadow-lg shadow-cinpa-200 transition flex items-center space-x-2">
+                                    <i class="fa-solid fa-box-archive"></i>
+                                    <span>Siparişi Onayla & Depocu Kamber'e İlet (Fişi Kilitle)</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= 2. ADIM: DEPO VE SEVK İRSALİYESİ (Sadece Depo, Muhasebe ve Admin Görür) ================= -->
+                <div id="content-step-2" class="hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
+                            <div>
+                                <span class="bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">Evrak 2: Sevk İrsaliyesi Hazırlığı</span>
+                                <h3 class="text-lg font-black text-slate-900 mt-1">Depo Stok Kontrolü & Ürün Toplama (Checklist)</h3>
+                            </div>
+                            <div class="text-xs text-slate-500 font-medium">
+                                <i class="fa-solid fa-boxes-stacked mr-1 text-slate-400"></i> Depo Sorumlusu: <strong class="text-slate-800">Kamber Usta</strong>
+                            </div>
+                        </div>
+
+                        <!-- Kilitlenme Uyarısı (Sevk edildiyse) -->
+                        <div id="step2-lock-alert" class="hidden bg-slate-100 border-l-4 border-slate-500 p-3.5 rounded-r-xl text-xs text-slate-700 flex items-center space-x-2">
+                            <i class="fa-solid fa-lock text-slate-500 text-sm"></i>
+                            <div><strong>İrsaliye Kesildi:</strong> Ürünler sahaya sevk edildiği için depo listesi üzerinde değişiklik yapılamaz (Salt Okunur).</div>
+                        </div>
+
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 text-slate-600 text-xs font-bold uppercase border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-3.5 w-12 text-center">Toplandı</th>
+                                        <th class="p-3.5">Talep Edilen Ürün</th>
+                                        <th class="p-3.5 text-center">Sipariş Miktarı</th>
+                                        <th class="p-3.5 text-center w-36">Fiili Sevk Miktarı</th>
+                                        <th class="p-3.5">Depo Hazırlık & İkame Notu</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="step2-items-tbody" class="divide-y divide-slate-100 font-medium text-slate-800"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-slate-100 gap-4">
+                            <div class="text-xs text-slate-500 flex items-center">
+                                <i class="fa-solid fa-truck-ramp-box text-slate-400 mr-2 text-base"></i>
+                                <span>Kolilendi ve nakliye aracına yüklenmeye hazır.</span>
+                            </div>
+                            <div id="step2-action-buttons">
+                                <button onclick="forwardToField()" class="px-6 py-3.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-amber-200 transition flex items-center space-x-2">
+                                    <i class="fa-solid fa-truck-fast"></i>
+                                    <span>Sevk İrsaliyesini Kes & Saha Ekibine Teslim Et</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= 3. ADIM: SAHA İADE VE İLAVE (Sadece Saha, Muhasebe ve Admin Görür) ================= -->
+                <div id="content-step-3" class="hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
+                            <div>
+                                <span class="bg-purple-100 text-purple-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">Evrak 3 & 4: Saha Uygulama</span>
+                                <h3 class="text-lg font-black text-slate-900 mt-1">Uygulama Sahası Mal Kabul, İade ve Ek Talep</h3>
+                            </div>
+                            <div class="text-xs text-slate-500 font-medium">
+                                <i class="fa-solid fa-helmet-safety mr-1 text-slate-400"></i> Saha Sorumlusu: <strong class="text-slate-800">Sefa Usta</strong>
+                            </div>
+                        </div>
+
+                        <!-- Faik Bey Kuralı -->
+                        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl text-xs text-red-950 space-y-1">
+                            <div class="font-extrabold flex items-center">
+                                <i class="fa-solid fa-shield-halved mr-1.5 text-red-600"></i> FAİK BEY ONAY KURALI:
+                            </div>
+                            <div>Faik Bey'in onayı olmadan mağazadan veya depodan hiçbir ilave ürün personele, müşteriye veya kargoya verilemez.</div>
+                        </div>
+
+                        <!-- Kilitlenme Uyarısı (Muhasebeye gittiyse) -->
+                        <div id="step3-lock-alert" class="hidden bg-slate-100 border-l-4 border-slate-500 p-3.5 rounded-r-xl text-xs text-slate-700 flex items-center space-x-2">
+                            <i class="fa-solid fa-lock text-slate-500 text-sm"></i>
+                            <div><strong>Saha Montajı Tamamlandı:</strong> Evraklar muhasebeye devredildiği için değişiklik yapılamaz (Salt Okunur).</div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Evrak 3: İade İrsaliyesi -->
+                            <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50/70 space-y-3">
+                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                    <h4 class="text-xs font-extrabold text-red-800 uppercase flex items-center">
+                                        <i class="fa-solid fa-rotate-left mr-1.5 text-red-600"></i> Evrak 3: İade İrsaliyesi
+                                    </h4>
+                                    <span class="text-[11px] text-slate-500">Artan Ürünler</span>
+                                </div>
+                                <div id="step3-returns-container" class="space-y-2"></div>
+                            </div>
+
+                            <!-- Evrak 4: İlave İrsaliyesi -->
+                            <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50/70 space-y-3">
+                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                    <h4 class="text-xs font-extrabold text-emerald-800 uppercase flex items-center">
+                                        <i class="fa-solid fa-cart-plus mr-1.5 text-emerald-600"></i> Evrak 4: İlave Ürün İrsaliyesi
+                                    </h4>
+                                    <span class="text-[11px] text-slate-500">Müşteri Ek Talebi</span>
+                                </div>
+                                <div id="step3-extras-container" class="space-y-2"></div>
+
+                                <!-- İlave Ekleme Paneli -->
+                                <div id="step3-add-extra-panel" class="pt-3 border-t border-slate-200 space-y-2">
+                                    <div class="grid grid-cols-12 gap-2">
+                                        <select id="step3-extra-select" class="col-span-8 text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white"></select>
+                                        <input type="number" id="step3-extra-qty" value="1" min="1" class="col-span-4 text-xs p-2.5 rounded-xl border border-slate-300 font-bold text-center" placeholder="Adet">
+                                    </div>
+                                    <button onclick="addExtraItemStep3()" class="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition">İlave Talebi Aç</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-slate-100 gap-4">
+                            <div class="text-xs text-slate-500">
+                                <i class="fa-solid fa-clipboard-check mr-1 text-slate-400"></i> Montaj tamamlandıktan sonra tüm evraklar tek dosyada birleşir.
+                            </div>
+                            <div id="step3-action-buttons">
+                                <button onclick="forwardToAccounting()" class="px-6 py-3.5 bg-purple-700 hover:bg-purple-800 text-white font-bold text-sm rounded-xl shadow-lg shadow-purple-200 transition flex items-center space-x-2">
+                                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                                    <span>Montajı Bitir & Muhasebeye (Gökhan) Gönder</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= 4. ADIM: MUHASEBE VE KAPANIŞ (Sadece Muhasebe ve Admin Görür) ================= -->
+                <div id="content-step-4" class="hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
+                            <div>
+                                <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">Nihai Evrak & Fiş Girişi</span>
+                                <h3 class="text-lg font-black text-slate-900 mt-1">4 Evrakın Konsolide Analizi & Fatura Hesabı</h3>
+                            </div>
+                            <div class="text-xs text-slate-500 font-medium">
+                                <i class="fa-solid fa-calculator mr-1 text-slate-400"></i> Muhasebe Sorumlusu: <strong class="text-slate-800">Gökhan</strong>
+                            </div>
+                        </div>
+
+                        <!-- 4 Evrak Özet Kartları -->
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                                <div class="text-[10px] font-bold text-slate-400 uppercase">1. Sipariş Formu</div>
+                                <div class="text-sm font-extrabold text-slate-900 mt-0.5" id="sum-evrak1-text">-</div>
+                                <div class="text-[11px] text-slate-500">Satış Çıkışı</div>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
+                                <div class="text-[10px] font-bold text-amber-800 uppercase">2. Sevk İrsaliyesi</div>
+                                <div class="text-sm font-extrabold text-amber-900 mt-0.5" id="sum-evrak2-text">-</div>
+                                <div class="text-[11px] text-amber-700">Depocu Kamber</div>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-red-50/70 border border-red-200">
+                                <div class="text-[10px] font-bold text-red-800 uppercase">3. İade İrsaliyesi</div>
+                                <div class="text-sm font-extrabold text-red-900 mt-0.5" id="sum-evrak3-text">-</div>
+                                <div class="text-[11px] text-red-700">Saha İadesi</div>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200">
+                                <div class="text-[10px] font-bold text-emerald-800 uppercase">4. İlave İrsaliyesi</div>
+                                <div class="text-sm font-extrabold text-emerald-900 mt-0.5" id="sum-evrak4-text">-</div>
+                                <div class="text-[11px] text-emerald-700">Faik Bey Onaylı</div>
+                            </div>
+                        </div>
+
+                        <!-- Fatura Tablosu (Muhasebe bu nihai fişi düzenleyebilir/carileştirebilir) -->
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-900 text-white text-xs font-bold uppercase tracking-wider">
+                                    <tr>
+                                        <th class="p-3.5">Ürün / Kalem Açıklaması</th>
+                                        <th class="p-3.5 text-center">İlk Sipariş</th>
+                                        <th class="p-3.5 text-center">Sevk Edilen</th>
+                                        <th class="p-3.5 text-center">İade</th>
+                                        <th class="p-3.5 text-center">İlave</th>
+                                        <th class="p-3.5 text-center bg-slate-800 font-extrabold">Net Faturalanacak</th>
+                                        <th class="p-3.5 text-right">Birim Fiyat</th>
+                                        <th class="p-3.5 text-right">Toplam Tutar</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="step4-items-tbody" class="divide-y divide-slate-200 font-medium text-slate-800"></tbody>
+                                <tfoot class="bg-slate-50 border-t-2 border-slate-300 font-bold text-slate-900">
+                                    <tr>
+                                        <td colspan="5" class="p-3 text-right uppercase text-xs text-slate-500">Ara Toplam:</td>
+                                        <td colspan="3" class="p-3 text-right font-bold text-base" id="final-subtotal">0,00 ₺</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="5" class="p-3 text-right uppercase text-xs text-slate-500">KDV (%20):</td>
+                                        <td colspan="3" class="p-3 text-right font-bold text-base text-slate-700" id="final-tax">0,00 ₺</td>
+                                    </tr>
+                                    <tr class="bg-emerald-100/70 text-emerald-950">
+                                        <td colspan="5" class="p-4 text-right uppercase text-sm font-black">Genel Fatura Toplamı:</td>
+                                        <td colspan="3" class="p-4 text-right font-black text-2xl text-emerald-800" id="final-grandtotal">0,00 ₺</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-slate-100 gap-4">
+                            <button onclick="exportToNebimJSON()" class="px-5 py-3 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 text-xs font-bold flex items-center space-x-2 transition">
+                                <i class="fa-solid fa-cloud-arrow-down"></i>
+                                <span>Nebim V3 Formatında Faturayı Dışa Aktar</span>
+                            </button>
+
+                            <div id="step4-action-buttons">
+                                <button onclick="finalizeAndCloseOrder()" class="px-8 py-3.5 bg-slate-900 hover:bg-black text-white font-black text-sm rounded-xl shadow-lg transition flex items-center space-x-2">
+                                    <i class="fa-solid fa-check-double text-emerald-400"></i>
+                                    <span>Cariye ve Faturaya İşle (Dosyayı Kapat)</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MODALLAR (Katalog ve Yeni Sipariş) -->
+    <div id="modal-catalog" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+        <div class="bg-white rounded-3xl max-w-3xl w-full p-6 shadow-2xl space-y-5 max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="text-base font-extrabold text-slate-900 flex items-center">
+                    <i class="fa-solid fa-boxes-stacked text-cinpa-700 mr-2"></i> Çinpa Ürün Kataloğu & Fiyat Listesi
+                </h3>
+                <button onclick="closeCatalogModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
+                <input type="text" id="cat-new-code" placeholder="Kod (Örn: ÇNP-701)" class="sm:col-span-3 p-2.5 rounded-xl border border-slate-300 font-bold bg-white">
+                <input type="text" id="cat-new-name" placeholder="Ürün Tanımı" class="sm:col-span-5 p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
+                <input type="number" id="cat-new-price" placeholder="Fiyat (TL)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 font-bold bg-white text-right">
+                <button onclick="saveProductToMasterCatalog()" class="sm:col-span-2 py-2.5 bg-cinpa-700 hover:bg-cinpa-800 text-white font-bold rounded-xl transition">+ Ekle</button>
+            </div>
+            <div class="overflow-y-auto flex-1 border border-slate-200 rounded-2xl">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-100 text-slate-700 font-bold uppercase sticky top-0 border-b border-slate-200">
+                        <tr>
+                            <th class="p-3">Ürün Kodu</th>
+                            <th class="p-3">Ürün Adı</th>
+                            <th class="p-3 text-right">Fiyat</th>
+                            <th class="p-3 text-center w-16">Sil</th>
+                        </tr>
+                    </thead>
+                    <tbody id="catalog-table-body" class="divide-y divide-slate-100 text-slate-800"></tbody>
+                </table>
+            </div>
+            <div class="flex justify-end pt-2 border-t border-slate-100">
+                <button onclick="closeCatalogModal()" class="px-5 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-xs">Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-new-order" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="text-base font-extrabold text-slate-900 flex items-center">
+                    <i class="fa-solid fa-file-circle-plus text-cinpa-700 mr-2"></i> Yeni Sipariş Formu Başlat
+                </h3>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 uppercase mb-1">Müşteri / Proje Adı <span class="text-red-500">*</span></label>
+                    <input type="text" id="new-cust-name" placeholder="Örn: Swissotel Balo Salonu" class="w-full text-xs font-semibold p-3 rounded-xl border border-slate-300 bg-slate-50">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 uppercase mb-1">Satış Uzmanı</label>
+                        <select id="new-sales-rep" class="w-full text-xs font-semibold p-3 rounded-xl border border-slate-300 bg-slate-50">
+                            <option value="Selin Yılmaz">Selin Yılmaz</option>
+                            <option value="Ahmet Kaya">Ahmet Kaya</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 uppercase mb-1">Tarih</label>
+                        <input type="date" id="new-date" class="w-full text-xs font-semibold p-3 rounded-xl border border-slate-300 bg-slate-50">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 uppercase mb-1">Notlar</label>
+                    <textarea id="new-notes" rows="2" placeholder="Özel talepler..." class="w-full text-xs p-3 rounded-xl border border-slate-300 bg-slate-50"></textarea>
+                </div>
+            </div>
+            <div class="flex items-center justify-end space-x-3 pt-2">
+                <button onclick="closeModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs">İptal</button>
+                <button onclick="saveNewOrder()" class="px-5 py-2.5 rounded-xl bg-cinpa-700 hover:bg-cinpa-800 text-white font-bold text-xs shadow-md shadow-cinpa-200">Siparişi Başlat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT STATE & STRICT RBAC ENGINE -->
+    <script>
+        const USER_ROLES = {
+            satis: {
+                roleId: 'satis',
+                name: 'Selin Yılmaz',
+                title: 'Satış Uzmanı',
+                badgeText: 'SATIŞ PANELİ',
+                dutyText: 'Sadece 1. Adım Sipariş Formunu görür. Fiş depoya iletildikten sonra değişiklik yapamaz.',
+                colorClass: 'bg-blue-50 text-blue-700 border-blue-200',
+                avatarBg: 'bg-blue-100 text-blue-700',
+                avatarIcon: 'fa-file-signature',
+                visibleSteps: [1], // Sadece 1. adımı görür
+                canCreateOrder: true,
+                canManageCatalog: true
+            },
+            depo: {
+                roleId: 'depo',
+                name: 'Kamber Usta',
+                title: 'Depo Sorumlusu',
+                badgeText: 'DEPO PANELİ',
+                dutyText: 'Sadece 2. Adım Depo Hazırlık ekranını görür. Sevk irsaliyesi kesilene kadar fişi değiştirebilir.',
+                colorClass: 'bg-amber-50 text-amber-800 border-amber-200',
+                avatarBg: 'bg-amber-100 text-amber-700',
+                avatarIcon: 'fa-boxes-packing',
+                visibleSteps: [2], // Sadece 2. adımı görür
+                canCreateOrder: false,
+                canManageCatalog: false
+            },
+            saha: {
+                roleId: 'saha',
+                name: 'Sefa Usta',
+                title: 'Saha & Uygulama Ekibi',
+                badgeText: 'SAHA MOBİL PANELİ',
+                dutyText: 'Sadece 3. Adım Saha Mal Kabul, İade ve İlave Ürün ekranını görür.',
+                colorClass: 'bg-purple-50 text-purple-700 border-purple-200',
+                avatarBg: 'bg-purple-100 text-purple-700',
+                avatarIcon: 'fa-helmet-safety',
+                visibleSteps: [3], // Sadece 3. adımı görür
+                canCreateOrder: false,
+                canManageCatalog: false
+            },
+            muhasebe: {
+                roleId: 'muhasebe',
+                name: 'Gökhan',
+                title: 'Muhasebe Uzmanı',
+                badgeText: 'MUHASEBE PANELİ',
+                dutyText: '4 Adımın HEPSİNİ görür ve inceler. İlk 3 adımı değiştiremez, sadece 4. adımda faturalandırır.',
+                colorClass: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+                avatarBg: 'bg-emerald-100 text-emerald-700',
+                avatarIcon: 'fa-receipt',
+                visibleSteps: [1, 2, 3, 4], // Hepsini görür
+                canCreateOrder: false,
+                canManageCatalog: false
+            },
+            admin: {
+                roleId: 'admin',
+                name: 'Sistem Yöneticisi',
+                title: 'Admin (Tam Yetki)',
+                badgeText: 'TAM YETKİLİ ADMIN',
+                dutyText: 'Tüm aşamaları görür ve her aşamada sınırsız düzenleme / değiştirme yetkisine sahiptir.',
+                colorClass: 'bg-slate-900 text-white border-slate-800',
+                avatarBg: 'bg-slate-800 text-emerald-400',
+                avatarIcon: 'fa-crown',
+                visibleSteps: [1, 2, 3, 4], // Hepsini görür ve düzenler
+                canCreateOrder: true,
+                canManageCatalog: true
+            }
+        };
+
+        const DEFAULT_PRODUCTS = [
+            { id: "CNP-101", name: "220cm İpek Yapraklı Areka Palmiyesi", price: 3500 },
+            { id: "CNP-204", name: "180cm Zeytin Ağacı (Ahşap Gövdeli)", price: 4200 },
+            { id: "CNP-310", name: "Yapay Dikey Bahçe Paneli (100x100 cm)", price: 1100 },
+            { id: "CNP-405", name: "120cm Doğal Bambu Ağacı", price: 2400 },
+            { id: "CNP-502", name: "160cm Budanmış Şimşir Top Ağaç", price: 1750 },
+            { id: "CNP-601", name: "Sarkıt Sarmaşık Demeti (80cm Yeşil)", price: 320 }
+        ];
+
+        let masterProducts = [];
+        try {
+            const storedProds = localStorage.getItem("cinpa_master_products");
+            masterProducts = storedProds ? JSON.parse(storedProds) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+        } catch(e) {
+            masterProducts = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+        }
+
+        const INITIAL_ORDERS = [
+            {
+                id: "CNP-2026-084",
+                customer: "Hilton Bosphorus Balo Salonu Projesi",
+                salesRep: "Selin Yılmaz",
+                date: "2026-08-25",
+                notes: "Palmiyeler mat antrasit saksılara konulsun.",
+                currentStep: 1,
+                items: [
+                    { id: "CNP-101", name: "220cm İpek Yapraklı Areka Palmiyesi", requestedQty: 6, dispatchedQty: 6, returnedQty: 0, price: 3500, warehouseNote: "Birebir A1 koridorundan toplandı.", checked: true },
+                    { id: "CNP-204", name: "180cm Zeytin Ağacı (Ahşap Gövdeli)", requestedQty: 4, dispatchedQty: 4, returnedQty: 0, price: 4200, warehouseNote: "Stokta 3 adet vardı, 1 adet 190cm ikame verildi.", checked: true },
+                    { id: "CNP-310", name: "Yapay Dikey Bahçe Paneli (100x100 cm)", requestedQty: 12, dispatchedQty: 12, returnedQty: 2, price: 1100, warehouseNote: "Birebir hazırlandı.", checked: true }
+                ],
+                extras: [
+                    { id: "CNP-405", name: "120cm Doğal Bambu Ağacı (Saha İlavesi)", qty: 1, price: 2400, faikApproval: true, approvalTime: "14:32" }
+                ],
+                isClosed: false
+            }
+        ];
+
+        let orders = [];
+        try {
+            const stored = localStorage.getItem("cinpa_orders");
+            orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
+        } catch (e) {
+            orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
+        }
+
+        let currentUser = null;
+        let activeOrder = null;
+        let activeStepTab = 1;
+
+        function saveToStorage() {
+            localStorage.setItem("cinpa_orders", JSON.stringify(orders));
+            localStorage.setItem("cinpa_master_products", JSON.stringify(masterProducts));
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById("toast");
+            const msg = document.getElementById("toast-msg");
+            const icon = document.getElementById("toast-icon");
+            msg.innerText = message;
+            icon.className = isError ? "fa-solid fa-circle-exclamation text-red-400 text-base" : "fa-solid fa-circle-check text-emerald-400 text-base";
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 3500);
+        }
+
+        // ================= GİRİŞ VE YETKİLENDİRME =================
+        function loginAs(roleKey) {
+            currentUser = USER_ROLES[roleKey];
+            if (!currentUser) return;
+
+            document.getElementById("view-login").classList.add("hidden");
+            document.getElementById("view-app").classList.remove("hidden");
+
+            document.getElementById("header-role-badge").innerText = currentUser.badgeText;
+            document.getElementById("header-user-desc").innerText = `Kullanıcı: ${currentUser.name}`;
+            
+            document.getElementById("role-welcome-name").innerText = `${currentUser.name} (${currentUser.title})`;
+            document.getElementById("role-duty-badge").innerText = currentUser.dutyText;
+            document.getElementById("role-duty-badge").className = `text-xs font-semibold px-3.5 py-2 rounded-xl border ${currentUser.colorClass}`;
+
+            document.getElementById("role-avatar-box").className = `w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold ${currentUser.avatarBg}`;
+            document.getElementById("role-avatar-icon").className = `fa-solid ${currentUser.avatarIcon}`;
+
+            document.getElementById("btn-header-new-order").style.display = currentUser.canCreateOrder ? "flex" : "none";
+            document.getElementById("btn-header-catalog").style.display = currentUser.canManageCatalog ? "flex" : "none";
+
+            renderOrderList();
+            showToast(`Hoş geldiniz, ${currentUser.name}!`);
+        }
+
+        function logout() {
+            currentUser = null;
+            activeOrder = null;
+            document.getElementById("view-app").classList.add("hidden");
+            document.getElementById("view-login").classList.remove("hidden");
+            showToast("Oturum kapatıldı.");
+        }
+
+        function returnToDashboard() {
+            activeOrder = null;
+            document.getElementById("section-order-detail").classList.add("hidden");
+            document.getElementById("section-dashboard").classList.remove("hidden");
+            renderOrderList();
+        }
+
+        // ================= SİPARİŞLERİ LİSTELEME =================
+        function renderOrderList() {
+            const tbody = document.getElementById("orders-table-body");
+            tbody.innerHTML = "";
+
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Sipariş bulunmuyor.</td></tr>`;
+                return;
+            }
+
+            orders.forEach(ord => {
+                const tr = document.createElement("tr");
+                tr.className = "hover:bg-slate-50 transition cursor-pointer";
+                tr.onclick = () => openOrderDetail(ord.id);
+
+                let badge = "";
+                if (ord.currentStep === 1) badge = `<span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-file-signature mr-1"></i> 1. Satış Formunda</span>`;
+                else if (ord.currentStep === 2) badge = `<span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-boxes-packing mr-1"></i> 2. Depoda (Kamber)</span>`;
+                else if (ord.currentStep === 3) badge = `<span class="bg-purple-100 text-purple-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-truck-ramp-box mr-1"></i> 3. Sahada (Sefa Usta)</span>`;
+                else if (ord.currentStep === 4) badge = `<span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-receipt mr-1"></i> 4. Muhasebede (Gökhan)</span>`;
+                else badge = `<span class="bg-slate-900 text-white text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-check-double text-emerald-400 mr-1"></i> Fatura Kesildi (Kapandı)</span>`;
+
+                tr.innerHTML = `
+                    <td class="p-4 font-mono font-bold text-slate-900">${ord.id}</td>
+                    <td class="p-4 font-bold text-slate-800">${ord.customer}</td>
+                    <td class="p-4 font-medium text-slate-600">${ord.salesRep || "Satış Ekibi"}</td>
+                    <td class="p-4 text-xs font-medium text-slate-500">${ord.date || "-"}</td>
+                    <td class="p-4">${badge}</td>
+                    <td class="p-4 text-right">
+                        <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-cinpa-700 hover:text-white transition">
+                            Aç <i class="fa-solid fa-chevron-right ml-1"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ================= SİPARİŞ DETAYI VE KATI YETKİ FİLTRESİ =================
+        function openOrderDetail(orderId) {
+            activeOrder = orders.find(o => o.id === orderId);
+            if (!activeOrder) return;
+
+            document.getElementById("section-dashboard").classList.add("hidden");
+            document.getElementById("section-order-detail").classList.remove("hidden");
+
+            document.getElementById("detail-order-code").innerText = activeOrder.id;
+            document.getElementById("detail-customer-name").innerText = activeOrder.customer;
+            document.getElementById("detail-order-date").innerText = activeOrder.date;
+            document.getElementById("step1-sales-rep").innerText = activeOrder.salesRep;
+
+            // SADECE KULLANICININ YETKİSİ OLAN SEKMELERİ ÇUBUĞA EKLE
+            buildDynamicStepperTabs();
+
+            // İlk görünür sekmeyi aç
+            const defaultStep = currentUser.visibleSteps[0] || 1;
+            switchStepTab(defaultStep);
+            populateProductSelects();
+        }
+
+        function buildDynamicStepperTabs() {
+            const container = document.getElementById("stepper-buttons-container");
+            container.innerHTML = "";
+
+            const stepNames = {
+                1: { num: 1, title: "1. Sipariş Formu (Satış)" },
+                2: { num: 2, title: "2. Sevk İrsaliyesi (Depo)" },
+                3: { num: 3, title: "3. Saha İade & İlave" },
+                4: { num: 4, title: "4. Muhasebe & Fatura" }
+            };
+
+            currentUser.visibleSteps.forEach(stepIdx => {
+                const info = stepNames[stepIdx];
+                const btn = document.createElement("button");
+                btn.id = `tab-btn-${stepIdx}`;
+                btn.onclick = () => switchStepTab(stepIdx);
+                btn.className = "flex-1 flex items-center space-x-3 p-3 rounded-xl border border-slate-200 bg-slate-50 opacity-70 transition text-left";
+                btn.innerHTML = `
+                    <div class="step-circle bg-slate-200 text-slate-600" id="step-num-${stepIdx}">${info.num}</div>
+                    <div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase">Aşama ${info.num}</div>
+                        <div class="text-xs font-black text-slate-900">${info.title}</div>
+                    </div>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function switchStepTab(step) {
+            activeStepTab = step;
+
+            // Tüm 4 içerik panelini gizle
+            for (let i = 1; i <= 4; i++) {
+                const content = document.getElementById(`content-step-${i}`);
+                if (content) content.classList.add("hidden");
+                
+                const tabBtn = document.getElementById(`tab-btn-${i}`);
+                const num = document.getElementById(`step-num-${i}`);
+                if (tabBtn && num) {
+                    tabBtn.className = "flex-1 flex items-center space-x-3 p-3 rounded-xl border border-slate-200 bg-slate-50 opacity-70 transition text-left";
+                    num.className = "step-circle bg-slate-200 text-slate-600";
+                }
+            }
+
+            // Seçilen içeriği aç (eğer yetkisi varsa)
+            const targetContent = document.getElementById(`content-step-${step}`);
+            if (targetContent) targetContent.classList.remove("hidden");
+
+            const activeBtn = document.getElementById(`tab-btn-${step}`);
+            const activeNum = document.getElementById(`step-num-${step}`);
+            if (activeBtn && activeNum) {
+                activeBtn.className = "flex-1 flex items-center space-x-3 p-3 rounded-xl border border-cinpa-700 bg-cinpa-50/50 shadow-sm transition text-left";
+                activeNum.className = "step-circle bg-cinpa-700 text-white";
+            }
+
+            renderStep1();
+            renderStep2();
+            renderStep3();
+            renderStep4();
+        }
+
+        // ================= 1. ADIM RENDER (SATIŞ) =================
+        function renderStep1() {
+            const tbody = document.getElementById("step1-items-tbody");
+            tbody.innerHTML = "";
+            let total = 0;
+
+            // Satışçı sadece sipariş henüz Adım 1'deyken değişiklik yapabilir. Depoya geçince (Adım 2+) KİLİTLENİR.
+            // Muhasebe salt okunur inceler. Admin her zaman düzenler.
+            const isAdmin = currentUser.roleId === 'admin';
+            const isSales = currentUser.roleId === 'satis';
+            const isAtStep1 = activeOrder.currentStep === 1;
+            const canEdit = isAdmin || (isSales && isAtStep1);
+
+            document.getElementById("step1-add-product-panel").style.display = canEdit ? "block" : "none";
+            document.getElementById("step1-action-buttons").style.display = canEdit ? "block" : "none";
+            document.getElementById("th-satis-action").style.display = canEdit ? "table-cell" : "none";
+            
+            // Fiş depoya geçmişse kilit uyarısı göster
+            document.getElementById("step1-lock-alert").style.display = (!canEdit && !isAdmin) ? "flex" : "none";
+
+            if (activeOrder.items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 italic">Siparişte henüz ürün bulunmuyor.</td></tr>`;
+            }
+
+            activeOrder.items.forEach((item, index) => {
+                const sub = item.requestedQty * item.price;
+                total += sub;
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td class="p-3.5 font-bold text-slate-900">
+                        <div class="text-xs text-slate-400 font-mono">${item.id || 'ÖZEL'}</div>
+                        <div>${item.name}</div>
+                    </td>
+                    <td class="p-3.5 text-center">
+                        ${canEdit 
+                            ? `<input type="number" min="1" value="${item.requestedQty}" onchange="updateStep1Qty(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">`
+                            : `<span class="font-bold">${item.requestedQty} Adet</span>`
+                        }
+                    </td>
+                    <td class="p-3.5 text-right font-medium">
+                        ${canEdit
+                            ? `<input type="number" min="0" step="any" value="${item.price}" onchange="updateStep1Price(${index}, this.value)" class="w-24 text-right font-bold border border-slate-300 rounded p-1"> ₺`
+                            : `${Number(item.price).toLocaleString('tr-TR')} ₺`
+                        }
+                    </td>
+                    <td class="p-3.5 text-right font-bold text-slate-900">${Number(sub).toLocaleString('tr-TR')} ₺</td>
+                    ${canEdit ? `<td class="p-3.5 text-center"><button onclick="removeItemStep1(${index})" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>` : ''}
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById("step1-total-amount").innerText = total.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + " ₺ + KDV";
+        }
+
+        function forwardToWarehouse() {
+            if (activeOrder.items.length === 0) {
+                showToast("Lütfen önce fişe en az bir ürün ekleyiniz.", true);
+                return;
+            }
+            activeOrder.currentStep = 2; // Artık 2. Aşamaya geçti
+            saveToStorage();
+            showToast("Sipariş depoya iletildi ve satış fişi kilitlendi!");
+            returnToDashboard();
+        }
+
+        function addItemFromCatalog() {
+            const prodId = document.getElementById("step1-select-product").value;
+            const customPrice = parseFloat(document.getElementById("step1-catalog-price").value);
+            const qty = parseInt(document.getElementById("step1-catalog-qty").value) || 1;
+            const p = masterProducts.find(x => x.id === prodId);
+
+            if (!p) {
+                showToast("Lütfen bir ürün seçin.", true);
+                return;
+            }
+
+            const finalPrice = isNaN(customPrice) ? p.price : customPrice;
+            activeOrder.items.push({
+                id: p.id,
+                name: p.name,
+                requestedQty: qty,
+                dispatchedQty: qty,
+                returnedQty: 0,
+                price: finalPrice,
+                warehouseNote: "Katalogdan seçildi.",
+                checked: true
+            });
+            saveToStorage();
+            renderStep1();
+            showToast(`${p.name} fişe eklendi!`);
+        }
+
+        function addItemManual() {
+            const code = document.getElementById("manual-code").value.trim() || `ÇNP-${Math.floor(100 + Math.random() * 900)}`;
+            const name = document.getElementById("manual-name").value.trim();
+            const price = parseFloat(document.getElementById("manual-price").value) || 0;
+            const qty = parseInt(document.getElementById("manual-qty").value) || 1;
+            const saveMaster = document.getElementById("chk-save-to-master").checked;
+
+            if (!name) {
+                showToast("Lütfen ürün adını yazınız.", true);
+                return;
+            }
+
+            activeOrder.items.push({
+                id: code,
+                name: name,
+                requestedQty: qty,
+                dispatchedQty: qty,
+                returnedQty: 0,
+                price: price,
+                warehouseNote: "Özel ürün girişi.",
+                checked: true
+            });
+
+            if (saveMaster) {
+                const exists = masterProducts.find(x => x.id === code);
+                if (!exists) masterProducts.push({ id: code, name: name, price: price });
+            }
+
+            saveToStorage();
+            populateProductSelects();
+            renderStep1();
+
+            document.getElementById("manual-code").value = "";
+            document.getElementById("manual-name").value = "";
+            document.getElementById("manual-price").value = "";
+            document.getElementById("manual-qty").value = "1";
+            showToast(`${name} özel ürün olarak fişe eklendi!`);
+        }
+
+        function updateStep1Qty(index, val) {
+            activeOrder.items[index].requestedQty = parseInt(val) || 1;
+            activeOrder.items[index].dispatchedQty = parseInt(val) || 1;
+            saveToStorage();
+            renderStep1();
+        }
+
+        function updateStep1Price(index, val) {
+            activeOrder.items[index].price = parseFloat(val) || 0;
+            saveToStorage();
+            renderStep1();
+        }
+
+        function removeItemStep1(index) {
+            activeOrder.items.splice(index, 1);
+            saveToStorage();
+            renderStep1();
+            showToast("Ürün fişten çıkarıldı.");
+        }
+
+        // ================= 2. ADIM RENDER (DEPO) =================
+        function renderStep2() {
+            const tbody = document.getElementById("step2-items-tbody");
+            tbody.innerHTML = "";
+
+            const isAdmin = currentUser.roleId === 'admin';
+            const isWarehouse = currentUser.roleId === 'depo';
+            const isAtStep2 = activeOrder.currentStep === 2;
+            const canEditWarehouse = isAdmin || (isWarehouse && isAtStep2);
+
+            document.getElementById("step2-action-buttons").style.display = canEditWarehouse ? "block" : "none";
+            document.getElementById("step2-lock-alert").style.display = (!canEditWarehouse && !isAdmin) ? "flex" : "none";
+
+            activeOrder.items.forEach((item, index) => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td class="p-3.5 text-center">
+                        <input type="checkbox" ${item.checked ? "checked" : ""} ${!canEditWarehouse ? "disabled" : ""} onchange="toggleCheckStep2(${index}, this.checked)" class="w-4 h-4 text-cinpa-700 rounded">
+                    </td>
+                    <td class="p-3.5 font-bold text-slate-900">${item.name}</td>
+                    <td class="p-3.5 text-center font-bold text-slate-500">${item.requestedQty} Adet</td>
+                    <td class="p-3.5 text-center">
+                        ${canEditWarehouse 
+                            ? `<input type="number" min="0" value="${item.dispatchedQty}" onchange="updateStep2Dispatched(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">`
+                            : `<span class="font-bold text-amber-900">${item.dispatchedQty} Adet</span>`
+                        }
+                    </td>
+                    <td class="p-3.5">
+                        ${canEditWarehouse 
+                            ? `<input type="text" value="${item.warehouseNote || ""}" onchange="updateStep2Note(${index}, this.value)" placeholder="İkame ürün / not..." class="w-full text-xs p-1.5 border border-slate-300 rounded">`
+                            : `<span class="text-xs text-slate-600">${item.warehouseNote || "-"}</span>`
+                        }
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleCheckStep2(index, chk) {
+            activeOrder.items[index].checked = chk;
+            saveToStorage();
+        }
+
+        function updateStep2Dispatched(index, val) {
+            activeOrder.items[index].dispatchedQty = parseInt(val) || 0;
+            saveToStorage();
+        }
+
+        function updateStep2Note(index, val) {
+            activeOrder.items[index].warehouseNote = val;
+            saveToStorage();
+        }
+
+        function forwardToField() {
+            activeOrder.currentStep = 3;
+            saveToStorage();
+            showToast("Sevk İrsaliyesi kesildi ve Saha Ekibine teslim edildi!");
+            returnToDashboard();
+        }
+
+        // ================= 3. ADIM RENDER (SAHA) =================
+        function renderStep3() {
+            const retCont = document.getElementById("step3-returns-container");
+            const extCont = document.getElementById("step3-extras-container");
+            retCont.innerHTML = "";
+            extCont.innerHTML = "";
+
+            const isAdmin = currentUser.roleId === 'admin';
+            const isField = currentUser.roleId === 'saha';
+            const isAtStep3 = activeOrder.currentStep === 3;
+            const canEditField = isAdmin || (isField && isAtStep3);
+
+            document.getElementById("step3-add-extra-panel").style.display = canEditField ? "block" : "none";
+            document.getElementById("step3-action-buttons").style.display = canEditField ? "block" : "none";
+            document.getElementById("step3-lock-alert").style.display = (!canEditField && !isAdmin) ? "flex" : "none";
+
+            // İade Ürünleri
+            activeOrder.items.forEach((item, index) => {
+                const row = document.createElement("div");
+                row.className = "flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 text-xs";
+                row.innerHTML = `
+                    <div>
+                        <span class="font-bold text-slate-800">${item.name}</span>
+                        <div class="text-[11px] text-slate-400">Sevk Edilen: ${item.dispatchedQty} Adet</div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-slate-500 font-bold">İade:</span>
+                        ${canEditField
+                            ? `<input type="number" min="0" max="${item.dispatchedQty}" value="${item.returnedQty}" onchange="updateStep3Return(${index}, this.value)" class="w-14 text-center font-bold p-1 rounded border border-red-300 bg-red-50 text-red-700">`
+                            : `<span class="font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded">${item.returnedQty} Adet</span>`
+                        }
+                    </div>
+                `;
+                retCont.appendChild(row);
+            });
+
+            // İlave Ürünler
+            if (activeOrder.extras && activeOrder.extras.length > 0) {
+                activeOrder.extras.forEach((ext, index) => {
+                    const row = document.createElement("div");
+                    row.className = "bg-white p-3 rounded-xl border border-slate-200 text-xs space-y-2";
+                    row.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-slate-800">${ext.name}</span>
+                            <span class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">+${ext.qty} Adet</span>
+                        </div>
+                        <div class="flex items-center justify-between text-[11px] bg-slate-50 p-2 rounded-lg">
+                            <span class="font-bold text-slate-600">Faik Bey Dijital Onayı:</span>
+                            ${ext.faikApproval 
+                                ? `<span class="bg-emerald-600 text-white font-bold px-2 py-0.5 rounded">ONAYLANDI (${ext.approvalTime || '12:00'})</span>`
+                                : (isAdmin 
+                                    ? `<button onclick="approveFaikExtra(${index})" class="bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1 rounded transition">Faik Bey Olarak Onayla</button>`
+                                    : `<span class="text-red-500 font-bold">Faik Bey Onayı Bekleniyor</span>`
+                                )
+                            }
+                        </div>
+                    `;
+                    extCont.appendChild(row);
+                });
+            } else {
+                extCont.innerHTML = '<div class="text-xs text-slate-400 p-2 italic">Henüz ilave ürün talebi yok.</div>';
+            }
+        }
+
+        function updateStep3Return(index, val) {
+            activeOrder.items[index].returnedQty = parseInt(val) || 0;
+            saveToStorage();
+        }
+
+        function addExtraItemStep3() {
+            const prodId = document.getElementById("step3-extra-select").value;
+            const qty = parseInt(document.getElementById("step3-extra-qty").value) || 1;
+            const p = masterProducts.find(x => x.id === prodId);
+
+            if (!activeOrder.extras) activeOrder.extras = [];
+            activeOrder.extras.push({
+                id: p ? p.id : "ÇNP-EK",
+                name: p ? (p.name + " (Saha İlavesi)") : "Saha Ekstra Ürün",
+                qty: qty,
+                price: p ? p.price : 0,
+                faikApproval: false,
+                approvalTime: null
+            });
+            saveToStorage();
+            renderStep3();
+            showToast("İlave ürün talebi açıldı. Faik Bey onayı bekleniyor.");
+        }
+
+        function approveFaikExtra(index) {
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+            activeOrder.extras[index].faikApproval = true;
+            activeOrder.extras[index].approvalTime = timeStr;
+            saveToStorage();
+            showToast("Faik Bey dijital onayı verildi!");
+            renderStep3();
+        }
+
+        function forwardToAccounting() {
+            if (activeOrder.extras && activeOrder.extras.some(e => !e.faikApproval)) {
+                showToast("UYARI: Faik Bey onayı alınmamış ilave ürünler var!", true);
+                return;
+            }
+            activeOrder.currentStep = 4;
+            saveToStorage();
+            showToast("Saha tamamlandı! Dosya Muhasebeye (Gökhan) iletildi.");
+            returnToDashboard();
+        }
+
+        // ================= 4. ADIM RENDER (MUHASEBE & FATURA) =================
+        function renderStep4() {
+            const tbody = document.getElementById("step4-items-tbody");
+            tbody.innerHTML = "";
+            let subtotal = 0;
+            let totalReturnCount = 0;
+            let totalExtraCount = 0;
+
+            activeOrder.items.forEach(item => {
+                const netQty = Math.max(0, item.dispatchedQty - (item.returnedQty || 0));
+                const totalItemPrice = netQty * item.price;
+                subtotal += totalItemPrice;
+                totalReturnCount += (item.returnedQty || 0);
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td class="p-3.5 font-bold text-slate-900">${item.name}</td>
+                    <td class="p-3.5 text-center text-slate-500">${item.requestedQty}</td>
+                    <td class="p-3.5 text-center text-amber-900">${item.dispatchedQty}</td>
+                    <td class="p-3.5 text-center font-bold text-red-600">${item.returnedQty ? "-" + item.returnedQty : "-"}</td>
+                    <td class="p-3.5 text-center text-slate-400">-</td>
+                    <td class="p-3.5 text-center font-black bg-slate-50 text-slate-900 text-base">${netQty} Adet</td>
+                    <td class="p-3.5 text-right font-medium">${Number(item.price).toLocaleString('tr-TR')} ₺</td>
+                    <td class="p-3.5 text-right font-black text-slate-900">${Number(totalItemPrice).toLocaleString('tr-TR')} ₺</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (activeOrder.extras) {
+                activeOrder.extras.forEach(ext => {
+                    if (ext.faikApproval) {
+                        const totalItemPrice = ext.qty * ext.price;
+                        subtotal += totalItemPrice;
+                        totalExtraCount += ext.qty;
+
+                        const tr = document.createElement("tr");
+                        tr.className = "bg-emerald-50/40";
+                        tr.innerHTML = `
+                            <td class="p-3.5 font-bold text-emerald-950">${ext.name}</td>
+                            <td class="p-3.5 text-center text-slate-400">0</td>
+                            <td class="p-3.5 text-center text-slate-400">0</td>
+                            <td class="p-3.5 text-center text-slate-400">-</td>
+                            <td class="p-3.5 text-center font-bold text-emerald-700">+${ext.qty}</td>
+                            <td class="p-3.5 text-center font-black bg-emerald-100 text-emerald-900 text-base">${ext.qty} Adet</td>
+                            <td class="p-3.5 text-right font-medium">${Number(ext.price).toLocaleString('tr-TR')} ₺</td>
+                            <td class="p-3.5 text-right font-black text-emerald-950">${Number(totalItemPrice).toLocaleString('tr-TR')} ₺</td>
+                        `;
+                        tbody.appendChild(tr);
+                    }
+                });
+            }
+
+            const tax = subtotal * 0.20;
+            const grandTotal = subtotal + tax;
+
+            document.getElementById("sum-evrak1-text").innerText = `${activeOrder.items.length} Kalem Sipariş`;
+            document.getElementById("sum-evrak2-text").innerText = `Sevk Edildi`;
+            document.getElementById("sum-evrak3-text").innerText = totalReturnCount > 0 ? `-${totalReturnCount} Adet İade` : "İade Yok";
+            document.getElementById("sum-evrak4-text").innerText = totalExtraCount > 0 ? `+${totalExtraCount} Adet İlave` : "İlave Yok";
+
+            document.getElementById("final-subtotal").innerText = subtotal.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + " ₺";
+            document.getElementById("final-tax").innerText = tax.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + " ₺";
+            document.getElementById("final-grandtotal").innerText = grandTotal.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + " ₺";
+
+            const canFinalize = currentUser.roleId === 'muhasebe' || currentUser.roleId === 'admin';
+            document.getElementById("step4-action-buttons").style.display = (canFinalize && !activeOrder.isClosed) ? "block" : "none";
+        }
+
+        function finalizeAndCloseOrder() {
+            activeOrder.isClosed = true;
+            activeOrder.currentStep = 5;
+            saveToStorage();
+            showToast("Tebrikler! 4 evrak birleştirildi, fatura kesildi ve dosya kapatıldı.");
+            renderOrderList();
+            returnToDashboard();
+        }
+
+        function exportToNebimJSON() {
+            const payload = {
+                NebimExportVersion: "V3.1",
+                CustomerCode: activeOrder.id,
+                CustomerName: activeOrder.customer,
+                DocumentDate: activeOrder.date,
+                Items: activeOrder.items.map(i => ({
+                    ProductCode: i.id,
+                    ProductName: i.name,
+                    NetQuantity: Math.max(0, i.dispatchedQty - (i.returnedQty || 0)),
+                    UnitPrice: i.price
+                }))
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `NEBIM_FATURA_${activeOrder.id}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast("Nebim V3 Entegrasyon dosyası indirildi!");
+        }
+
+        // WhatsApp Bildirimi
+        function sendWhatsAppNotification() {
+            if (!activeOrder) return;
+            const stepNames = ["", "1. Satış Formu", "2. Depo Hazırlığı", "3. Saha Montajı", "4. Muhasebe Kontrolü", "5. Fatura Kesildi"];
+            const statusText = stepNames[activeOrder.currentStep] || "Aktif";
+            const text = encodeURIComponent(`*ÇİNPA BOTANİK SİPARİŞ BİLDİRİMİ*\n\nSipariş No: ${activeOrder.id}\nMüşteri: ${activeOrder.customer}\nAşama: ${statusText}\nİşlem Yapan: ${currentUser.name}\n\nDetaylar ERP panelinde güncellenmiştir.`);
+            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+        }
+
+        // Ürün Seçim Kutularını Doldur
+        function populateProductSelects() {
+            const s1 = document.getElementById("step1-select-product");
+            const s3 = document.getElementById("step3-extra-select");
+            if (!s1 || !s3) return;
+
+            s1.innerHTML = "";
+            s3.innerHTML = "";
+
+            masterProducts.forEach(p => {
+                const opt1 = document.createElement("option");
+                opt1.value = p.id;
+                opt1.innerText = `${p.id} - ${p.name} (${Number(p.price).toLocaleString('tr-TR')} ₺)`;
+                s1.appendChild(opt1);
+
+                const opt3 = document.createElement("option");
+                opt3.value = p.id;
+                opt3.innerText = `${p.id} - ${p.name} (${Number(p.price).toLocaleString('tr-TR')} ₺)`;
+                s3.appendChild(opt3);
+            });
+            syncSelectedCatalogPrice();
+        }
+
+        function syncSelectedCatalogPrice() {
+            const s1 = document.getElementById("step1-select-product");
+            if (!s1 || s1.options.length === 0) return;
+            const p = masterProducts.find(x => x.id === s1.value);
+            if (p) document.getElementById("step1-catalog-price").value = p.price;
+        }
+
+        function toggleAddMode(mode) {
+            const catBox = document.getElementById("add-mode-catalog-box");
+            const manBox = document.getElementById("add-mode-manual-box");
+            const btnCat = document.getElementById("btn-mode-catalog");
+            const btnMan = document.getElementById("btn-mode-manual");
+
+            if (mode === "catalog") {
+                catBox.classList.remove("hidden");
+                manBox.classList.add("hidden");
+                btnCat.className = "px-3 py-1 rounded-md bg-white text-slate-900 shadow-sm";
+                btnMan.className = "px-3 py-1 rounded-md text-slate-600";
+            } else {
+                catBox.classList.add("hidden");
+                manBox.classList.remove("hidden");
+                btnMan.className = "px-3 py-1 rounded-md bg-white text-slate-900 shadow-sm";
+                btnCat.className = "px-3 py-1 rounded-md text-slate-600";
+            }
+        }
+
+        // Yeni Sipariş Modal
+        function createNewOrderModal() {
+            document.getElementById("modal-new-order").classList.remove("hidden");
+            document.getElementById("new-cust-name").value = "";
+            document.getElementById("new-notes").value = "";
+            document.getElementById("new-date").value = new Date().toISOString().split("T")[0];
+            document.getElementById("new-cust-name").focus();
+        }
+
+        function closeModal() {
+            document.getElementById("modal-new-order").classList.add("hidden");
+        }
+
+        function saveNewOrder() {
+            const cust = document.getElementById("new-cust-name").value.trim();
+            if (!cust) {
+                showToast("Lütfen müşteri veya proje adını giriniz.", true);
+                return;
+            }
+
+            const newId = "CNP-2026-" + String(Math.floor(100 + Math.random() * 900));
+            const newOrd = {
+                id: newId,
+                customer: cust,
+                salesRep: currentUser.name || "Selin Yılmaz",
+                date: document.getElementById("new-date").value,
+                notes: document.getElementById("new-notes").value,
+                currentStep: 1,
+                items: [],
+                extras: [],
+                isClosed: false
+            };
+
+            orders.unshift(newOrd);
+            saveToStorage();
+            closeModal();
+            showToast(`Yeni sipariş açıldı: ${newId}`);
+            openOrderDetail(newId);
+        }
+
+        // Katalog Modal
+        function openCatalogModal() {
+            document.getElementById("modal-catalog").classList.remove("hidden");
+            renderCatalogTable();
+        }
+
+        function closeCatalogModal() {
+            document.getElementById("modal-catalog").classList.add("hidden");
+            populateProductSelects();
+        }
+
+        function renderCatalogTable() {
+            const tbody = document.getElementById("catalog-table-body");
+            tbody.innerHTML = "";
+
+            masterProducts.forEach((p, idx) => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td class="p-3 font-mono font-bold text-slate-900">${p.id}</td>
+                    <td class="p-3 font-medium">${p.name}</td>
+                    <td class="p-3 text-right font-bold">${Number(p.price).toLocaleString('tr-TR')} ₺</td>
+                    <td class="p-3 text-center">
+                        <button onclick="removeProductFromMaster(${idx})" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function saveProductToMasterCatalog() {
+            const code = document.getElementById("cat-new-code").value.trim() || `ÇNP-${Math.floor(100 + Math.random() * 900)}`;
+            const name = document.getElementById("cat-new-name").value.trim();
+            const price = parseFloat(document.getElementById("cat-new-price").value) || 0;
+
+            if (!name) {
+                showToast("Lütfen ürün adını yazınız.", true);
+                return;
+            }
+
+            masterProducts.push({ id: code, name: name, price: price });
+            saveToStorage();
+            renderCatalogTable();
+
+            document.getElementById("cat-new-code").value = "";
+            document.getElementById("cat-new-name").value = "";
+            document.getElementById("cat-new-price").value = "";
+            showToast(`${name} kataloğa eklendi!`);
+        }
+
+        function removeProductFromMaster(idx) {
+            masterProducts.splice(idx, 1);
+            saveToStorage();
+            renderCatalogTable();
+            showToast("Ürün katalogdan silindi.");
+        }
+
+        function filterOrders() {
+            const q = document.getElementById("search-input").value.toLowerCase();
+            const rows = document.querySelectorAll("#orders-table-body tr");
+            rows.forEach(r => {
+                r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none";
+            });
+        }
+    </script>
+</body>
+</html>
