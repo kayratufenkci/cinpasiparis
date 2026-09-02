@@ -569,7 +569,7 @@
         </main>
     </div>
 
-    <!-- NEBİM / EXCEL'den FİŞ İÇE AKTAR MODAL -->
+    <!-- NEBİM / EXCEL'DEN FİŞ İÇE AKTAR MODAL -->
     <div id="modal-excel-import" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -706,7 +706,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE KATALOG MOTORU -->
+    <!-- JAVASCRIPT STATE VE GÖMÜLÜ 17.900 ÜRÜN MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -743,24 +743,16 @@
             }
         };
 
+        // Tüm ürünler dogrudan belleğe gömülü (Asla dış dosya hatası veya önbellek sorunu yaşatmaz)
+        const DEFAULT_PRODUCTS = ${products_json_compact};
+
         let masterProducts = [];
-
-        async function loadFullCatalog() {
-            try {
-                const res = await fetch('products.json');
-                if (res.ok) {
-                    masterProducts = await res.json();
-                } else {
-                    masterProducts = [{"id":"0101007","name":"YUCCA BUSH X 36 W/WHITE FLOWERS","color":"-","price":350}];
-                }
-            } catch(e) {
-                masterProducts = [{"id":"0101007","name":"YUCCA BUSH X 36 W/WHITE FLOWERS","color":"-","price":350}];
-            }
-            const badge = document.getElementById("cat-count-badge");
-            if (badge) badge.innerText = masterProducts.length;
+        try {
+            const stored = localStorage.getItem("cinpa_master_products_v6");
+            masterProducts = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+        } catch(e) {
+            masterProducts = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
         }
-
-        loadFullCatalog();
 
         const INITIAL_ORDERS = [
             {
@@ -775,7 +767,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v5");
+            const stored = localStorage.getItem("cinpa_orders_v6");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -788,7 +780,8 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v5", JSON.stringify(orders));
+                localStorage.setItem("cinpa_orders_v6", JSON.stringify(orders));
+                localStorage.setItem("cinpa_master_products_v6", JSON.stringify(masterProducts));
             } catch(e) {}
         }
 
