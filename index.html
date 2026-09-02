@@ -9,7 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- SheetJS (Excel .xlsx / .xls / .csv okuma) -->
+    <!-- SheetJS CDN (Excel .xlsx / .xls / .csv okuma) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <script>
@@ -59,7 +59,7 @@
                 <label class="block text-xs font-extrabold text-slate-400 uppercase tracking-wider text-center">Giriş Yapmak İstediğiniz Profil</label>
                 <div class="grid grid-cols-1 gap-2.5">
                     
-                    <!-- Satış Profili (Açılır Seçim) -->
+                    <!-- Satış Profili Seçimi -->
                     <div class="p-3.5 rounded-2xl border border-slate-200 hover:border-blue-500 bg-blue-50/30 transition text-left space-y-2.5">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-base">
@@ -67,7 +67,7 @@
                             </div>
                             <div>
                                 <div class="text-xs font-black text-slate-900">Satış Uzmanı Girişi</div>
-                                <div class="text-[11px] text-slate-500 font-medium">Manuel Fiş Girişi & Nebim Excel Aktarımı</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Sadece kendi siparişlerinizi görür ve yönetirsiniz</div>
                             </div>
                         </div>
                         <div class="flex items-center space-x-2 pt-1">
@@ -111,29 +111,35 @@
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-purple-600 transition text-xs"></i>
                     </button>
 
-                    <!-- Muhasebe Profili -->
-                    <button onclick="loginAs('muhasebe')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left">
+                    <!-- Muhasebe Profili (Şifreli) -->
+                    <button onclick="requestPasswordAndLogin('muhasebe')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
                                 <i class="fa-solid fa-receipt"></i>
                             </div>
                             <div>
-                                <div class="text-xs font-black text-slate-900">Muhasebe (Gökhan)</div>
-                                <div class="text-[11px] text-slate-500 font-medium">Hepsini Görür (İlk 3'ü Salt Okunur, 4.'yü Değiştirir)</div>
+                                <div class="text-xs font-black text-slate-900 flex items-center space-x-1.5">
+                                    <span>Muhasebe (Gökhan)</span>
+                                    <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
+                                </div>
+                                <div class="text-[11px] text-slate-500 font-medium">Tüm Evrakları Görür (Şifre Korumalı)</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-600 transition text-xs"></i>
                     </button>
 
-                    <!-- Admin Profili -->
-                    <button onclick="loginAs('admin')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-800 bg-slate-900 text-white hover:bg-black transition group text-left">
+                    <!-- Admin Profili (Şifreli) -->
+                    <button onclick="requestPasswordAndLogin('admin')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-800 bg-slate-900 text-white hover:bg-black transition group text-left">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-slate-800 text-emerald-400 flex items-center justify-center font-bold text-base">
                                 <i class="fa-solid fa-crown"></i>
                             </div>
                             <div>
-                                <div class="text-xs font-black text-white">Sistem Yöneticisi (Admin)</div>
-                                <div class="text-[11px] text-slate-400 font-medium">Hepsini Görür ve Her Aşamayı Değiştirme Yetkisi Vardır</div>
+                                <div class="text-xs font-black text-white flex items-center space-x-1.5">
+                                    <span>Sistem Yöneticisi (Admin)</span>
+                                    <i class="fa-solid fa-lock text-[10px] text-emerald-400"></i>
+                                </div>
+                                <div class="text-[11px] text-slate-400 font-medium">Tam Yetki & Sınırsız Düzenleme (Şifre Korumalı)</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-arrow-right-to-bracket text-emerald-400 text-xs"></i>
@@ -158,7 +164,7 @@
                                 <h1 class="text-base font-black tracking-tight text-slate-900 leading-none">ÇİNPA BOTANİK</h1>
                                 <span class="bg-cinpa-100 text-cinpa-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-cinpa-200" id="header-role-badge">SATIŞ PANELİ</span>
                             </div>
-                            <p class="text-xs text-slate-500 font-medium mt-0.5" id="header-user-desc">Kullanıcı: Orhan Özen</p>
+                            <p class="text-xs text-slate-500 font-medium mt-0.5" id="header-user-desc">Kullanıcı: -</p>
                         </div>
                     </div>
 
@@ -195,7 +201,7 @@
                     </div>
                     <div>
                         <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Yetkili Oturum</div>
-                        <h2 class="text-base font-extrabold text-slate-900" id="role-welcome-name">Orhan Özen (Satış Uzmanı)</h2>
+                        <h2 class="text-base font-extrabold text-slate-900" id="role-welcome-name">-</h2>
                     </div>
                 </div>
                 <div class="text-xs font-semibold px-3.5 py-2 rounded-xl border" id="role-duty-badge">
@@ -208,8 +214,8 @@
                 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
-                            <h2 class="text-base font-extrabold text-slate-900">Sipariş Dosyaları</h2>
-                            <p class="text-xs text-slate-500">İlgili siparişin üzerine tıklayarak işlem ekranına geçebilirsiniz.</p>
+                            <h2 class="text-base font-extrabold text-slate-900" id="dashboard-table-title">Sipariş Dosyaları</h2>
+                            <p class="text-xs text-slate-500" id="dashboard-table-subtitle">İlgili siparişin üzerine tıklayarak işlem ekranına geçebilirsiniz.</p>
                         </div>
                         <div class="relative">
                             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
@@ -219,7 +225,7 @@
 
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
-                            <thead class="bg-slate-50 text-slate-600 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+                            <thead class="bg-slate-50 text-slate-600 text-xs font-bold uppercase border-b border-slate-200">
                                 <tr>
                                     <th class="p-4">İş No / Dosya</th>
                                     <th class="p-4">Müşteri / Proje</th>
@@ -244,12 +250,13 @@
                         </button>
                         <div>
                             <div class="flex items-center space-x-2">
-                                <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-md bg-slate-900 text-white font-mono" id="detail-order-code">CNP-2026-084</span>
-                                <span class="text-xs font-bold text-slate-500" id="detail-order-date">20 Ağustos 2026</span>
+                                <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-md bg-slate-900 text-white font-mono" id="detail-order-code">-</span>
+                                <span class="text-xs font-bold text-slate-500" id="detail-order-date">-</span>
                             </div>
-                            <h2 class="text-lg font-black text-slate-900 mt-1" id="detail-customer-name">Müşteri Adı</h2>
+                            <h2 class="text-lg font-black text-slate-900 mt-1" id="detail-customer-name">-</h2>
                         </div>
                     </div>
+
                     <div class="flex items-center space-x-2">
                         <button onclick="sendWhatsAppNotification()" class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold flex items-center space-x-1.5 transition">
                             <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i>
@@ -275,7 +282,7 @@
                                 <h3 class="text-lg font-black text-slate-900 mt-1">Müşteri Talebi ve Sipariş Kalemleri</h3>
                             </div>
                             <div class="text-xs text-slate-500 font-medium">
-                                Satış Uzmanı: <strong id="step1-sales-rep" class="text-slate-800">Orhan Özen</strong>
+                                Satış Uzmanı: <strong id="step1-sales-rep" class="text-slate-800">-</strong>
                             </div>
                         </div>
 
@@ -663,13 +670,14 @@
         </div>
     </div>
 
+    <!-- JAVASCRIPT STATE, ŞİFRE KONTROLÜ, STRICT RBAC VE FİLTRE MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
         const USER_ROLES = {
             satis: {
                 roleId: 'satis', name: 'Orhan Özen', title: 'Satış Uzmanı', badgeText: 'SATIŞ PANELİ',
-                dutyText: 'Sadece 1. Adım Sipariş Formunu görür. Manuel veya Nebim Excel ile fiş girer. Fiş depoya iletildikten sonra kilitlenir.',
+                dutyText: 'Sadece KENDİ siparişlerinizi görürsünüz. Fiş depoya iletildikten sonra değişiklik yapamazsınız.',
                 colorClass: 'bg-blue-50 text-blue-700 border-blue-200', avatarBg: 'bg-blue-100 text-blue-700', avatarIcon: 'fa-file-signature',
                 visibleSteps: [1], canCreateOrder: true, canManageCatalog: true
             },
@@ -727,6 +735,14 @@
                 ],
                 extras: [{ id: "CNP-405", name: "120cm Doğal Bambu Ağacı (Saha İlavesi)", qty: 1, price: 2400, faikApproval: true, approvalTime: "14:32" }],
                 isClosed: false
+            },
+            {
+                id: "CNP-2026-085", customer: "Sheraton Ankara Teras Projesi", salesRep: "Uğur Morkoç", date: "2026-08-26",
+                notes: "Dikey bahçe montajı yapılacak.", currentStep: 2,
+                items: [
+                    { id: "CNP-310", name: "Yapay Dikey Bahçe Paneli (100x100 cm)", requestedQty: 20, dispatchedQty: 20, returnedQty: 0, price: 1100, warehouseNote: "Kutulandı.", checked: true }
+                ],
+                extras: [], isClosed: false
             }
         ];
 
@@ -756,6 +772,27 @@
             setTimeout(() => toast.classList.remove("show"), 3500);
         }
 
+        // ================= ŞİFRE KONTROL MEKANİZMASI =================
+        function requestPasswordAndLogin(roleKey) {
+            if (roleKey === 'muhasebe') {
+                const pass = prompt("Muhasebe Paneli Giriş Şifresi:");
+                if (pass === null) return; // İptal basıldı
+                if (pass.trim() === "1") {
+                    loginAs('muhasebe');
+                } else {
+                    showToast("Hatalı Muhasebe şifresi!", true);
+                }
+            } else if (roleKey === 'admin') {
+                const pass = prompt("Sistem Yöneticisi (Admin) Giriş Şifresi:");
+                if (pass === null) return; // İptal basıldı
+                if (pass.trim() === "cinpasiparis") {
+                    loginAs('admin');
+                } else {
+                    showToast("Hatalı Admin şifresi!", true);
+                }
+            }
+        }
+
         function loginAsSalesSelected() {
             const selectedRep = document.getElementById("login-sales-rep-select").value;
             USER_ROLES.satis.name = selectedRep;
@@ -777,6 +814,12 @@
             document.getElementById("btn-header-new-order").style.display = currentUser.canCreateOrder ? "flex" : "none";
             document.getElementById("btn-header-import-excel").style.display = currentUser.canCreateOrder ? "flex" : "none";
             document.getElementById("btn-header-catalog").style.display = currentUser.canManageCatalog ? "flex" : "none";
+
+            const selRepDrop = document.getElementById("new-sales-rep");
+            if (selRepDrop && currentUser.roleId === 'satis') {
+                selRepDrop.value = currentUser.name;
+            }
+
             renderOrderList();
             showToast(`Hoş geldiniz, ${currentUser.name}!`);
         }
@@ -798,11 +841,23 @@
         function renderOrderList() {
             const tbody = document.getElementById("orders-table-body");
             tbody.innerHTML = "";
-            if (orders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Sipariş bulunmuyor.</td></tr>`;
+
+            let visibleOrders = orders;
+            if (currentUser && currentUser.roleId === 'satis') {
+                visibleOrders = orders.filter(ord => (ord.salesRep || '').trim().toLowerCase() === currentUser.name.trim().toLowerCase());
+                document.getElementById("dashboard-table-title").innerText = `Siparişlerim (${currentUser.name})`;
+                document.getElementById("dashboard-table-subtitle").innerText = `Yalnızca sizin tarafınızdan açılmış sipariş dosyaları listelenmektedir.`;
+            } else {
+                document.getElementById("dashboard-table-title").innerText = `Tüm Sipariş Dosyaları`;
+                document.getElementById("dashboard-table-subtitle").innerText = `Sistemde kayıtlı olan tüm birimlere ait aktif dosyalar.`;
+            }
+
+            if (visibleOrders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Bu profile ait herhangi bir sipariş dosyası bulunamadı.</td></tr>`;
                 return;
             }
-            orders.forEach(ord => {
+
+            visibleOrders.forEach(ord => {
                 const tr = document.createElement("tr");
                 tr.className = "hover:bg-slate-50 transition cursor-pointer";
                 tr.onclick = () => openOrderDetail(ord.id);
@@ -830,12 +885,19 @@
         function openOrderDetail(orderId) {
             activeOrder = orders.find(o => o.id === orderId);
             if (!activeOrder) return;
+
+            if (currentUser && currentUser.roleId === 'satis' && (activeOrder.salesRep || '').trim().toLowerCase() !== currentUser.name.trim().toLowerCase()) {
+                showToast("YETKİSİZ ERİŞİM: Yalnızca kendi oluşturduğunuz sipariş dosyalarını görüntüleyebilirsiniz.", true);
+                return;
+            }
+
             document.getElementById("section-dashboard").classList.add("hidden");
             document.getElementById("section-order-detail").classList.remove("hidden");
             document.getElementById("detail-order-code").innerText = activeOrder.id;
             document.getElementById("detail-customer-name").innerText = activeOrder.customer;
             document.getElementById("detail-order-date").innerText = activeOrder.date;
             document.getElementById("step1-sales-rep").innerText = activeOrder.salesRep;
+
             buildDynamicStepperTabs();
             const defaultStep = currentUser.visibleSteps[0] || 1;
             switchStepTab(defaultStep);
@@ -1253,7 +1315,7 @@
                 showToast("Lütfen önce Excel'den kopyaladığınız veriyi yapıştırınız.", true);
                 return;
             }
-            const rows = text.split(/\\r?\\n/).map(row => row.split('\\t'));
+            const rows = text.split(/\r?\n/).map(row => row.split('\t'));
             processRawExcelRows(rows);
         }
 
@@ -1369,7 +1431,7 @@
             if (!activeOrder) return;
             const stepNames = ["", "1. Satış Formu", "2. Depo Hazırlığı", "3. Saha Montajı", "4. Muhasebe Kontrolü", "5. Fatura Kesildi"];
             const statusText = stepNames[activeOrder.currentStep] || "Aktif";
-            const text = encodeURIComponent(`*ÇİNPA BOTANİK SİPARİŞ BİLDİRİMİ*\\n\\nSipariş No: ${activeOrder.id}\\nMüşteri: ${activeOrder.customer}\\nAşama: ${statusText}\\nİşlem Yapan: ${currentUser.name}\\n\\nDetaylar ERP panelinde güncellenmiştir.`);
+            const text = encodeURIComponent(`*ÇİNPA BOTANİK SİPARİŞ BİLDİRİMİ*\n\nSipariş No: ${activeOrder.id}\nMüşteri: ${activeOrder.customer}\nAşama: ${statusText}\nİşlem Yapan: ${currentUser.name}\n\nDetaylar ERP panelinde güncellenmiştir.`);
             window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
         }
 
@@ -1417,6 +1479,9 @@
             document.getElementById("new-cust-name").value = "";
             document.getElementById("new-notes").value = "";
             document.getElementById("new-date").value = new Date().toISOString().split("T")[0];
+            if (currentUser && currentUser.roleId === 'satis') {
+                document.getElementById("new-sales-rep").value = currentUser.name;
+            }
             document.getElementById("new-cust-name").focus();
         }
 
@@ -1426,8 +1491,9 @@
             const cust = document.getElementById("new-cust-name").value.trim();
             if (!cust) { showToast("Lütfen müşteri veya proje adını giriniz.", true); return; }
             const newId = "CNP-2026-" + String(Math.floor(100 + Math.random() * 900));
+            const rep = (currentUser && currentUser.roleId === 'satis') ? currentUser.name : (document.getElementById("new-sales-rep").value || "Orhan Özen");
             const newOrd = {
-                id: newId, customer: cust, salesRep: document.getElementById("new-sales-rep").value || currentUser.name,
+                id: newId, customer: cust, salesRep: rep,
                 date: document.getElementById("new-date").value, notes: document.getElementById("new-notes").value,
                 currentStep: 1, items: [], extras: [], isClosed: false
             };
