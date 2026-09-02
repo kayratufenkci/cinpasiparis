@@ -111,7 +111,7 @@
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-purple-600 transition text-xs"></i>
                     </button>
 
-                    <!-- Muhasebe Profili (Şifreli) -->
+                    <!-- Muhasebe Profili (Şifreli: 1) -->
                     <button onclick="requestPasswordAndLogin('muhasebe')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
@@ -128,7 +128,7 @@
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-600 transition text-xs"></i>
                     </button>
 
-                    <!-- Admin Profili (Şifreli) -->
+                    <!-- Admin Profili (Şifreli: cinpasiparis) -->
                     <button onclick="requestPasswordAndLogin('admin')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-800 bg-slate-900 text-white hover:bg-black transition group text-left">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-slate-800 text-emerald-400 flex items-center justify-center font-bold text-base">
@@ -169,6 +169,12 @@
                     </div>
 
                     <div class="flex items-center space-x-2 sm:space-x-3">
+                        <!-- Profil Değiştir / Kullanıcı Değiştir Butonu -->
+                        <button onclick="logout()" title="Giriş Ekranına Dön ve Kullanıcı Değiştir" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-300 transition flex items-center space-x-1.5 shadow-sm">
+                            <i class="fa-solid fa-arrow-left"></i>
+                            <span class="hidden sm:inline">Kullanıcı Değiştir</span>
+                        </button>
+
                         <button onclick="openExcelImportModal()" id="btn-header-import-excel" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs sm:text-sm rounded-xl border border-emerald-200 transition flex items-center space-x-1.5 shadow-sm">
                             <i class="fa-solid fa-file-excel text-emerald-600"></i>
                             <span class="hidden sm:inline">Nebim / Excel'den Al</span>
@@ -200,12 +206,24 @@
                         <i class="fa-solid fa-user-tie" id="role-avatar-icon"></i>
                     </div>
                     <div>
-                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Yetkili Oturum</div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Yetkili Oturum</span>
+                            <button onclick="logout()" class="text-[11px] font-bold text-blue-600 hover:underline flex items-center space-x-1">
+                                <i class="fa-solid fa-repeat text-[10px]"></i>
+                                <span>(Profil Değiştir)</span>
+                            </button>
+                        </div>
                         <h2 class="text-base font-extrabold text-slate-900" id="role-welcome-name">-</h2>
                     </div>
                 </div>
-                <div class="text-xs font-semibold px-3.5 py-2 rounded-xl border" id="role-duty-badge">
-                    Görev Tanımı
+                <div class="flex items-center space-x-2">
+                    <button onclick="logout()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex items-center space-x-1 sm:hidden">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Geri Dön</span>
+                    </button>
+                    <div class="text-xs font-semibold px-3.5 py-2 rounded-xl border" id="role-duty-badge">
+                        Görev Tanımı
+                    </div>
                 </div>
             </div>
 
@@ -245,8 +263,9 @@
             <section id="section-order-detail" class="hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="flex items-center space-x-4">
-                        <button onclick="returnToDashboard()" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">
+                        <button onclick="returnToDashboard()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center space-x-1.5 transition text-xs font-bold" title="Sipariş Listesine Geri Dön">
                             <i class="fa-solid fa-arrow-left"></i>
+                            <span>Listeye Dön</span>
                         </button>
                         <div>
                             <div class="flex items-center space-x-2">
@@ -776,7 +795,7 @@
         function requestPasswordAndLogin(roleKey) {
             if (roleKey === 'muhasebe') {
                 const pass = prompt("Muhasebe Paneli Giriş Şifresi:");
-                if (pass === null) return; // İptal basıldı
+                if (pass === null) return;
                 if (pass.trim() === "1") {
                     loginAs('muhasebe');
                 } else {
@@ -784,7 +803,7 @@
                 }
             } else if (roleKey === 'admin') {
                 const pass = prompt("Sistem Yöneticisi (Admin) Giriş Şifresi:");
-                if (pass === null) return; // İptal basıldı
+                if (pass === null) return;
                 if (pass.trim() === "cinpasiparis") {
                     loginAs('admin');
                 } else {
@@ -828,7 +847,7 @@
             currentUser = null; activeOrder = null;
             document.getElementById("view-app").classList.add("hidden");
             document.getElementById("view-login").classList.remove("hidden");
-            showToast("Oturum kapatıldı.");
+            showToast("Giriş ekranına dönüldü.");
         }
 
         function returnToDashboard() {
