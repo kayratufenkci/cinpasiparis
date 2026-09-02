@@ -627,7 +627,7 @@
         </div>
     </div>
 
-    <!-- KATALOG VE YENİ SİPARİŞ MODALLARI (TOPLU SİLME VE AKILLI FİYAT TESPİTİ EKLENDİ) -->
+    <!-- KATALOG VE YENİ SİPARİŞ MODALLARI -->
     <div id="modal-catalog" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-3xl max-w-5xl w-full p-6 shadow-2xl space-y-5 max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -737,7 +737,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE AKILLI EXCEL FİYAT OKUMA MOTORU -->
+    <!-- JAVASCRIPT STATE VE AKILLI SÜTUN EŞLEME MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -785,7 +785,7 @@
 
         let masterProducts = [];
         try {
-            const stored = localStorage.getItem("cinpa_permanent_catalog_v13");
+            const stored = localStorage.getItem("cinpa_permanent_catalog_v14");
             masterProducts = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
         } catch(e) {
             masterProducts = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
@@ -804,7 +804,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v13");
+            const stored = localStorage.getItem("cinpa_orders_v14");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -817,8 +817,8 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v13", JSON.stringify(orders));
-                localStorage.setItem("cinpa_permanent_catalog_v13", JSON.stringify(masterProducts));
+                localStorage.setItem("cinpa_orders_v14", JSON.stringify(orders));
+                localStorage.setItem("cinpa_permanent_catalog_v14", JSON.stringify(masterProducts));
             } catch(e) {}
         }
 
@@ -835,7 +835,7 @@
             }, 3000);
         }
 
-        // --- AKILLI EXCEL KATALOG YÜKLEME (TOPTAN SATIŞ FİYATI DAHİL) ---
+        // --- GELİŞMİŞ AKILLI SÜTUN EŞLEME MOTORU (KOD | AD | RENK | FİYAT) ---
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -848,16 +848,16 @@
                     const worksheet = workbook.Sheets[firstSheetName];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
                     
-                    let codeCol = 0, nameCol = 1, colorCol = 2, priceCol = 3;
+                    let codeCol = 0, nameCol = 1, colorCol = -1, priceCol = -1;
 
-                    // Başlık satırını tarayarak "Toptan Satış Fiyatı", "Fiyat" gibi sütunların yerini otomatik bulalım
+                    // Başlık satırını tarayarak sütunların yerini akıllıca tespit ediyoruz
                     if (jsonData.length > 0) {
                         const headerRow = jsonData[0].map(h => String(h || '').toLowerCase().trim());
                         headerRow.forEach((h, colIdx) => {
-                            if (h.includes('kod') || h.includes('stok') || h.includes('sku')) codeCol = colIdx;
-                            else if (h.includes('ad') || h.includes('açıklama') || h.includes('ürün')) nameCol = colIdx;
-                            else if (h.includes('renk')) colorCol = colIdx;
-                            else if (h.includes('fiyat') || h.includes('toptan') || h.includes('satış')) priceCol = colIdx;
+                            if (h.includes('kod') || h.includes('stok') || h.includes('sku') || h.includes('item')) codeCol = colIdx;
+                            else if (h.includes('ad') || h.includes('açıklama') || h.includes('ürün') || h.includes('tanım')) nameCol = colIdx;
+                            else if (h.includes('renk') || h.includes('color')) colorCol = colIdx;
+                            else if (h.includes('fiyat') || h.includes('toptan') || h.includes('satış') || h.includes('tutar')) priceCol = colIdx;
                         });
                     }
 
@@ -870,10 +870,33 @@
                         }
 
                         let code = String(cols[codeCol] !== undefined ? cols[codeCol] : cols[0] || '').trim();
-                        let name = String(cols[nameCol] !== undefined ? cols[nameCol] : cols[1] || '').trim();
-                        let color = String(cols[colorCol] !== undefined ? cols[colorCol] : (cols.length > 2 ? cols[2] : '-')).trim();
-                        let rawPrice = cols[priceCol] !== undefined ? cols[priceCol] : (cols.length > 3 ? cols[3] : cols[2]);
+                        let name = String(cols[nameCol] !== undefined ? cols[nameCol] : (cols[1] || '')).trim();
                         
+                        let color = "-";
+                        if (colorCol !== -1 && cols[colorCol] !== undefined) {
+                            color = String(cols[colorCol]).trim();
+                        } else if (cols.length >= 3) {
+                            // Eğer renk sütunu başlıkla bulunamadıysa 3. sütunu kontrol et (sayı değilse renktir)
+                            const candCol2 = String(cols[2] || '').trim();
+                            if (candCol2 && isNaN(parseFloat(candCol2.replace(',', '.')))) {
+                                color = candCol2;
+                            }
+                        }
+
+                        let rawPrice = 0;
+                        if (priceCol !== -1 && cols[priceCol] !== undefined) {
+                            rawPrice = cols[priceCol];
+                        } else {
+                            // Fiyat bulunamadıysa satırdaki en son sayısal değeri fiyat olarak al
+                            for (let i = cols.length - 1; i >= 0; i--) {
+                                const val = parseFloat(String(cols[i] || '').replace(/[^0-9,.-]/g, '').replace(',', '.'));
+                                if (!isNaN(val) && val >= 0 && i !== codeCol) {
+                                    rawPrice = cols[i];
+                                    break;
+                                }
+                            }
+                        }
+
                         let price = parseFloat(String(rawPrice || '0').replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
 
                         if (code && name) {
@@ -891,7 +914,7 @@
                         saveToStorage();
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
-                        showToast(`Başarıyla ${newProducts.length} ürün toptan fiyatlarıyla yüklendi!`);
+                        showToast(`Başarıyla ${newProducts.length} ürün kod, renk ve fiyatlarıyla yüklendi!`);
                     } else {
                         showToast("Excel dosyasından geçerli ürün satırı okunamadı.", true);
                     }
