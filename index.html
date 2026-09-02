@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÇİNPA BOTANİK - Özel Yetkilendirilmiş Operasyon & Sipariş Paneli</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- SheetJS (Excel .xlsx / .xls / .csv okuma) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -16,7 +20,7 @@
                         cinpa: {
                             50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0',
                             500: '#22c55e', 600: '#16a34a', 700: '#15803d',
-                            800: '#166534', 900: '#14532d'
+                            800: '#166534', 900: '#14532d',
                         }
                     }
                 }
@@ -33,105 +37,147 @@
     </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased">
+
+    <!-- Toast Bildirimi -->
     <div id="toast" class="fixed bottom-6 left-1/2 z-50 bg-slate-900 text-white text-xs sm:text-sm font-bold px-5 py-3.5 rounded-2xl shadow-2xl flex items-center space-x-3 no-print">
         <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
         <span id="toast-msg">İşlem başarıyla gerçekleştirildi.</span>
     </div>
 
-    <!-- 1. GİRİŞ EKRANI -->
+    <!-- ================= 1. GİRİŞ EKRANI ================= -->
     <section id="view-login" class="min-h-screen flex items-center justify-center p-4 bg-slate-950 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950">
         <div class="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl space-y-6">
             <div class="text-center space-y-2">
-                <div class="w-16 h-16 rounded-2xl bg-cinpa-700 mx-auto flex items-center justify-center text-white font-black text-3xl shadow-xl shadow-cinpa-900/40">Ç</div>
+                <div class="w-16 h-16 rounded-2xl bg-cinpa-700 mx-auto flex items-center justify-center text-white font-black text-3xl shadow-xl shadow-cinpa-900/40">
+                    Ç
+                </div>
                 <h1 class="text-2xl font-black text-slate-900 tracking-tight">ÇİNPA BOTANİK</h1>
                 <p class="text-xs text-slate-500 font-medium">Nebim Entegreli Rol & Görev Bazlı Yetkili Giriş Portalı</p>
             </div>
+
             <div class="space-y-3 pt-2">
                 <label class="block text-xs font-extrabold text-slate-400 uppercase tracking-wider text-center">Giriş Yapmak İstediğiniz Profil</label>
                 <div class="grid grid-cols-1 gap-2.5">
-                    <button onclick="loginAs('satis')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 transition group text-left">
+                    
+                    <!-- Satış Profili (Açılır Seçim) -->
+                    <div class="p-3.5 rounded-2xl border border-slate-200 hover:border-blue-500 bg-blue-50/30 transition text-left space-y-2.5">
                         <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-base"><i class="fa-solid fa-file-signature"></i></div>
+                            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-base">
+                                <i class="fa-solid fa-file-signature"></i>
+                            </div>
                             <div>
-                                <div class="text-xs font-black text-slate-900">Satış Uzmanı (Selin Yılmaz)</div>
+                                <div class="text-xs font-black text-slate-900">Satış Uzmanı Girişi</div>
                                 <div class="text-[11px] text-slate-500 font-medium">Manuel Fiş Girişi & Nebim Excel Aktarımı</div>
                             </div>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-                    </button>
+                        <div class="flex items-center space-x-2 pt-1">
+                            <select id="login-sales-rep-select" class="w-full text-xs font-bold p-2.5 rounded-xl border border-blue-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="Orhan Özen">Orhan Özen</option>
+                                <option value="Uğur Morkoç">Uğur Morkoç</option>
+                                <option value="Tolga Keleş">Tolga Keleş</option>
+                                <option value="Salih Şahin">Salih Şahin</option>
+                            </select>
+                            <button onclick="loginAsSalesSelected()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition whitespace-nowrap">
+                                Giriş <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Depo Profili -->
                     <button onclick="loginAs('depo')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-amber-500 hover:bg-amber-50/50 transition group text-left">
                         <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-base"><i class="fa-solid fa-boxes-packing"></i></div>
+                            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
+                                <i class="fa-solid fa-boxes-packing"></i>
+                            </div>
                             <div>
                                 <div class="text-xs font-black text-slate-900">Depocu (Kamber Usta)</div>
-                                <div class="text-[11px] text-slate-500 font-medium">Sadece Depo Hazırlık & İkame Değişikliği</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Sadece Depo Hazırlık & İkame Değişikliği Görür</div>
                             </div>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-amber-600 transition text-xs"></i>
                     </button>
+
+                    <!-- Saha Profili -->
                     <button onclick="loginAs('saha')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-purple-500 hover:bg-purple-50/50 transition group text-left">
                         <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-base"><i class="fa-solid fa-helmet-safety"></i></div>
+                            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
+                                <i class="fa-solid fa-helmet-safety"></i>
+                            </div>
                             <div>
                                 <div class="text-xs font-black text-slate-900">Saha Ekibi (Sefa Usta)</div>
-                                <div class="text-[11px] text-slate-500 font-medium">Sadece Mal Kabul, İade & İlave Ekranı</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Sadece Mal Kabul, İade & İlave Ekranını Görür</div>
                             </div>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-purple-600 transition text-xs"></i>
                     </button>
+
+                    <!-- Muhasebe Profili -->
                     <button onclick="loginAs('muhasebe')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left">
                         <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-base"><i class="fa-solid fa-receipt"></i></div>
+                            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
+                                <i class="fa-solid fa-receipt"></i>
+                            </div>
                             <div>
                                 <div class="text-xs font-black text-slate-900">Muhasebe (Gökhan)</div>
-                                <div class="text-[11px] text-slate-500 font-medium">4 Evrak Kontrolü, Fatura & Kapanış</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Hepsini Görür (İlk 3'ü Salt Okunur, 4.'yü Değiştirir)</div>
                             </div>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-600 transition text-xs"></i>
                     </button>
+
+                    <!-- Admin Profili -->
                     <button onclick="loginAs('admin')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-800 bg-slate-900 text-white hover:bg-black transition group text-left">
                         <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-xl bg-slate-800 text-emerald-400 flex items-center justify-center font-bold text-base"><i class="fa-solid fa-crown"></i></div>
+                            <div class="w-10 h-10 rounded-xl bg-slate-800 text-emerald-400 flex items-center justify-center font-bold text-base">
+                                <i class="fa-solid fa-crown"></i>
+                            </div>
                             <div>
                                 <div class="text-xs font-black text-white">Sistem Yöneticisi (Admin)</div>
-                                <div class="text-[11px] text-slate-400 font-medium">Tam Yetki & Sınırsız Düzenleme</div>
+                                <div class="text-[11px] text-slate-400 font-medium">Hepsini Görür ve Her Aşamayı Değiştirme Yetkisi Vardır</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-arrow-right-to-bracket text-emerald-400 text-xs"></i>
                     </button>
+
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 2. ANA PANEL -->
+    <!-- ================= 2. ANA PANEL ================= -->
     <div id="view-app" class="hidden flex-1 flex flex-col min-h-screen">
         <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm no-print">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center space-x-3 cursor-pointer" onclick="returnToDashboard()">
-                        <div class="w-10 h-10 rounded-xl bg-cinpa-700 flex items-center justify-center text-white font-black text-xl">Ç</div>
+                        <div class="w-10 h-10 rounded-xl bg-cinpa-700 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-cinpa-200">
+                            Ç
+                        </div>
                         <div>
                             <div class="flex items-center space-x-2">
                                 <h1 class="text-base font-black tracking-tight text-slate-900 leading-none">ÇİNPA BOTANİK</h1>
                                 <span class="bg-cinpa-100 text-cinpa-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-cinpa-200" id="header-role-badge">SATIŞ PANELİ</span>
                             </div>
-                            <p class="text-xs text-slate-500 font-medium mt-0.5" id="header-user-desc">Kullanıcı: Selin Yılmaz</p>
+                            <p class="text-xs text-slate-500 font-medium mt-0.5" id="header-user-desc">Kullanıcı: Orhan Özen</p>
                         </div>
                     </div>
+
                     <div class="flex items-center space-x-2 sm:space-x-3">
                         <button onclick="openExcelImportModal()" id="btn-header-import-excel" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs sm:text-sm rounded-xl border border-emerald-200 transition flex items-center space-x-1.5 shadow-sm">
                             <i class="fa-solid fa-file-excel text-emerald-600"></i>
                             <span class="hidden sm:inline">Nebim / Excel'den Al</span>
                         </button>
+
                         <button onclick="createNewOrderModal()" id="btn-header-new-order" class="px-4 py-2 bg-cinpa-700 hover:bg-cinpa-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center space-x-2">
                             <i class="fa-solid fa-plus"></i>
                             <span>Yeni Sipariş</span>
                         </button>
+
                         <button onclick="openCatalogModal()" id="btn-header-catalog" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-200 transition flex items-center space-x-1.5">
                             <i class="fa-solid fa-boxes-stacked text-cinpa-700"></i>
                             <span class="hidden md:inline">Katalog</span>
                         </button>
+
                         <button onclick="logout()" title="Oturumu Kapat" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs rounded-xl border border-red-200 transition flex items-center space-x-1.5">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
                             <span class="hidden md:inline">Çıkış</span>
@@ -149,10 +195,12 @@
                     </div>
                     <div>
                         <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Yetkili Oturum</div>
-                        <h2 class="text-base font-extrabold text-slate-900" id="role-welcome-name">Selin Yılmaz (Satış Uzmanı)</h2>
+                        <h2 class="text-base font-extrabold text-slate-900" id="role-welcome-name">Orhan Özen (Satış Uzmanı)</h2>
                     </div>
                 </div>
-                <div class="text-xs font-semibold px-3.5 py-2 rounded-xl border" id="role-duty-badge">Görev Tanımı</div>
+                <div class="text-xs font-semibold px-3.5 py-2 rounded-xl border" id="role-duty-badge">
+                    Görev Tanımı
+                </div>
             </div>
 
             <!-- DASHBOARD LİSTESİ -->
@@ -168,9 +216,10 @@
                             <input type="text" id="search-input" onkeyup="filterOrders()" placeholder="Sipariş no veya müşteri ara..." class="text-xs pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-cinpa-600 w-full sm:w-72">
                         </div>
                     </div>
+
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
-                            <thead class="bg-slate-50 text-slate-600 text-xs font-bold uppercase border-b border-slate-200">
+                            <thead class="bg-slate-50 text-slate-600 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
                                 <tr>
                                     <th class="p-4">İş No / Dosya</th>
                                     <th class="p-4">Müşteri / Proje</th>
@@ -226,7 +275,7 @@
                                 <h3 class="text-lg font-black text-slate-900 mt-1">Müşteri Talebi ve Sipariş Kalemleri</h3>
                             </div>
                             <div class="text-xs text-slate-500 font-medium">
-                                Satış Uzmanı: <strong id="step1-sales-rep" class="text-slate-800">Selin Yılmaz</strong>
+                                Satış Uzmanı: <strong id="step1-sales-rep" class="text-slate-800">Orhan Özen</strong>
                             </div>
                         </div>
 
@@ -591,8 +640,10 @@
                     <div>
                         <label class="block font-bold text-slate-700 uppercase mb-1">Satış Uzmanı</label>
                         <select id="new-sales-rep" class="w-full text-xs font-semibold p-3 rounded-xl border border-slate-300 bg-slate-50">
-                            <option value="Selin Yılmaz">Selin Yılmaz</option>
-                            <option value="Ahmet Kaya">Ahmet Kaya</option>
+                            <option value="Orhan Özen">Orhan Özen</option>
+                            <option value="Uğur Morkoç">Uğur Morkoç</option>
+                            <option value="Tolga Keleş">Tolga Keleş</option>
+                            <option value="Salih Şahin">Salih Şahin</option>
                         </select>
                     </div>
                     <div>
@@ -613,9 +664,11 @@
     </div>
 
     <script>
+        const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
+
         const USER_ROLES = {
             satis: {
-                roleId: 'satis', name: 'Selin Yılmaz', title: 'Satış Uzmanı', badgeText: 'SATIŞ PANELİ',
+                roleId: 'satis', name: 'Orhan Özen', title: 'Satış Uzmanı', badgeText: 'SATIŞ PANELİ',
                 dutyText: 'Sadece 1. Adım Sipariş Formunu görür. Manuel veya Nebim Excel ile fiş girer. Fiş depoya iletildikten sonra kilitlenir.',
                 colorClass: 'bg-blue-50 text-blue-700 border-blue-200', avatarBg: 'bg-blue-100 text-blue-700', avatarIcon: 'fa-file-signature',
                 visibleSteps: [1], canCreateOrder: true, canManageCatalog: true
@@ -665,7 +718,7 @@
 
         const INITIAL_ORDERS = [
             {
-                id: "CNP-2026-084", customer: "Hilton Bosphorus Balo Salonu Projesi", salesRep: "Selin Yılmaz", date: "2026-08-25",
+                id: "CNP-2026-084", customer: "Hilton Bosphorus Balo Salonu Projesi", salesRep: "Orhan Özen", date: "2026-08-25",
                 notes: "Palmiyeler mat antrasit saksılara konulsun.", currentStep: 1,
                 items: [
                     { id: "CNP-101", name: "220cm İpek Yapraklı Areka Palmiyesi", requestedQty: 6, dispatchedQty: 6, returnedQty: 0, price: 3500, warehouseNote: "Birebir A1 koridorundan toplandı.", checked: true },
@@ -701,6 +754,12 @@
             icon.className = isError ? "fa-solid fa-circle-exclamation text-red-400 text-base" : "fa-solid fa-circle-check text-emerald-400 text-base";
             toast.classList.add("show");
             setTimeout(() => toast.classList.remove("show"), 3500);
+        }
+
+        function loginAsSalesSelected() {
+            const selectedRep = document.getElementById("login-sales-rep-select").value;
+            USER_ROLES.satis.name = selectedRep;
+            loginAs('satis');
         }
 
         function loginAs(roleKey) {
@@ -1290,7 +1349,7 @@
             const newOrd = {
                 id: newId,
                 customer: custName,
-                salesRep: currentUser ? currentUser.name : "Selin Yılmaz",
+                salesRep: currentUser ? currentUser.name : "Orhan Özen",
                 date: new Date().toISOString().split("T")[0],
                 notes: "Nebim Excel dosyasından otomatik aktarıldı.",
                 currentStep: 1,
@@ -1368,7 +1427,7 @@
             if (!cust) { showToast("Lütfen müşteri veya proje adını giriniz.", true); return; }
             const newId = "CNP-2026-" + String(Math.floor(100 + Math.random() * 900));
             const newOrd = {
-                id: newId, customer: cust, salesRep: currentUser.name || "Selin Yılmaz",
+                id: newId, customer: cust, salesRep: document.getElementById("new-sales-rep").value || currentUser.name,
                 date: document.getElementById("new-date").value, notes: document.getElementById("new-notes").value,
                 currentStep: 1, items: [], extras: [], isClosed: false
             };
@@ -1421,10 +1480,3 @@
     </script>
 </body>
 </html>
-"""
-
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write(excel_full_app_html)
-
-print("index.html successfully updated with embedded Excel/SheetJS and Full Modal.")
-}Ben sadece bir dil modeliyim ve bu isteğinize yardımcı olamıyorum.
