@@ -1,1 +1,2450 @@
-
+[
+  {
+    "id": "0101007",
+    "name": "YUCCA BUSH X 36 W/WHITE FLOWERS",
+    "color": "-",
+    "price": 350.0
+  },
+  {
+    "id": "0101018",
+    "name": "67 MİNG ARALİA (GREEN)",
+    "color": "-",
+    "price": 330.0
+  },
+  {
+    "id": "0101024",
+    "name": "GUZMANIA KIRMIZI BÜYÜK",
+    "color": "-",
+    "price": 130.0
+  },
+  {
+    "id": "0101025",
+    "name": "GUZMANIA SARI BÜYÜK",
+    "color": "SARI",
+    "price": 0.0
+  },
+  {
+    "id": "0101026",
+    "name": "GUZMANIA MOR BÜYÜK",
+    "color": "PEMBE",
+    "price": 160.0
+  },
+  {
+    "id": "0101027",
+    "name": "GUZMANIA KIRMIZI KÜÇÜK",
+    "color": "-",
+    "price": 130.0
+  },
+  {
+    "id": "0101028",
+    "name": "GUZMANIA SARI KÜÇÜK",
+    "color": "-",
+    "price": 130.0
+  },
+  {
+    "id": "0101029",
+    "name": "GUZMANIA MOR KÜÇÜK",
+    "color": "-",
+    "price": 130.0
+  },
+  {
+    "id": "0101030",
+    "name": "PEPEROMIA TOPIARY",
+    "color": "-",
+    "price": 620.0
+  },
+  {
+    "id": "0101031",
+    "name": "SWEETBAY TOPIARY",
+    "color": "-",
+    "price": 620.0
+  },
+  {
+    "id": "0101032",
+    "name": "T234Z-14510-00108 48 CEDAR TREE",
+    "color": "-",
+    "price": 820.0
+  },
+  {
+    "id": "0101033",
+    "name": "RIVER GRASS BUSH",
+    "color": "-",
+    "price": 450.0
+  },
+  {
+    "id": "0101101",
+    "name": "HEDERA SARMAŞIK 80CM",
+    "color": "-",
+    "price": 890.0
+  },
+  {
+    "id": "0101102",
+    "name": "HEDERA YEŞİL BEYAZ 80CM",
+    "color": "-",
+    "price": 890.0
+  },
+  {
+    "id": "0101103",
+    "name": "PETUNYA SARKAN 60CM BEYAZ",
+    "color": "-",
+    "price": 530.0
+  },
+  {
+    "id": "0101104",
+    "name": "60 CM PETUNIA HANGING BUSH",
+    "color": "MOR",
+    "price": 530.0
+  },
+  {
+    "id": "0101105",
+    "name": "PETUNYA SARKAN 60CM MOR BEYAZ",
+    "color": "-",
+    "price": 530.0
+  },
+  {
+    "id": "0101106",
+    "name": "PETUNYA SARKAN 60CM MOR SARI",
+    "color": "-",
+    "price": 530.0
+  },
+  {
+    "id": "0101107",
+    "name": "59 CM POPPY SPRAY X 2 WITH",
+    "color": "-",
+    "price": 15.0
+  },
+  {
+    "id": "0101108",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 0.0
+  },
+  {
+    "id": "0101109",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 0.0
+  },
+  {
+    "id": "0101110",
+    "name": "SARDUNYA DEMET KIRMIZI 40CM",
+    "color": "-",
+    "price": 470.0
+  },
+  {
+    "id": "0101110K",
+    "name": "SARDUNYA DEMET KIRMIZI 40CM KÜÇÜK",
+    "color": "-",
+    "price": 250.0
+  },
+  {
+    "id": "0101111",
+    "name": "SARDUNYA DEMET PEMBE 40CM",
+    "color": "-",
+    "price": 470.0
+  },
+  {
+    "id": "0101112",
+    "name": "SARDUNYA DEMET KREM 40CM",
+    "color": "-",
+    "price": 470.0
+  },
+  {
+    "id": "0101115",
+    "name": "35333",
+    "color": "-",
+    "price": 330.0
+  },
+  {
+    "id": "0101117",
+    "name": "WANDERING 80CM",
+    "color": "-",
+    "price": 890.0
+  },
+  {
+    "id": "0101118",
+    "name": "PETUNYA SARKAN SARI 30CM",
+    "color": "-",
+    "price": 58.0
+  },
+  {
+    "id": "0101119",
+    "name": "PETUNIA VINE (PEMBE) 30CM",
+    "color": "-",
+    "price": 58.0
+  },
+  {
+    "id": "0101120",
+    "name": "PETUNIA VINE (MOR) 30CM",
+    "color": "-",
+    "price": 58.0
+  },
+  {
+    "id": "0101121",
+    "name": "PETUNIA VINE (KREM) 30CM",
+    "color": "-",
+    "price": 58.0
+  },
+  {
+    "id": "0101123",
+    "name": "POTHOS SARKAN 80CM",
+    "color": "-",
+    "price": 890.0
+  },
+  {
+    "id": "0101124",
+    "name": "HEDERA GARLAND 180CM",
+    "color": "-",
+    "price": 340.0
+  },
+  {
+    "id": "0101125",
+    "name": "45CM CADENTI HANGING SARMAŞIK",
+    "color": "-",
+    "price": 60.0
+  },
+  {
+    "id": "0101126",
+    "name": "35CM BOSTON IVY BUSH X9",
+    "color": "-",
+    "price": 340.0
+  },
+  {
+    "id": "0101127",
+    "name": "ENGLISH IVY 120CM",
+    "color": "-",
+    "price": 2210.0
+  },
+  {
+    "id": "0101501",
+    "name": "YNC-371 SARMAŞIK YAPAY BİTKİ",
+    "color": "-",
+    "price": 0.0
+  },
+  {
+    "id": "0102002",
+    "name": "DRACENCA 150CM",
+    "color": "-",
+    "price": 10920.0
+  },
+  {
+    "id": "0102003",
+    "name": "DRECENA 150CM",
+    "color": "-",
+    "price": 5280.0
+  },
+  {
+    "id": "0102006",
+    "name": "PHILO 60CM",
+    "color": "-",
+    "price": 2020.0
+  },
+  {
+    "id": "0102007",
+    "name": "Golden Lvs.",
+    "color": "-",
+    "price": 60.0
+  },
+  {
+    "id": "0102010",
+    "name": "GUZMANIA 60CM",
+    "color": "-",
+    "price": 2580.0
+  },
+  {
+    "id": "0102011",
+    "name": "PINEAPPLE",
+    "color": "-",
+    "price": 650.0
+  },
+  {
+    "id": "0102012",
+    "name": "POTHOS 160CM",
+    "color": "-",
+    "price": 5500.0
+  },
+  {
+    "id": "0102014",
+    "name": "RAINBOW 220CM",
+    "color": "-",
+    "price": 25760.0
+  },
+  {
+    "id": "0102015",
+    "name": "RAINBOW 160CM",
+    "color": "-",
+    "price": 12240.0
+  },
+  {
+    "id": "0102017",
+    "name": "DIFFENBAHIA DEMET 50CM",
+    "color": "-",
+    "price": 790.0
+  },
+  {
+    "id": "0102020",
+    "name": "AGAVE 60CM",
+    "color": "-",
+    "price": 2450.0
+  },
+  {
+    "id": "0102025",
+    "name": "NARCISSUSS 4'LÜ",
+    "color": "PEMBE",
+    "price": 540.0
+  },
+  {
+    "id": "0102025",
+    "name": "NARCISSUSS 4'LÜ",
+    "color": "MAVİ",
+    "price": 540.0
+  },
+  {
+    "id": "0102025",
+    "name": "NARCISSUSS 4'LÜ",
+    "color": "BEYAZ",
+    "price": 540.0
+  },
+  {
+    "id": "0102025-1",
+    "name": "NARCISSUS",
+    "color": "PEMBE",
+    "price": 540.0
+  },
+  {
+    "id": "0102025-1",
+    "name": "NARCISSUS",
+    "color": "MAVİ",
+    "price": 540.0
+  },
+  {
+    "id": "0102025-1",
+    "name": "NARCISSUS",
+    "color": "BEYAZ",
+    "price": 540.0
+  },
+  {
+    "id": "0102026",
+    "name": "SCHEFFLERRA",
+    "color": "-",
+    "price": 910.0
+  },
+  {
+    "id": "0102027",
+    "name": "NARCISSUS",
+    "color": "-",
+    "price": 210.0
+  },
+  {
+    "id": "0102028",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 0.0
+  },
+  {
+    "id": "0102031",
+    "name": "160CM SISIAL HEMP",
+    "color": "-",
+    "price": 990.0
+  },
+  {
+    "id": "0102032",
+    "name": "AYMENDCALLIS",
+    "color": "-",
+    "price": 420.0
+  },
+  {
+    "id": "0102033",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 0.0
+  },
+  {
+    "id": "0102037",
+    "name": "KORUMALI PLASTİK PALMİYE YAPRAĞI",
+    "color": "-",
+    "price": 1008.0
+  },
+  {
+    "id": "0102040",
+    "name": "CYSAS",
+    "color": "-",
+    "price": 900.0
+  },
+  {
+    "id": "0102045",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 0.0
+  },
+  {
+    "id": "0102050",
+    "name": "CACTUS - KAKTÜS",
+    "color": "-",
+    "price": 4080.0
+  },
+  {
+    "id": "0102051",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 1440.0
+  },
+  {
+    "id": "0102052",
+    "name": "CACTUS - KAKTÜS",
+    "color": "-",
+    "price": 5880.0
+  },
+  {
+    "id": "0102053",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 0.0
+  },
+  {
+    "id": "0102054",
+    "name": "CACTUS - KAKTÜS",
+    "color": "-",
+    "price": 7180.0
+  },
+  {
+    "id": "0102055",
+    "name": "ΚΑKTÜS 150CM",
+    "color": "-",
+    "price": 11980.0
+  },
+  {
+    "id": "0102057",
+    "name": "LATEX FICUS",
+    "color": "-",
+    "price": 8.0
+  },
+  {
+    "id": "0102058",
+    "name": "BAMBU YAPRAĞI",
+    "color": "-",
+    "price": 220.0
+  },
+  {
+    "id": "0102059",
+    "name": "UV KORUMALI PLASTİK PALMİYE YAPRAĞI",
+    "color": "-",
+    "price": 750.0
+  },
+  {
+    "id": "0102060",
+    "name": "STARLİÇE ÇİÇEKLİ 80CM",
+    "color": "-",
+    "price": 3480.0
+  },
+  {
+    "id": "0102061",
+    "name": "DRACAENA",
+    "color": "-",
+    "price": 5980.0
+  },
+  {
+    "id": "0102062",
+    "name": "DRACENA 190CM",
+    "color": "-",
+    "price": 6904.0
+  },
+  {
+    "id": "0102063",
+    "name": "SPATIFILYUM 145CM",
+    "color": "-",
+    "price": 8280.0
+  },
+  {
+    "id": "0102064",
+    "name": "PEACOCK PLANT 50CM",
+    "color": "-",
+    "price": 1070.0
+  },
+  {
+    "id": "0102065",
+    "name": "OAK TREE",
+    "color": "-",
+    "price": 3725.0
+  },
+  {
+    "id": "0102066",
+    "name": "STARLİÇE ÇİÇEKLİ 140CM",
+    "color": "-",
+    "price": 6240.0
+  },
+  {
+    "id": "0102067",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 8300.0
+  },
+  {
+    "id": "0102068",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 5600.0
+  },
+  {
+    "id": "0102069",
+    "name": "ANTHURIUM",
+    "color": "-",
+    "price": 2300.0
+  },
+  {
+    "id": "0102070",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 0.0
+  },
+  {
+    "id": "0102071",
+    "name": "OAK TREE",
+    "color": "-",
+    "price": 0.0
+  },
+  {
+    "id": "0102072",
+    "name": "SPYTHIPHILLUM KÜÇÜK",
+    "color": "-",
+    "price": 4400.0
+  },
+  {
+    "id": "0102073",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 1660.0
+  },
+  {
+    "id": "0102074",
+    "name": "SHEFFLERA",
+    "color": "-",
+    "price": 0.0
+  },
+  {
+    "id": "0102075",
+    "name": "YELLOW SPOTTED LUCKY LVS",
+    "color": "-",
+    "price": 38.0
+  },
+  {
+    "id": "0102077",
+    "name": "SPİRAL TREE",
+    "color": "-",
+    "price": 1209.0
+  },
+  {
+    "id": "0102078",
+    "name": "OLIVE SPRAY",
+    "color": "-",
+    "price": 260.0
+  },
+  {
+    "id": "0102079",
+    "name": "PITTOSPORUM SPRAY",
+    "color": "-",
+    "price": 124.0
+  },
+  {
+    "id": "0102081",
+    "name": "MANGO SPRAY",
+    "color": "-",
+    "price": 210.0
+  },
+  {
+    "id": "0102082",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 0.0
+  },
+  {
+    "id": "0102083",
+    "name": "MİNİ FİCUS SPRAY VARIEGATED",
+    "color": "-",
+    "price": 192.0
+  },
+  {
+    "id": "0102084",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 1240.0
+  },
+  {
+    "id": "0102087",
+    "name": "90CM GRASS WITH POT",
+    "color": "-",
+    "price": 1800.0
+  },
+  {
+    "id": "0102088",
+    "name": "80CM SMARAGLD WITHOUT POT",
+    "color": "-",
+    "price": 2500.0
+  },
+  {
+    "id": "0102089",
+    "name": "SANSEVERIA 65CM",
+    "color": "-",
+    "price": 4080.0
+  },
+  {
+    "id": "0102089V",
+    "name": "63CM PAŞA KILICI BİTKİSİ",
+    "color": "-",
+    "price": 1890.0
+  },
+  {
+    "id": "0102091",
+    "name": "200CM CYCAS WITHOUT POT",
+    "color": "-",
+    "price": 110.0
+  },
+  {
+    "id": "0102092",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 0.0
+  },
+  {
+    "id": "0102094",
+    "name": "150CM AGAVE BEŞ GÖVDELİ",
+    "color": "-",
+    "price": 1480.0
+  },
+  {
+    "id": "0102095",
+    "name": "110CM CYCAS WITHOUT POT",
+    "color": "-",
+    "price": 3450.0
+  },
+  {
+    "id": "0102096",
+    "name": "75CM CYCAS WITHOUT POT",
+    "color": "-",
+    "price": 500.0
+  },
+  {
+    "id": "0102101",
+    "name": "ΚAKTÜS 75CM",
+    "color": "-",
+    "price": 2050.0
+  },
+  {
+    "id": "0102102",
+    "name": "DÌA 40CM CACTUS BALL WITHOUT POT",
+    "color": "-",
+    "price": 1960.0
+  },
+  {
+    "id": "0102103",
+    "name": "DIA 28CM CACTUS BALL WITHOUT POT",
+    "color": "-",
+    "price": 1350.0
+  },
+  {
+    "id": "0102104",
+    "name": "160CM CACTUS WITHOUT POT",
+    "color": "-",
+    "price": 6100.0
+  },
+  {
+    "id": "0102105",
+    "name": "200CM CACTUS WITHOUT POT",
+    "color": "-",
+    "price": 7500.0
+  },
+  {
+    "id": "0102106",
+    "name": "75CM CACTUS WITHOUT POT",
+    "color": "-",
+    "price": 1740.0
+  },
+  {
+    "id": "0102107",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 0.0
+  },
+  {
+    "id": "0102110",
+    "name": "PODOCARPUS (130IVS)",
+    "color": "-",
+    "price": 75.0
+  },
+  {
+    "id": "0102111",
+    "name": "CROTON BUSH",
+    "color": "-",
+    "price": 450.0
+  },
+  {
+    "id": "0102112",
+    "name": "DRECAENA REFLEXA VARIEGATED SPRAY",
+    "color": "-",
+    "price": 290.0
+  },
+  {
+    "id": "0102113",
+    "name": "CROTON SPRAY",
+    "color": "-",
+    "price": 500.0
+  },
+  {
+    "id": "0102114",
+    "name": "BRAZMAN PITTOSPORUM SPRAY",
+    "color": "-",
+    "price": 130.0
+  },
+  {
+    "id": "0102115",
+    "name": "FICUS RETUSA SPRAY",
+    "color": "-",
+    "price": 220.0
+  },
+  {
+    "id": "0102116",
+    "name": "90CM SANSEVIERIA WITHOUT POT",
+    "color": "-",
+    "price": 5600.0
+  },
+  {
+    "id": "0102116V",
+    "name": "89CM PAŞA KILICI BİTKİSİ",
+    "color": "-",
+    "price": 3100.0
+  },
+  {
+    "id": "0102117",
+    "name": "70 CM CACTUS",
+    "color": "-",
+    "price": 4500.0
+  },
+  {
+    "id": "0102118",
+    "name": "65 CM CACTUS",
+    "color": "-",
+    "price": 2400.0
+  },
+  {
+    "id": "0102119",
+    "name": "150 CM CACTUS",
+    "color": "-",
+    "price": 5100.0
+  },
+  {
+    "id": "0102120",
+    "name": "ΚΑKTÜS 100CM",
+    "color": "-",
+    "price": 4900.0
+  },
+  {
+    "id": "0102121",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 1240.0
+  },
+  {
+    "id": "0102122",
+    "name": "DIA 23 CM CACTUS BALL",
+    "color": "-",
+    "price": 240.0
+  },
+  {
+    "id": "0102123",
+    "name": "50 CM CALADIUM",
+    "color": "-",
+    "price": 350.0
+  },
+  {
+    "id": "0102125",
+    "name": "UV BAXUS SPRAY 47 CM",
+    "color": "-",
+    "price": 230.0
+  },
+  {
+    "id": "0102126",
+    "name": "32 CM GRASS BALL",
+    "color": "-",
+    "price": 900.0
+  },
+  {
+    "id": "0102127",
+    "name": "36 CM GRASS BALL",
+    "color": "-",
+    "price": 900.0
+  },
+  {
+    "id": "0102128",
+    "name": "BIG 5 BRANCHES 84 LEAVES CROTON",
+    "color": "-",
+    "price": 540.0
+  },
+  {
+    "id": "0102129",
+    "name": "BIG 5 BRANCHES 67 LEAVES JACKFRUIT 2 FRUITS",
+    "color": "-",
+    "price": 540.0
+  },
+  {
+    "id": "0102130",
+    "name": "30 LEAVES RED SONG OF INDIA",
+    "color": "-",
+    "price": 130.0
+  },
+  {
+    "id": "0102131",
+    "name": "30 LEAVES PURPLE SONG OF JAMAICA",
+    "color": "-",
+    "price": 130.0
+  },
+  {
+    "id": "0102132",
+    "name": "30 LEAVES YELLOW SONG OF INDIA",
+    "color": "-",
+    "price": 130.0
+  },
+  {
+    "id": "0102133",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 840.0
+  },
+  {
+    "id": "0102134",
+    "name": "CYCAS 110CM",
+    "color": "-",
+    "price": 4330.0
+  },
+  {
+    "id": "0102135",
+    "name": "150 CM 160 LEAVES GREEN YUCCA",
+    "color": "-",
+    "price": 6100.0
+  },
+  {
+    "id": "0102136",
+    "name": "ONON GRASS",
+    "color": "-",
+    "price": 110.0
+  },
+  {
+    "id": "0102137",
+    "name": "YUCCA 3 GÖVDE 180CM",
+    "color": "-",
+    "price": 8160.0
+  },
+  {
+    "id": "0102138",
+    "name": "18 LEAVES PHOENIX GRASS",
+    "color": "-",
+    "price": 940.0
+  },
+  {
+    "id": "0102139",
+    "name": "SINGLE UV OUDOOR PALM LEAF",
+    "color": "-",
+    "price": 1500.0
+  },
+  {
+    "id": "0102140",
+    "name": "180 CM SPRIAL TREE",
+    "color": "-",
+    "price": 18120.0
+  },
+  {
+    "id": "0102141",
+    "name": "PORTAKAL AĞACI 150CM",
+    "color": "-",
+    "price": 8832.0
+  },
+  {
+    "id": "0102142",
+    "name": "LİMON AĞACI 150CM",
+    "color": "-",
+    "price": 8832.0
+  },
+  {
+    "id": "0102144",
+    "name": "FICUS SPRAY",
+    "color": "-",
+    "price": 130.0
+  },
+  {
+    "id": "0102145",
+    "name": "SCHEFLERA DEMET SARI YEŞİL",
+    "color": "-",
+    "price": 350.0
+  },
+  {
+    "id": "01021458",
+    "name": "SCHEFLERA DEMET SARI YEŞİL BÜYÜK",
+    "color": "-",
+    "price": 1490.0
+  },
+  {
+    "id": "0102146",
+    "name": "SHEFLERA AĞAÇ",
+    "color": "-",
+    "price": 6840.0
+  },
+  {
+    "id": "0102147",
+    "name": "POTHOS AĞAÇ",
+    "color": "-",
+    "price": 5200.0
+  },
+  {
+    "id": "0102148",
+    "name": "CAM GÜZELİ KIRMIZI",
+    "color": "-",
+    "price": 160.0
+  },
+  {
+    "id": "0102149",
+    "name": "COLVOS DEMET",
+    "color": "-",
+    "price": 580.0
+  },
+  {
+    "id": "0102150",
+    "name": "CAM GÜZELİ SARMAŞIK 75CM",
+    "color": "-",
+    "price": 1250.0
+  },
+  {
+    "id": "0102151",
+    "name": "HEDERA 110CM",
+    "color": "-",
+    "price": 1600.0
+  },
+  {
+    "id": "0102152",
+    "name": "YAPRAK GÜZELİ TEK DAL SARMAŞIK 220CM",
+    "color": "-",
+    "price": 800.0
+  },
+  {
+    "id": "0102153",
+    "name": "HEDERA TEK DAL SARMAŞIK 220CM",
+    "color": "-",
+    "price": 910.0
+  },
+  {
+    "id": "0102154",
+    "name": "FALSE ARALIA 80CM",
+    "color": "-",
+    "price": 1700.0
+  },
+  {
+    "id": "0102155",
+    "name": "ASPILENIUM DEMET 50CM",
+    "color": "-",
+    "price": 770.0
+  },
+  {
+    "id": "0102156",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 1300.0
+  },
+  {
+    "id": "0102157",
+    "name": "DEVE TABANI 160CM",
+    "color": "-",
+    "price": 7900.0
+  },
+  {
+    "id": "0102158",
+    "name": "FICUS LYRATA 180CM",
+    "color": "-",
+    "price": 8280.0
+  },
+  {
+    "id": "0102159",
+    "name": "YAPAY BİTKİ",
+    "color": "-",
+    "price": 2200.0
+  },
+  {
+    "id": "0102160",
+    "name": "MANGO YAPRAK (YEŞİL BEYAZ)",
+    "color": "-",
+    "price": 140.0
+  },
+  {
+    "id": "0102161",
+    "name": "170CM PLASTİK PALMİYE YAPRAĞI",
+    "color": "-",
+    "price": 2640.0
+  },
+  {
+    "id": "0102162",
+    "name": "STARLİÇE İNCE DAL 120CM",
+    "color": "-",
+    "price": 3960.0
+  },
+  {
+    "id": "0102163",
+    "name": "STARLİÇE İNCE DAL 210CM",
+    "color": "-",
+    "price": 9840.0
+  },
+  {
+    "id": "0102164",
+    "name": "AGAVE YEŞİL 110CM",
+    "color": "-",
+    "price": 6720.0
+  },
+  {
+    "id": "0102165",
+    "name": "TOP KAKTÜS 38CM",
+    "color": "-",
+    "price": 4680.0
+  },
+  {
+    "id": "0102166",
+    "name": "TOP KAKTÜS 28CM",
+    "color": "-",
+    "price": 2860.0
+  },
+  {
+    "id": "0102167",
+    "name": "TOP KAKTÜS 18CM",
+    "color": "-",
+    "price": 1680.0
+  },
+  {
+    "id": "0102168",
+    "name": "SANSEVERIA YEŞİL 65CM",
+    "color": "-",
+    "price": 4080.0
+  },
+  {
+    "id": "0102168V",
+    "name": "SANSEVERIA 65CM",
+    "color": "-",
+    "price": 2480.0
+  },
+  {
+    "id": "0102169",
+    "name": "CACTUS 120 CM",
+    "color": "-",
+    "price": 10080.0
+  },
+  {
+    "id": "0102170",
+    "name": "ZEYTİN DALI",
+    "color": "-",
+    "price": 790.0
+  },
+  {
+    "id": "0102171",
+    "name": "KAKTUS 78CM",
+    "color": "-",
+    "price": 5040.0
+  },
+  {
+    "id": "0102172",
+    "name": "178CM CACTUS",
+    "color": "-",
+    "price": 11730.0
+  },
+  {
+    "id": "0102173",
+    "name": "YAPRAK GÜZELİ TEK DAL SARMAŞIK 220CM",
+    "color": "-",
+    "price": 710.0
+  },
+  {
+    "id": "0102174",
+    "name": "CAM GÜZELİ DEMET YEŞİLLİK 45CM",
+    "color": "-",
+    "price": 280.0
+  },
+  {
+    "id": "0102175",
+    "name": "MONSTERA SARMAŞIK 60CM",
+    "color": "-",
+    "price": 490.0
+  },
+  {
+    "id": "0102176",
+    "name": "SHEFLERA DEMET 55CM",
+    "color": "-",
+    "price": 540.0
+  },
+  {
+    "id": "0102177",
+    "name": "SALON PALMİYESİ 150CM",
+    "color": "-",
+    "price": 8096.0
+  },
+  {
+    "id": "0102178",
+    "name": "DUA ÇİÇEĞİ 60CM",
+    "color": "-",
+    "price": 640.0
+  },
+  {
+    "id": "0102179",
+    "name": "ZAMIA 90CM",
+    "color": "-",
+    "price": 4440.0
+  },
+  {
+    "id": "0102180",
+    "name": "ZAMIA 120CM",
+    "color": "-",
+    "price": 5880.0
+  },
+  {
+    "id": "0102181",
+    "name": "STARLİÇE 150CM",
+    "color": "-",
+    "price": 4720.0
+  },
+  {
+    "id": "0102182",
+    "name": "STARLİÇE 120CM",
+    "color": "-",
+    "price": 2530.0
+  },
+  {
+    "id": "0102183",
+    "name": "SÜS BİTKİSİ 160CM",
+    "color": "-",
+    "price": 4448.0
+  },
+  {
+    "id": "0102184",
+    "name": "MUZ AĞAÇI 4'LÜ 320CM",
+    "color": "-",
+    "price": 18360.0
+  },
+  {
+    "id": "0102185",
+    "name": "MUZ AĞACI EKO 3'LÜ 280CM",
+    "color": "-",
+    "price": 10680.0
+  },
+  {
+    "id": "0102186",
+    "name": "DRECENA 140CM",
+    "color": "-",
+    "price": 6440.0
+  },
+  {
+    "id": "0102187",
+    "name": "BONZAİ AĞAÇ 150CM",
+    "color": "-",
+    "price": 79200.0
+  },
+  {
+    "id": "0102188",
+    "name": "BONZAİ AĞAÇ 200CM",
+    "color": "-",
+    "price": 109890.0
+  },
+  {
+    "id": "0102189",
+    "name": "BONZAİ AĞAÇ 180CM",
+    "color": "-",
+    "price": 96580.0
+  },
+  {
+    "id": "0102190",
+    "name": "BONZAİ AĞAÇ 250CM",
+    "color": "-",
+    "price": 131670.0
+  },
+  {
+    "id": "0102191",
+    "name": "BONZAİ AĞAÇ 220CM",
+    "color": "-",
+    "price": 128700.0
+  },
+  {
+    "id": "0102192",
+    "name": "BONSAI DAL 33 CM",
+    "color": "-",
+    "price": 240.0
+  },
+  {
+    "id": "0102193",
+    "name": "BONSAI DAL 32 CM",
+    "color": "-",
+    "price": 180.0
+  },
+  {
+    "id": "0102194",
+    "name": "BONSAI DAL 32 CM",
+    "color": "YEŞİL",
+    "price": 290.0
+  },
+  {
+    "id": "0102194",
+    "name": "BONSAI DAL 32 CM",
+    "color": "KIRMIZI",
+    "price": 290.0
+  },
+  {
+    "id": "0102195",
+    "name": "BONSAI DAL 48 CM",
+    "color": "-",
+    "price": 380.0
+  },
+  {
+    "id": "0102196",
+    "name": "BONZAİ AĞAÇ 250CM",
+    "color": "-",
+    "price": 133060.0
+  },
+  {
+    "id": "0102197",
+    "name": "BONZAİ AĞAÇ 120CM",
+    "color": "-",
+    "price": 36850.0
+  },
+  {
+    "id": "0102198",
+    "name": "BONZAİ AĞAÇ 200CM",
+    "color": "-",
+    "price": 99800.0
+  },
+  {
+    "id": "0102199",
+    "name": "SARKAN FUJER 90CM",
+    "color": "-",
+    "price": 310.0
+  },
+  {
+    "id": "0102200",
+    "name": "SARKAN BİTKİ 85CM",
+    "color": "-",
+    "price": 350.0
+  },
+  {
+    "id": "0102201",
+    "name": "DEMET YEŞİLLİK 50CM",
+    "color": "-",
+    "price": 240.0
+  },
+  {
+    "id": "0102202",
+    "name": "DEMET YEŞİLLİK 50CM",
+    "color": "KAHVE YEŞİL",
+    "price": 290.0
+  },
+  {
+    "id": "0102202",
+    "name": "DEMET YEŞİLLİK 50CM",
+    "color": "KOYU YEŞİL",
+    "price": 290.0
+  },
+  {
+    "id": "0102203",
+    "name": "DEMET YEŞİLLİK 50CM",
+    "color": "-",
+    "price": 290.0
+  },
+  {
+    "id": "0102204",
+    "name": "HAZIR GÖVDE ZEYTİN AĞACI 230CM",
+    "color": "-",
+    "price": 39270.0
+  },
+  {
+    "id": "0102205",
+    "name": "HAZIR GÖVDE LİMON AĞACI 250CM",
+    "color": "-",
+    "price": 45430.0
+  },
+  {
+    "id": "0102206",
+    "name": "HAZIR GÖVDE MANOLYA AĞACI 230CM",
+    "color": "-",
+    "price": 33720.0
+  },
+  {
+    "id": "0102207",
+    "name": "UV ZEYTİN DALI 102CM",
+    "color": "-",
+    "price": 760.0
+  },
+  {
+    "id": "0102208",
+    "name": "AGAVE SISALANA 118CM",
+    "color": "-",
+    "price": 6600.0
+  },
+  {
+    "id": "0102209",
+    "name": "YUCCA 150CM",
+    "color": "-",
+    "price": 7080.0
+  },
+  {
+    "id": "0102210",
+    "name": "AREKA PALM 150CM",
+    "color": "-",
+    "price": 5880.0
+  },
+  {
+    "id": "0102211",
+    "name": "KWAI PALM",
+    "color": "-",
+    "price": 5880.0
+  },
+  {
+    "id": "0102212",
+    "name": "DEMET YEŞİLLİK",
+    "color": "KAHVE YEŞİL",
+    "price": 300.0
+  },
+  {
+    "id": "0102212",
+    "name": "DEMET YEŞİLLİK",
+    "color": "YEŞİL",
+    "price": 300.0
+  },
+  {
+    "id": "0102212",
+    "name": "DEMET YEŞİLLİK",
+    "color": "TURUNCU",
+    "price": 300.0
+  },
+  {
+    "id": "0102213",
+    "name": "NERGİS ÇİÇEĞİ 5Lİ DEMET",
+    "color": "SARI",
+    "price": 200.0
+  },
+  {
+    "id": "0102213",
+    "name": "NERGİS ÇİÇEĞİ 5Lİ DEMET",
+    "color": "BEYAZ",
+    "price": 200.0
+  },
+  {
+    "id": "0102214",
+    "name": "MONSTERA 68CM",
+    "color": "-",
+    "price": 830.0
+  },
+  {
+    "id": "0102215",
+    "name": "PHILODENDRON 68CM",
+    "color": "-",
+    "price": 830.0
+  },
+  {
+    "id": "0102216",
+    "name": "FAN PALM 68CM",
+    "color": "-",
+    "price": 960.0
+  },
+  {
+    "id": "0102217",
+    "name": "DIFFENBAHIA",
+    "color": "-",
+    "price": 820.0
+  },
+  {
+    "id": "0102218",
+    "name": "YAPAY KAYA GRİ 7Lİ SET",
+    "color": "-",
+    "price": 3500.0
+  },
+  {
+    "id": "0102219",
+    "name": "YAPAY KAYA KAHVERENGİ 8Lİ SET",
+    "color": "-",
+    "price": 3500.0
+  },
+  {
+    "id": "0102220",
+    "name": "BANKSIA TEK DAL 65CM",
+    "color": "TURUNCU",
+    "price": 460.0
+  },
+  {
+    "id": "0102220",
+    "name": "BANKSIA TEK DAL 65CM",
+    "color": "SARI",
+    "price": 460.0
+  },
+  {
+    "id": "0102220",
+    "name": "BANKSIA TEK DAL 65CM",
+    "color": "MAVİ",
+    "price": 460.0
+  },
+  {
+    "id": "0102220",
+    "name": "BANKSIA TEK DAL 65CM",
+    "color": "BORDO",
+    "price": 460.0
+  },
+  {
+    "id": "0102221",
+    "name": "LILAC TEK DAL 63CM",
+    "color": "SARI",
+    "price": 410.0
+  },
+  {
+    "id": "0102221",
+    "name": "LILAC TEK DAL 63CM",
+    "color": "MAVİ",
+    "price": 410.0
+  },
+  {
+    "id": "0102222",
+    "name": "PROTEA TEK DAL 73CM",
+    "color": "SARI",
+    "price": 380.0
+  },
+  {
+    "id": "0102222",
+    "name": "PROTEA TEK DAL 73CM",
+    "color": "MAVİ",
+    "price": 380.0
+  },
+  {
+    "id": "0102222",
+    "name": "PROTEA TEK DAL 73CM",
+    "color": "BORDO",
+    "price": 380.0
+  },
+  {
+    "id": "0102223",
+    "name": "GLOBOSA TEK DAL 69CM",
+    "color": "TURUNCU",
+    "price": 380.0
+  },
+  {
+    "id": "0102223",
+    "name": "GLOBOSA TEK DAL 69CM",
+    "color": "SARI",
+    "price": 380.0
+  },
+  {
+    "id": "0102223",
+    "name": "GLOBOSA TEK DAL 69CM",
+    "color": "MAVÍ",
+    "price": 380.0
+  },
+  {
+    "id": "0102223",
+    "name": "GLOBOSA TEK DAL 69CM",
+    "color": "BORDO",
+    "price": 380.0
+  },
+  {
+    "id": "0102224",
+    "name": "WILD BERRY TEK DAL 53CM",
+    "color": "SARI",
+    "price": 250.0
+  },
+  {
+    "id": "0102224",
+    "name": "WILD BERRY TEK DAL 53CM",
+    "color": "MAVİ",
+    "price": 250.0
+  },
+  {
+    "id": "0102224",
+    "name": "WILD BERRY TEK DAL 53CM",
+    "color": "BORDO",
+    "price": 250.0
+  },
+  {
+    "id": "0102225",
+    "name": "SAGUARO CACTUS 168CM",
+    "color": "-",
+    "price": 49880.0
+  },
+  {
+    "id": "0102226",
+    "name": "CACTUS 165CM",
+    "color": "-",
+    "price": 40800.0
+  },
+  {
+    "id": "0102227",
+    "name": "CACTUS 160CM",
+    "color": "-",
+    "price": 13680.0
+  },
+  {
+    "id": "0102228",
+    "name": "CACTUS 143CM",
+    "color": "-",
+    "price": 11280.0
+  },
+  {
+    "id": "0102229",
+    "name": "CACTUS 98CM",
+    "color": "-",
+    "price": 7800.0
+  },
+  {
+    "id": "0102230",
+    "name": "CACTUS 100CM",
+    "color": "-",
+    "price": 11880.0
+  },
+  {
+    "id": "0102231",
+    "name": "CACTUS 145CM",
+    "color": "-",
+    "price": 13080.0
+  },
+  {
+    "id": "0102232",
+    "name": "TOP KAKTÜS 30CM",
+    "color": "-",
+    "price": 4200.0
+  },
+  {
+    "id": "0102233",
+    "name": "TOP KAKTÜS 36CM",
+    "color": "-",
+    "price": 5880.0
+  },
+  {
+    "id": "0102234",
+    "name": "AREKA PALM 150CM",
+    "color": "-",
+    "price": 4180.0
+  },
+  {
+    "id": "0102235",
+    "name": "UV ZAMIA DEMET YEŞİLLİK",
+    "color": "-",
+    "price": 1550.0
+  },
+  {
+    "id": "0102236",
+    "name": "BONSAI DAL YEŞİL",
+    "color": "-",
+    "price": 240.0
+  },
+  {
+    "id": "0102237",
+    "name": "BONSAI DAL HAZAN",
+    "color": "-",
+    "price": 240.0
+  },
+  {
+    "id": "0102238",
+    "name": "BONSAI DAL YEŞİL",
+    "color": "-",
+    "price": 180.0
+  },
+  {
+    "id": "0102239",
+    "name": "BONSAI AKÇAAĞAÇ DAL",
+    "color": "KIRMIZI",
+    "price": 290.0
+  },
+  {
+    "id": "0102239",
+    "name": "BONSAI AKÇAAĞAÇ DAL",
+    "color": "TURUNCU",
+    "price": 290.0
+  },
+  {
+    "id": "0102240",
+    "name": "SAZLIK PLASTİK 120CM",
+    "color": "-",
+    "price": 2760.0
+  },
+  {
+    "id": "0102241",
+    "name": "SAZLIK PLASTİK 95CM",
+    "color": "-",
+    "price": 1920.0
+  },
+  {
+    "id": "0102242",
+    "name": "SAZLIK PLASTİK 110CM",
+    "color": "-",
+    "price": 3240.0
+  },
+  {
+    "id": "0102243",
+    "name": "CANA BİTKİSİ TURUNCU 155CM",
+    "color": "-",
+    "price": 8880.0
+  },
+  {
+    "id": "0102244",
+    "name": "CANA BİTKİSİ BEYAZ 155CM",
+    "color": "-",
+    "price": 8880.0
+  },
+  {
+    "id": "0102245",
+    "name": "ZEYTİN AĞACI 180CM",
+    "color": "-",
+    "price": 6960.0
+  },
+  {
+    "id": "0102246",
+    "name": "ZEYTİN AĞACI 240CM",
+    "color": "-",
+    "price": 20640.0
+  },
+  {
+    "id": "0102247",
+    "name": "TROPİK HAZIR AĞAÇ 220CM",
+    "color": "-",
+    "price": 22800.0
+  },
+  {
+    "id": "0102248",
+    "name": "SANSEVERIA 63CM-SARI YEŞİL",
+    "color": "-",
+    "price": 2880.0
+  },
+  {
+    "id": "0102249",
+    "name": "SANSEVERIA 63CM-YEŞİL",
+    "color": "-",
+    "price": 2880.0
+  },
+  {
+    "id": "0102250",
+    "name": "AREKA PALM 180CM",
+    "color": "-",
+    "price": 10240.0
+  },
+  {
+    "id": "0102251",
+    "name": "GRASS PLAKA 50X50 YEŞİL",
+    "color": "-",
+    "price": 2040.0
+  },
+  {
+    "id": "0102252",
+    "name": "GRASS PLAKA 50X50 SARI YEŞİL",
+    "color": "-",
+    "price": 2040.0
+  },
+  {
+    "id": "0102253",
+    "name": "SARKAN OKALİPTÜS 90CM",
+    "color": "-",
+    "price": 350.0
+  },
+  {
+    "id": "0102254",
+    "name": "ÜÇ TOP KAKTÜS 45CM",
+    "color": "-",
+    "price": 4560.0
+  },
+  {
+    "id": "0102255",
+    "name": "ÜÇ TOP KAKTÜS 33CM",
+    "color": "-",
+    "price": 3480.0
+  },
+  {
+    "id": "0104001",
+    "name": "ŞİMŞİR PANEL 25X25CM (DIŞ MEKAN UV KORUMA)",
+    "color": "-",
+    "price": 260.0
+  },
+  {
+    "id": "0104004",
+    "name": "DUVAR SARMAŞIĞI DİKEY BAHÇE 100X100CM",
+    "color": "-",
+    "price": 4070.0
+  },
+  {
+    "id": "0104006",
+    "name": "MAZI DİKEY BAHÇE 100X100CM (DIŞ MEKAN)",
+    "color": "-",
+    "price": 5060.0
+  },
+  {
+    "id": "0104014",
+    "name": "AMERİKAN SARMAŞIK DİKEY BAHÇE 100X100CM",
+    "color": "-",
+    "price": 5060.0
+  },
+  {
+    "id": "0104017",
+    "name": "LUX DİKEY BAHÇE 100X100CM (DİKEY BAHÇE )",
+    "color": "-",
+    "price": 5480.0
+  },
+  {
+    "id": "0104020",
+    "name": "ŞİMŞİR DİKEY BAHÇE UZUN DALLI 100X100CM",
+    "color": "-",
+    "price": 5170.0
+  },
+  {
+    "id": "0104021",
+    "name": "YEŞİL AKÇAAĞAÇ DİKEY BAHÇE 100X100CM (DIŞ MEKAN)",
+    "color": "-",
+    "price": 5060.0
+  },
+  {
+    "id": "0104022",
+    "name": "KIRMIZI AKÇAAĞAÇ DİKEY BAHÇE 100X100CM",
+    "color": "-",
+    "price": 4840.0
+  },
+  {
+    "id": "0104023",
+    "name": "RENKLİ DİKEY BAHÇE 100X100CM (DIŞ MEKAN)",
+    "color": "-",
+    "price": 4690.0
+  },
+  {
+    "id": "0104024",
+    "name": "ARANJMAN DİKEY BAHÇE 100X100CM (DIŞ MEKAN)",
+    "color": "-",
+    "price": 5280.0
+  },
+  {
+    "id": "0104025",
+    "name": "BEGONVIL DİKEY BAHÇE 100X100CM (DIŞ MEKAN)",
+    "color": "-",
+    "price": 5830.0
+  },
+  {
+    "id": "0104026",
+    "name": "YONCA ARANJMAN DİKEY BAHÇE 100X100CM",
+    "color": "-",
+    "price": 5280.0
+  },
+  {
+    "id": "0104027",
+    "name": "YAPAY MOSS DİKEY BAHÇE 50X50CM (DIŞ MEKAN)",
+    "color": "-",
+    "price": 1920.0
+  },
+  {
+    "id": "0104028",
+    "name": "HAZIR DİKEY BAHÇE PANEL 100X100CM",
+    "color": "-",
+    "price": 12980.0
+  },
+  {
+    "id": "0104029",
+    "name": "HAZIR DİKEY BAHÇE PANEL 100X100CM",
+    "color": "-",
+    "price": 11990.0
+  },
+  {
+    "id": "0104030",
+    "name": "DIŞ MEKAN BİTKİLİ DİKEY BAHÇE",
+    "color": "-",
+    "price": 11990.0
+  },
+  {
+    "id": "0104031",
+    "name": "DİKEY BAHÇE 100X100CM (DIŞ MEKAN)",
+    "color": "-",
+    "price": 11990.0
+  },
+  {
+    "id": "0104032",
+    "name": "OKİLİPTUS DİKEY BAHÇE PANEL 100X100CM",
+    "color": "-",
+    "price": 5830.0
+  },
+  {
+    "id": "0104033",
+    "name": "UZUN ŞİMŞİR YEŞİL DİKEY BAHÇE PANEL 100X100CM",
+    "color": "-",
+    "price": 5170.0
+  },
+  {
+    "id": "0104034",
+    "name": "HAZIR DİKEY BAHÇE PANEL 100X100CM",
+    "color": "-",
+    "price": 10890.0
+  },
+  {
+    "id": "0104035",
+    "name": "HAZIR DİKEY BAHÇE PANEL 100X100CM",
+    "color": "-",
+    "price": 8690.0
+  },
+  {
+    "id": "0104036",
+    "name": "SET HAZIR DİKEY BAHÇE PANEL (4*50x50) DIŞ MEKAN",
+    "color": "-",
+    "price": 9020.0
+  },
+  {
+    "id": "0104037-1",
+    "name": "HAZIR DİKEY BAHÇE PANEL 100x100 DIŞ MEKAN",
+    "color": "-",
+    "price": 7590.0
+  },
+  {
+    "id": "0104037-2",
+    "name": "HAZIR DİKEY BAHÇE PANEL 100x100 DIŞ MEKAN",
+    "color": "-",
+    "price": 7590.0
+  },
+  {
+    "id": "0104037-3",
+    "name": "HAZIR DİKEY BAHÇE PANEL 100x100 DIŞ MEKAN",
+    "color": "-",
+    "price": 7590.0
+  },
+  {
+    "id": "0104037-4",
+    "name": "HAZIR DİKEY BAHÇE PANEL 100x100 DIŞ MEKAN",
+    "color": "-",
+    "price": 7590.0
+  },
+  {
+    "id": "0104038",
+    "name": "LUX DİKEY BAHÇE VER.2 100X100CM",
+    "color": "-",
+    "price": 4840.0
+  },
+  {
+    "id": "0105001",
+    "name": "22-24MM BAMBU ÇUBUK",
+    "color": "-",
+    "price": 165.0
+  },
+  {
+    "id": "0105003",
+    "name": "30-35MM BAMBU ÇUBUK",
+    "color": "-",
+    "price": 58.0
+  },
+  {
+    "id": "0105006",
+    "name": "50-60MM BAMBU ÇUBUK",
+    "color": "-",
+    "price": 4120.0
+  },
+  {
+    "id": "0105009",
+    "name": "60X180CM BAMBU ÇİT",
+    "color": "-",
+    "price": 625.0
+  },
+  {
+    "id": "0105010",
+    "name": "90X180CM BAMBU ÇİT",
+    "color": "-",
+    "price": 215.0
+  },
+  {
+    "id": "0105701",
+    "name": "LİLYUM 75 CM",
+    "color": "PEMBE",
+    "price": 670.0
+  },
+  {
+    "id": "0105701",
+    "name": "LILYUM 75 CM",
+    "color": "SARI",
+    "price": 670.0
+  },
+  {
+    "id": "0105701",
+    "name": "LİLYUM 75 CM",
+    "color": "BEYAZ",
+    "price": 670.0
+  },
+  {
+    "id": "0105702",
+    "name": "ORTANCA 55 CM",
+    "color": "YEŞİL",
+    "price": 470.0
+  },
+  {
+    "id": "0105702",
+    "name": "ORTANCA 55 CM",
+    "color": "TURUNCU",
+    "price": 470.0
+  },
+  {
+    "id": "0105702",
+    "name": "ORTANCA 55 CM",
+    "color": "MOR",
+    "price": 470.0
+  },
+  {
+    "id": "0105702",
+    "name": "ORTANCA 55 CM",
+    "color": "BEYAZ",
+    "price": 470.0
+  },
+  {
+    "id": "0105702",
+    "name": "ORTANCA 55 CM",
+    "color": "KOYU PEMBE",
+    "price": 470.0
+  },
+  {
+    "id": "0105702",
+    "name": "ORTANCA 55 CM",
+    "color": "AÇIK PEMBE",
+    "price": 470.0
+  },
+  {
+    "id": "0105702",
+    "name": "ORTANCA 55 CM",
+    "color": "KOYU MAVİ",
+    "price": 470.0
+  },
+  {
+    "id": "0105703",
+    "name": "DAL ÇİÇEK 83 CM",
+    "color": "KIRMIZI",
+    "price": 560.0
+  },
+  {
+    "id": "0105703",
+    "name": "DAL ÇİÇEK 83 CM",
+    "color": "MOR",
+    "price": 560.0
+  },
+  {
+    "id": "0105703",
+    "name": "DAL ÇİÇEK 83 CM",
+    "color": "MAVİ",
+    "price": 560.0
+  },
+  {
+    "id": "0105703",
+    "name": "DAL ÇİÇEK 83 CM",
+    "color": "BEYAZ",
+    "price": 560.0
+  },
+  {
+    "id": "0105704",
+    "name": "LACGUER 250CM",
+    "color": "-",
+    "price": 24480.0
+  },
+  {
+    "id": "0105705",
+    "name": "LACGUER 210CM",
+    "color": "-",
+    "price": 15600.0
+  },
+  {
+    "id": "0105706",
+    "name": "MACROPHYLLA 250CM",
+    "color": "-",
+    "price": 18144.0
+  },
+  {
+    "id": "0105707",
+    "name": "OSMANTHUS 210CM",
+    "color": "-",
+    "price": 25200.0
+  },
+  {
+    "id": "0105801",
+    "name": "YOSUN PLAKA 100X100CM",
+    "color": "-",
+    "price": 4190.0
+  },
+  {
+    "id": "0105804",
+    "name": "OKALIPTUS DAL 76CM",
+    "color": "-",
+    "price": 220.0
+  },
+  {
+    "id": "0105805",
+    "name": "KRİZANTEM 70CM",
+    "color": "KIRMIZI",
+    "price": 420.0
+  },
+  {
+    "id": "0105805",
+    "name": "KRİZANTEM 70CM",
+    "color": "PEMBE",
+    "price": 420.0
+  },
+  {
+    "id": "0105805",
+    "name": "KRİZANTEM 70CM",
+    "color": "TURUNCU",
+    "price": 420.0
+  },
+  {
+    "id": "0105805",
+    "name": "KRİZANTEM 70CM",
+    "color": "SARI",
+    "price": 420.0
+  },
+  {
+    "id": "0105805",
+    "name": "KRİZANTEM 70CM",
+    "color": "KREM",
+    "price": 420.0
+  },
+  {
+    "id": "0105806",
+    "name": "ORTANCA DEMET 34CM",
+    "color": "YEŞİL",
+    "price": 490.0
+  },
+  {
+    "id": "0105806",
+    "name": "ORTANCA DEMET 34CM",
+    "color": "PEMBE",
+    "price": 490.0
+  },
+  {
+    "id": "0105806",
+    "name": "ORTANCA DEMET 34CM",
+    "color": "SARI",
+    "price": 490.0
+  },
+  {
+    "id": "0105806",
+    "name": "ORTANCA DEMET 34CM",
+    "color": "MOR",
+    "price": 490.0
+  },
+  {
+    "id": "0105806",
+    "name": "ORTANCA DEMET 34CM",
+    "color": "MAVİ",
+    "price": 490.0
+  },
+  {
+    "id": "0105806",
+    "name": "ORTANCA DEMET 34CM",
+    "color": "BEYAZ",
+    "price": 490.0
+  },
+  {
+    "id": "0105807",
+    "name": "RENKLİ LAHANA 22CM",
+    "color": "MOR",
+    "price": 470.0
+  },
+  {
+    "id": "0105807",
+    "name": "RENKLİ LAHANA 22CM",
+    "color": "BEYAZ",
+    "price": 470.0
+  },
+  {
+    "id": "0105807",
+    "name": "RENKLİ LAHANA 22CM",
+    "color": "KOYU PEMBE",
+    "price": 470.0
+  },
+  {
+    "id": "0105807",
+    "name": "RENKLİ LAHANA 22CM",
+    "color": "AÇIK PEMBE",
+    "price": 470.0
+  },
+  {
+    "id": "0105808",
+    "name": "ZAMBAK 100CM",
+    "color": "SARI",
+    "price": 560.0
+  },
+  {
+    "id": "0105808",
+    "name": "ZAMBAK 100CM",
+    "color": "BEYAZ",
+    "price": 560.0
+  },
+  {
+    "id": "0105808",
+    "name": "ZAMBAK 100CM",
+    "color": "KOYU PEMBE",
+    "price": 560.0
+  },
+  {
+    "id": "0105808",
+    "name": "ZAMBAK 100CM",
+    "color": "AÇIK PEMBE",
+    "price": 560.0
+  },
+  {
+    "id": "0105809",
+    "name": "ŞEBBOY 90CM",
+    "color": "KIRMIZI",
+    "price": 380.0
+  },
+  {
+    "id": "0105809",
+    "name": "ŞEBBOY 90CM",
+    "color": "PEMBE",
+    "price": 380.0
+  },
+  {
+    "id": "0105809",
+    "name": "ŞEBBOY 90CM",
+    "color": "BEYAZ",
+    "price": 380.0
+  },
+  {
+    "id": "0105809",
+    "name": "ŞEBBOY 90CM",
+    "color": "AÇIK MAVİ",
+    "price": 380.0
+  },
+  {
+    "id": "0105809",
+    "name": "ŞEBBOY 90CM",
+    "color": "KOYU MAVİ",
+    "price": 380.0
+  },
+  {
+    "id": "0105810",
+    "name": "ŞAKAYIK 58CM",
+    "color": "KIRMIZI",
+    "price": 340.0
+  },
+  {
+    "id": "0105810",
+    "name": "ŞAKAYIK 58CM",
+    "color": "PEMBE",
+    "price": 340.0
+  },
+  {
+    "id": "0105810",
+    "name": "ŞAKAYIK 58CM",
+    "color": "KREM",
+    "price": 340.0
+  },
+  {
+    "id": "0105810",
+    "name": "ŞAKAYIK 58CM",
+    "color": "BEYAZ",
+    "price": 340.0
+  },
+  {
+    "id": "0105811",
+    "name": "MANOLYA 83CM",
+    "color": "PEMBE",
+    "price": 480.0
+  },
+  {
+    "id": "0105811",
+    "name": "MANOLYA 83CM",
+    "color": "MOR",
+    "price": 480.0
+  },
+  {
+    "id": "0105811",
+    "name": "MANOLYA 83CM",
+    "color": "BEYAZ",
+    "price": 480.0
+  },
+  {
+    "id": "0105812",
+    "name": "LALE 63CM",
+    "color": "PEMBE",
+    "price": 310.0
+  },
+  {
+    "id": "0105812",
+    "name": "LALE 63CM",
+    "color": "TURUNCU",
+    "price": 310.0
+  },
+  {
+    "id": "0105812",
+    "name": "LALE 63CM",
+    "color": "SARI",
+    "price": 310.0
+  },
+  {
+    "id": "0105812",
+    "name": "LALE 63CM",
+    "color": "MOR",
+    "price": 310.0
+  },
+  {
+    "id": "0105812",
+    "name": "LALE 63CM",
+    "color": "BEYAZ",
+    "price": 310.0
+  },
+  {
+    "id": "0105813",
+    "name": "SÜMBÜL 82CM",
+    "color": "PEMBE",
+    "price": 490.0
+  },
+  {
+    "id": "0105813",
+    "name": "SÜMBÜL 82CM",
+    "color": "MOR",
+    "price": 490.0
+  },
+  {
+    "id": "0105813",
+    "name": "SÜMBÜL 82CM",
+    "color": "MAVİ",
+    "price": 490.0
+  },
+  {
+    "id": "0105813",
+    "name": "SÜMBÜL 82CM",
+    "color": "BEYAZ",
+    "price": 490.0
+  },
+  {
+    "id": "0106101",
+    "name": "STARLİÇE REAL TOUCH 185CM * 13LVS",
+    "color": "-",
+    "price": 7920.0
+  },
+  {
+    "id": "0106102",
+    "name": "STARLİÇE REAL TOUCH 240CM * 18LVS",
+    "color": "-",
+    "price": 16080.0
+  },
+  {
+    "id": "0106103",
+    "name": "STARLİÇE MAT 185CM * 13LVS",
+    "color": "-",
+    "price": 7920.0
+  },
+  {
+    "id": "0106104",
+    "name": "STARLICE MAT 220CM * 13LVS",
+    "color": "-",
+    "price": 9480.0
+  },
+  {
+    "id": "0106105",
+    "name": "ΚΑKTÜS 80CM",
+    "color": "-",
+    "price": 4560.0
+  },
+  {
+    "id": "0106106",
+    "name": "ΚΑKTÜS 155CM",
+    "color": "-",
+    "price": 9000.0
+  },
+  {
+    "id": "0106107",
+    "name": "ΚΑKTÜS 104CM",
+    "color": "-",
+    "price": 6360.0
+  },
+  {
+    "id": "0106108",
+    "name": "ΚAKTÜS 110CM",
+    "color": "-",
+    "price": 9480.0
+  },
+  {
+    "id": "0106109",
+    "name": "STARLİÇE REAL TOUCH 120CM*8LVS",
+    "color": "-",
+    "price": 3800.0
+  },
+  {
+    "id": "0106110",
+    "name": "STARLİÇE REAL TOUCH 310CM *18LVS",
+    "color": "-",
+    "price": 17760.0
+  },
+  {
+    "id": "0106111",
+    "name": "STARLİÇE ÇİÇEKLİ 182CM* 26LVS",
+    "color": "-",
+    "price": 10440.0
+  },
+  {
+    "id": "0106112",
+    "name": "PHILODENDRON REAL TOUCH 110CM* 10LVS",
+    "color": "-",
+    "price": 5088.0
+  },
+  {
+    "id": "0106113",
+    "name": "MONSTERA REAL TOUCH 210CM* 26LVS",
+    "color": "-",
+    "price": 19560.0
+  },
+  {
+    "id": "0106114",
+    "name": "SNAKE GRASS 105CM* 9LVS",
+    "color": "-",
+    "price": 6720.0
+  },
+  {
+    "id": "0106115",
+    "name": "ΚΑKTÜS 130CM",
+    "color": "-",
+    "price": 8280.0
+  },
+  {
+    "id": "0211502-3",
+    "name": "POLARIS POT 45*45*39 CREAM",
+    "color": "KREM",
+    "price": 4440.0
+  },
+  {
+    "id": "0211502-4",
+    "name": "POLARIS POT 55*55*46 CREAM",
+    "color": "KREM",
+    "price": 6600.0
+  },
+  {
+    "id": "0211510-2",
+    "name": "SIRIUS POT 36X36X60 ANTRASİT",
+    "color": "ANTRASİT",
+    "price": 5520.0
+  },
+  {
+    "id": "0211510-3",
+    "name": "SIRIUS POT 46X46X75 ANTRASİT",
+    "color": "ANTRASİT",
+    "price": 8280.0
+  },
+  {
+    "id": "0211511-2",
+    "name": "SIRIUS POT 36X36X60 WHITE",
+    "color": "BEYAZ",
+    "price": 5520.0
+  },
+  {
+    "id": "0211511-3",
+    "name": "SIRIUS POT 46X46X75 WHITE",
+    "color": "BEYAZ",
+    "price": 8280.0
+  },
+  {
+    "id": "0211517-3",
+    "name": "RIGEL POT 43x43x36 GREY",
+    "color": "GRİ",
+    "price": 4320.0
+  },
+  {
+    "id": "0211517-4",
+    "name": "RIGEL POT 55X55X44 GREY",
+    "color": "GRİ",
+    "price": 6480.0
+  },
+  {
+    "id": "0211518-2",
+    "name": "ALTAIR POT 43X43X31 ANTRASİT",
+    "color": "ANTRASİT",
+    "price": 4080.0
+  },
+  {
+    "id": "0211518-3",
+    "name": "ALTAIR POT 55X55X37 ANTRASİT",
+    "color": "ANTRASİT",
+    "price": 7080.0
+  },
+  {
+    "id": "0211523-2",
+    "name": "ALTAIR POT 43X43X31 CREAM",
+    "color": "KREM",
+    "price": 4080.0
+  },
+  {
+    "id": "0211523-3",
+    "name": "ALTAIR POT 55X55X37 CREAM",
+    "color": "KREM",
+    "price": 7080.0
+  },
+  {
+    "id": "0211528-2",
+    "name": "VIREA POT 42*42*43 YEŞİL",
+    "color": "YEŞİL",
+    "price": 5880.0
+  },
+  {
+    "id": "0211528-3",
+    "name": "VIREA POT 54*54*55 YEŞİL",
+    "color": "YEŞİL",
+    "price": 8880.0
+  },
+  {
+    "id": "0211529-2",
+    "name": "VIREA POT 42*42*43 ANTRASİT",
+    "color": "ANTRASİT",
+    "price": 5880.0
+  },
+  {
+    "id": "0211529-3",
+    "name": "VIREA POT 54*54*55 ANTRASİT",
+    "color": "ANTRASİT",
+    "price": 8880.0
+  },
+  {
+    "id": "0219003",
+    "name": "MİNİ SAKSI 12X10CM",
+    "color": "KIRMIZI",
+    "price": 330.0
+  },
+  {
+    "id": "0219003",
+    "name": "MİNİ SAKSI 12X10CM",
+    "color": "SİYAH",
+    "price": 330.0
+  },
+  {
+    "id": "0219029",
+    "name": "MİNİ SAKSI",
+    "color": "YEŞİL",
+    "price": 220.0
+  },
+  {
+    "id": "0219029",
+    "name": "MİNİ SAKSI",
+    "color": "TURUNCU",
+    "price": 220.0
+  },
+  {
+    "id": "0219029",
+    "name": "MİNİ SAKSI",
+    "color": "SARI",
+    "price": 220.0
+  },
+  {
+    "id": "0219029",
+    "name": "MİNİ SAKSI",
+    "color": "MOR",
+    "price": 220.0
+  },
+  {
+    "id": "0219052",
+    "name": "DEKORATİF DÜNYA AKSESUAR",
+    "color": "TURUNCU",
+    "price": 1720.0
+  },
+  {
+    "id": "0219052",
+    "name": "DEKORATİF DÜNYA AKSESUAR",
+    "color": "GRİ",
+    "price": 1720.0
+  },
+  {
+    "id": "0219052",
+    "name": "DEKORATİF DÜNYA AKSESUAR",
+    "color": "SİYAH",
+    "price": 1720.0
+  },
+  {
+    "id": "0219052",
+    "name": "DEKORATİF DÜNYA AKSESUAR",
+    "color": "GÜMÜŞ",
+    "price": 1720.0
+  }
+]
