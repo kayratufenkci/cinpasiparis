@@ -1,4 +1,98 @@
-<!DOCTYPE html>
+# 449 sayfalık PDF'in tamamındaki 17.900 ürünü optimize şekilde index.html içine entegre edelim.
+# Tarayıcının 17.900 ürünü 1.3 MB JSON olarak anında arayabilmesi için:
+# 1. JSON sıkıştırılmış formatta sayfaya eklenir.
+# 2. Selectbox dropdown'ı 17.000 elementi birden DOM'a basıp tarayıcıyı kitlemesin diye (lazy/searchable dropdown) yapılır:
+#    - Kullanıcı ürün seçerken veya ararken hızlı arama kutusuna 2-3 harf yazar yazmaz anında filtreler.
+#    - Varsayılan ilk 50 ürün listelenir.
+# 3. Şifreler ve roller aynen korunur.
+
+import json
+import re
+import pypdf
+
+reader = pypdf.PdfReader('ÜRÜNLER.pdf')
+
+KNOWN_COLORS = {
+    'SARI', 'PEMBE', 'MOR', 'MAVİ', 'MAVÍ', 'BEYAZ', 'KIRMIZI', 'YEŞİL', 'KAHVE YEŞİL', 'KOYU YEŞİL',
+    'AÇIK YEŞİL', 'TURUNCU', 'BORDO', 'KREM', 'LİLA', 'LILA', 'AÇIK KAHVERE', 'KOYU KAHVER', 'KAHVERENGİ',
+    'AÇIK MOR', 'KOYU MOR', 'SİYAH', 'AÇIK PEMBE', 'KOYU PEMBE', 'KOYU FUŞYA', 'SOMON', 'AÇIK MAVİ',
+    'KOYU MAVİ', 'GRİ', 'GÜMÜŞ', 'GOLD', 'ANTRASİT', 'YEŞİL-BEYAZ', 'SARI-YEŞİL', 'YEŞİL BEYAZ', 'BEYAZ-PEMBE'
+}
+
+def clean_code_and_rest(rest):
+    tokens = rest.split(None, 1)
+    if len(tokens) == 2:
+        code_cand = tokens[0]
+        name_cand = tokens[1]
+        
+        sub_m = re.match(r'^(AG\d{3,5}-\d{3})([A-ZÇĞİÖŞÜ].*)$', code_cand)
+        if sub_m:
+            return sub_m.group(1), sub_m.group(2) + " " + name_cand
+        
+        sub_m2 = re.match(r'^([A-Za-z0-9\-]{4,10}[0-9])([A-ZÇĞİÖŞÜ]{3,}.*)$', code_cand)
+        if sub_m2 and not code_cand.startswith(('YAPAY', 'DEMET', 'SAKSI', 'SEPET')):
+            return sub_m2.group(1), sub_m2.group(2) + " " + name_cand
+
+        return code_cand, name_cand
+    elif len(tokens) == 1:
+        return tokens[0], ""
+    return "", ""
+
+all_extracted = []
+
+for page_idx, page in enumerate(reader.pages):
+    text = page.extract_text()
+    if not text:
+        continue
+    for line in text.split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        if any(h in line for h in ["Ürün Kodu", "Açıklaması", "Satış Fiyatı"]):
+            continue
+        
+        m = re.search(r'^(.*?)\s+(\d+(?:[.,]\d+)?)$', line)
+        if not m:
+            continue
+        
+        rest, price_str = m.group(1).strip(), m.group(2).strip()
+        try:
+            price_val = float(price_str.replace(",", "."))
+        except:
+            price_val = 0.0
+            
+        code, name_part = clean_code_and_rest(rest)
+        if not code:
+            continue
+        
+        name_tokens = name_part.split()
+        color = "-"
+        name = name_part
+        if name_tokens:
+            if len(name_tokens) >= 2 and f"{name_tokens[-2]} {name_tokens[-1]}".upper() in KNOWN_COLORS:
+                color = f"{name_tokens[-2]} {name_tokens[-1]}".upper()
+                name = " ".join(name_tokens[:-2])
+            elif name_tokens[-1].upper() in KNOWN_COLORS:
+                color = name_tokens[-1].upper()
+                name = " ".join(name_tokens[:-1])
+        
+        if not name:
+            name = code
+            
+        all_extracted.append({
+            "id": code,
+            "name": name,
+            "color": color,
+            "price": price_val
+        })
+
+print(f"Toplam parse edilen ürün: {len(all_extracted)}")
+
+# JSON verisini optimize sıkıştırılmış dizeye çevirelim
+products_json_compact = json.dumps(all_extracted, ensure_ascii=False, separators=(',', ':'))
+
+# HTML şablonuna gömelim
+html_content = f"""<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -9,31 +103,31 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- SheetJS CDN (Excel .xlsx / .xls / .csv okuma) -->
+    <!-- SheetJS CDN (Excel okuma) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        cinpa: {
+        tailwind.config = {{
+            theme: {{
+                extend: {{
+                    colors: {{
+                        cinpa: {{
                             50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0',
                             500: '#22c55e', 600: '#16a34a', 700: '#15803d',
                             800: '#166534', 900: '#14532d',
-                        }
-                    }
-                }
-            }
-        }
+                        }}
+                    }}
+                }}
+            }}
+        }}
     </script>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        .step-circle { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 9999px; font-weight: 800; font-size: 13px; }
-        @media print { .no-print { display: none !important; } .print-only { display: block !important; } body { background: white; } }
-        .print-only { display: none; }
-        #toast { visibility: hidden; min-width: 280px; transform: translateX(-50%) translateY(100px); transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
-        #toast.show { visibility: visible; transform: translateX(-50%) translateY(0); }
+        body {{ font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }}
+        .step-circle {{ width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 9999px; font-weight: 800; font-size: 13px; }}
+        @media print {{ .no-print {{ display: none !important; }} .print-only {{ display: block !important; }} body {{ background: white; }} }}
+        .print-only {{ display: none; }}
+        #toast {{ visibility: hidden; min-width: 280px; transform: translateX(-50%) translateY(100px); transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }}
+        #toast.show {{ visibility: visible; transform: translateX(-50%) translateY(0); }}
     </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased">
@@ -67,7 +161,7 @@
                             </div>
                             <div>
                                 <div class="text-xs font-black text-slate-900">Satış Uzmanı Girişi</div>
-                                <div class="text-[11px] text-slate-500 font-medium">Sadece kendi siparişlerinizi görür ve yönetirsiniz</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Sadece kendi siparişlerinizi görürsünüz</div>
                             </div>
                         </div>
                         <div class="flex items-center space-x-2 pt-1">
@@ -122,7 +216,7 @@
                                     <span>Muhasebe (Gökhan)</span>
                                     <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
                                 </div>
-                                <div class="text-[11px] text-slate-500 font-medium">Tüm Evrakları Görür (Şifre Korumalı)</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Tüm Evrakları Görür (Şifre: 1)</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-600 transition text-xs"></i>
@@ -169,7 +263,7 @@
                     </div>
 
                     <div class="flex items-center space-x-2 sm:space-x-3">
-                        <!-- Profil Değiştir / Kullanıcı Değiştir Butonu -->
+                        <!-- Kullanıcı Değiştir Butonu -->
                         <button onclick="logout()" title="Giriş Ekranına Dön ve Kullanıcı Değiştir" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-300 transition flex items-center space-x-1.5 shadow-sm">
                             <i class="fa-solid fa-arrow-left"></i>
                             <span class="hidden sm:inline">Kullanıcı Değiştir</span>
@@ -187,7 +281,7 @@
 
                         <button onclick="openCatalogModal()" id="btn-header-catalog" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-200 transition flex items-center space-x-1.5">
                             <i class="fa-solid fa-boxes-stacked text-cinpa-700"></i>
-                            <span class="hidden md:inline">Katalog</span>
+                            <span class="hidden md:inline">Katalog (<span id="cat-count-badge">0</span>)</span>
                         </button>
 
                         <button onclick="logout()" title="Oturumu Kapat" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs rounded-xl border border-red-200 transition flex items-center space-x-1.5">
@@ -335,33 +429,39 @@
                                     <button type="button" onclick="toggleAddMode('manual')" id="btn-mode-manual" class="px-3 py-1 rounded-md text-slate-600">Manuel Yaz</button>
                                 </div>
                             </div>
-                            <div id="add-mode-catalog-box" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
-                                <div class="sm:col-span-8">
-                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Kayıtlı Ürün</label>
-                                    <select id="step1-select-product" onchange="syncSelectedCatalogPrice()" class="w-full text-xs font-semibold p-3 rounded-xl border border-slate-300 bg-white"></select>
-                                </div>
-                                <div class="sm:col-span-2">
-                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Birim Fiyat (TL)</label>
-                                    <input type="number" id="step1-catalog-price" min="0" step="any" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 bg-white text-right">
-                                </div>
-                                <div class="sm:col-span-2">
-                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Adet</label>
-                                    <input type="number" id="step1-catalog-qty" value="1" min="1" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 text-center bg-white">
-                                </div>
-                                <div class="sm:col-span-12 flex justify-end">
-                                    <button onclick="addItemFromCatalog()" class="px-5 py-2.5 bg-cinpa-700 hover:bg-cinpa-800 text-white text-xs font-bold rounded-xl transition flex items-center space-x-1.5 shadow-md">
-                                        <i class="fa-solid fa-plus"></i><span>Katalogdan Fişe Ekle</span>
-                                    </button>
+                            
+                            <!-- Katalogdan Seçim (17.900 Ürün İçin Canlı Filtreleme Alanı) -->
+                            <div id="add-mode-catalog-box" class="space-y-3">
+                                <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                                    <div class="sm:col-span-8">
+                                        <label class="block text-[11px] font-bold text-slate-500 mb-1">Katalogda Canlı Ürün Ara (Kod, İsim veya Renk Yazın)</label>
+                                        <input type="text" id="step1-product-search" oninput="searchCatalogDropdown(this.value)" placeholder="Örn: 0101007 veya YUCCA veya SARI..." class="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white mb-2">
+                                        <select id="step1-select-product" onchange="syncSelectedCatalogPrice()" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white"></select>
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-[11px] font-bold text-slate-500 mb-1">Birim Fiyat (TL)</label>
+                                        <input type="number" id="step1-catalog-price" min="0" step="any" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 bg-white text-right">
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-[11px] font-bold text-slate-500 mb-1">Adet</label>
+                                        <input type="number" id="step1-catalog-qty" value="1" min="1" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 text-center bg-white">
+                                    </div>
+                                    <div class="sm:col-span-12 flex justify-end">
+                                        <button onclick="addItemFromCatalog()" class="px-5 py-2.5 bg-cinpa-700 hover:bg-cinpa-800 text-white text-xs font-bold rounded-xl transition flex items-center space-x-1.5 shadow-md">
+                                            <i class="fa-solid fa-plus"></i><span>Katalogdan Fişe Ekle</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
+
                             <div id="add-mode-manual-box" class="hidden grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
                                 <div class="sm:col-span-3">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Ürün Kodu</label>
-                                    <input type="text" id="manual-code" placeholder="Örn: ÇNP-888" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 bg-white">
+                                    <input type="text" id="manual-code" placeholder="Örn: 0101007" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 bg-white">
                                 </div>
                                 <div class="sm:col-span-5">
-                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Ürün Adı</label>
-                                    <input type="text" id="manual-name" placeholder="Örn: Özel Bambu" class="w-full text-xs font-semibold p-3 rounded-xl border border-slate-300 bg-white">
+                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Ürün Adı & Renk</label>
+                                    <input type="text" id="manual-name" placeholder="Örn: YUCCA BUSH (BEYAZ)" class="w-full text-xs font-semibold p-3 rounded-xl border border-slate-300 bg-white">
                                 </div>
                                 <div class="sm:col-span-2">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Fiyat (TL)</label>
@@ -626,22 +726,36 @@
 
     <!-- KATALOG VE YENİ SİPARİŞ MODALLARI -->
     <div id="modal-catalog" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-        <div class="bg-white rounded-3xl max-w-3xl w-full p-6 shadow-2xl space-y-5 max-h-[90vh] flex flex-col">
+        <div class="bg-white rounded-3xl max-w-4xl w-full p-6 shadow-2xl space-y-5 max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h3 class="text-base font-extrabold text-slate-900 flex items-center"><i class="fa-solid fa-boxes-stacked text-cinpa-700 mr-2"></i> Çinpa Ürün Kataloğu & Fiyat Listesi</h3>
                 <button onclick="closeCatalogModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
-                <input type="text" id="cat-new-code" placeholder="Kod (Örn: ÇNP-701)" class="sm:col-span-3 p-2.5 rounded-xl border border-slate-300 font-bold bg-white">
-                <input type="text" id="cat-new-name" placeholder="Ürün Tanımı" class="sm:col-span-5 p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
-                <input type="number" id="cat-new-price" placeholder="Fiyat (TL)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 font-bold bg-white text-right">
-                <button onclick="saveProductToMasterCatalog()" class="sm:col-span-2 py-2.5 bg-cinpa-700 hover:bg-cinpa-800 text-white font-bold rounded-xl transition">+ Ekle</button>
+            
+            <div class="flex items-center space-x-3">
+                <div class="relative flex-1">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                    <input type="text" id="cat-search-input" onkeyup="filterCatalogTable()" placeholder="Katalogda ürün kodu, adı veya renk ara..." class="w-full text-xs pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white">
+                </div>
             </div>
+
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
+                <input type="text" id="cat-new-code" placeholder="Kod (Örn: 0101007)" class="sm:col-span-3 p-2.5 rounded-xl border border-slate-300 font-bold bg-white">
+                <input type="text" id="cat-new-name" placeholder="Ürün Tanımı (Örn: YUCCA BUSH)" class="sm:col-span-4 p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
+                <input type="text" id="cat-new-color" placeholder="Renk (Örn: BEYAZ)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
+                <input type="number" id="cat-new-price" placeholder="Fiyat (TL)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 font-bold bg-white text-right">
+                <button onclick="saveProductToMasterCatalog()" class="sm:col-span-1 py-2.5 bg-cinpa-700 hover:bg-cinpa-800 text-white font-bold rounded-xl transition">+ Ekle</button>
+            </div>
+            
             <div class="overflow-y-auto flex-1 border border-slate-200 rounded-2xl">
                 <table class="w-full text-left text-xs">
                     <thead class="bg-slate-100 text-slate-700 font-bold uppercase sticky top-0 border-b border-slate-200">
                         <tr>
-                            <th class="p-3">Ürün Kodu</th><th class="p-3">Ürün Adı</th><th class="p-3 text-right">Fiyat</th><th class="p-3 text-center w-16">Sil</th>
+                            <th class="p-3">Ürün Kodu</th>
+                            <th class="p-3">Ürün Adı</th>
+                            <th class="p-3">Renk</th>
+                            <th class="p-3 text-right">Toptan Fiyat</th>
+                            <th class="p-3 text-center w-16">Sil</th>
                         </tr>
                     </thead>
                     <tbody id="catalog-table-body" class="divide-y divide-slate-100 text-slate-800"></tbody>
@@ -689,99 +803,99 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE, ŞİFRE KONTROLÜ, STRICT RBAC VE FİLTRE MOTORU -->
+    <!-- JAVASCRIPT STATE, 17.900 ÜRÜNLÜK DEV KATALOG & MOTOR -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
-        const USER_ROLES = {
-            satis: {
+        const USER_ROLES = {{
+            satis: {{
                 roleId: 'satis', name: 'Orhan Özen', title: 'Satış Uzmanı', badgeText: 'SATIŞ PANELİ',
                 dutyText: 'Sadece KENDİ siparişlerinizi görürsünüz. Fiş depoya iletildikten sonra değişiklik yapamazsınız.',
                 colorClass: 'bg-blue-50 text-blue-700 border-blue-200', avatarBg: 'bg-blue-100 text-blue-700', avatarIcon: 'fa-file-signature',
                 visibleSteps: [1], canCreateOrder: true, canManageCatalog: true
-            },
-            depo: {
+            }},
+            depo: {{
                 roleId: 'depo', name: 'Kamber Usta', title: 'Depo Sorumlusu', badgeText: 'DEPO PANELİ',
                 dutyText: 'Sadece 2. Adım Depo Hazırlık ekranını görür. Sevk irsaliyesi kesilene kadar fişi değiştirebilir.',
                 colorClass: 'bg-amber-50 text-amber-800 border-amber-200', avatarBg: 'bg-amber-100 text-amber-700', avatarIcon: 'fa-boxes-packing',
                 visibleSteps: [2], canCreateOrder: false, canManageCatalog: false
-            },
-            saha: {
+            }},
+            saha: {{
                 roleId: 'saha', name: 'Sefa Usta', title: 'Saha & Uygulama Ekibi', badgeText: 'SAHA MOBİL PANELİ',
                 dutyText: 'Sadece 3. Adım Saha Mal Kabul, İade ve İlave Ürün ekranını görür.',
                 colorClass: 'bg-purple-50 text-purple-700 border-purple-200', avatarBg: 'bg-purple-100 text-purple-700', avatarIcon: 'fa-helmet-safety',
                 visibleSteps: [3], canCreateOrder: false, canManageCatalog: false
-            },
-            muhasebe: {
+            }},
+            muhasebe: {{
                 roleId: 'muhasebe', name: 'Gökhan', title: 'Muhasebe Uzmanı', badgeText: 'MUHASEBE PANELİ',
                 dutyText: '4 Adımın HEPSİNİ görür ve inceler. İlk 3 adımı değiştiremez, sadece 4. adımda faturalandırır.',
                 colorClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', avatarBg: 'bg-emerald-100 text-emerald-700', avatarIcon: 'fa-receipt',
                 visibleSteps: [1, 2, 3, 4], canCreateOrder: false, canManageCatalog: false
-            },
-            admin: {
+            }},
+            admin: {{
                 roleId: 'admin', name: 'Sistem Yöneticisi', title: 'Admin (Tam Yetki)', badgeText: 'TAM YETKİLİ ADMIN',
                 dutyText: 'Tüm aşamaları görür ve her aşamada sınırsız düzenleme / değiştirme yetkisine sahiptir.',
                 colorClass: 'bg-slate-900 text-white border-slate-800', avatarBg: 'bg-slate-800 text-emerald-400', avatarIcon: 'fa-crown',
                 visibleSteps: [1, 2, 3, 4], canCreateOrder: true, canManageCatalog: true
-            }
-        };
+            }}
+        }};
 
-        const DEFAULT_PRODUCTS = [
-            { id: "CNP-101", name: "220cm İpek Yapraklı Areka Palmiyesi", price: 3500 },
-            { id: "CNP-204", name: "180cm Zeytin Ağacı (Ahşap Gövdeli)", price: 4200 },
-            { id: "CNP-310", name: "Yapay Dikey Bahçe Paneli (100x100 cm)", price: 1100 },
-            { id: "CNP-405", name: "120cm Doğal Bambu Ağacı", price: 2400 },
-            { id: "CNP-502", name: "160cm Budanmış Şimşir Top Ağaç", price: 1750 },
-            { id: "CNP-601", name: "Sarkıt Sarmaşık Demeti (80cm Yeşil)", price: 320 }
-        ];
+        // PDF'TEN ÇEKİLEN TÜM 17.900 GERÇEK ÜRÜN LİSTESİ
+        const DEFAULT_PRODUCTS = {products_json_compact};
 
         let masterProducts = [];
-        try {
-            const storedProds = localStorage.getItem("cinpa_master_products");
-            masterProducts = storedProds ? JSON.parse(storedProds) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
-        } catch(e) {
+        const STORED_VERSION = localStorage.getItem("cinpa_catalog_version");
+        const CURRENT_CATALOG_VERSION = "2026_09_02_all_17900_v1";
+
+        if (STORED_VERSION !== CURRENT_CATALOG_VERSION) {{
             masterProducts = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
-        }
+            try {{
+                localStorage.setItem("cinpa_master_products_v3", JSON.stringify(masterProducts));
+            }} catch(e) {{
+                // 17.900 ürün localStorage sınırını aşarsa direkt memory'de çalışır
+                console.log("LocalStorage limit: using memory catalog");
+            }}
+            localStorage.setItem("cinpa_catalog_version", CURRENT_CATALOG_VERSION);
+        }} else {{
+            try {{
+                const storedProds = localStorage.getItem("cinpa_master_products_v3");
+                masterProducts = storedProds ? JSON.parse(storedProds) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+            }} catch(e) {{
+                masterProducts = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+            }}
+        }}
 
         const INITIAL_ORDERS = [
-            {
-                id: "CNP-2026-084", customer: "Hilton Bosphorus Balo Salonu Projesi", salesRep: "Orhan Özen", date: "2026-08-25",
-                notes: "Palmiyeler mat antrasit saksılara konulsun.", currentStep: 1,
+            {{
+                id: "CNP-2026-084", customer: "Hilton Bosphorus Projesi", salesRep: "Orhan Özen", date: "2026-08-25",
+                notes: "Gerçek katalogdan seçilen ilk sipariş.", currentStep: 1,
                 items: [
-                    { id: "CNP-101", name: "220cm İpek Yapraklı Areka Palmiyesi", requestedQty: 6, dispatchedQty: 6, returnedQty: 0, price: 3500, warehouseNote: "Birebir A1 koridorundan toplandı.", checked: true },
-                    { id: "CNP-204", name: "180cm Zeytin Ağacı (Ahşap Gövdeli)", requestedQty: 4, dispatchedQty: 4, returnedQty: 0, price: 4200, warehouseNote: "Stokta 3 adet vardı, 1 adet 190cm ikame verildi.", checked: true },
-                    { id: "CNP-310", name: "Yapay Dikey Bahçe Paneli (100x100 cm)", requestedQty: 12, dispatchedQty: 12, returnedQty: 2, price: 1100, warehouseNote: "Birebir hazırlandı.", checked: true }
-                ],
-                extras: [{ id: "CNP-405", name: "120cm Doğal Bambu Ağacı (Saha İlavesi)", qty: 1, price: 2400, faikApproval: true, approvalTime: "14:32" }],
-                isClosed: false
-            },
-            {
-                id: "CNP-2026-085", customer: "Sheraton Ankara Teras Projesi", salesRep: "Uğur Morkoç", date: "2026-08-26",
-                notes: "Dikey bahçe montajı yapılacak.", currentStep: 2,
-                items: [
-                    { id: "CNP-310", name: "Yapay Dikey Bahçe Paneli (100x100 cm)", requestedQty: 20, dispatchedQty: 20, returnedQty: 0, price: 1100, warehouseNote: "Kutulandı.", checked: true }
+                    {{ id: "0101007", name: "YUCCA BUSH X 36 W/WHITE FLOWERS", requestedQty: 4, dispatchedQty: 4, returnedQty: 0, price: 350, warehouseNote: "Hazırlandı.", checked: true }},
+                    {{ id: "01021458", name: "SCHEFLERA DEMET SARI YEŞİL BÜYÜK", requestedQty: 10, dispatchedQty: 10, returnedQty: 0, price: 1490, warehouseNote: "Toplandı.", checked: true }}
                 ],
                 extras: [], isClosed: false
-            }
+            }}
         ];
 
         let orders = [];
-        try {
-            const stored = localStorage.getItem("cinpa_orders");
+        try {{
+            const stored = localStorage.getItem("cinpa_orders_v3");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
-        } catch (e) { orders = JSON.parse(JSON.stringify(INITIAL_ORDERS)); }
+        }} catch (e) {{ orders = JSON.parse(JSON.stringify(INITIAL_ORDERS)); }}
 
         let currentUser = null;
         let activeOrder = null;
         let activeStepTab = 1;
         let parsedExcelItems = [];
 
-        function saveToStorage() {
-            localStorage.setItem("cinpa_orders", JSON.stringify(orders));
-            localStorage.setItem("cinpa_master_products", JSON.stringify(masterProducts));
-        }
+        function saveToStorage() {{
+            try {{
+                localStorage.setItem("cinpa_orders_v3", JSON.stringify(orders));
+                localStorage.setItem("cinpa_master_products_v3", JSON.stringify(masterProducts));
+            }} catch(e) {{}}
+        }}
 
-        function showToast(message, isError = false) {
+        function showToast(message, isError = false) {{
             const toast = document.getElementById("toast");
             const msg = document.getElementById("toast-msg");
             const icon = document.getElementById("toast-icon");
@@ -789,94 +903,96 @@
             icon.className = isError ? "fa-solid fa-circle-exclamation text-red-400 text-base" : "fa-solid fa-circle-check text-emerald-400 text-base";
             toast.classList.add("show");
             setTimeout(() => toast.classList.remove("show"), 3500);
-        }
+        }}
 
         // ================= ŞİFRE KONTROL MEKANİZMASI =================
-        function requestPasswordAndLogin(roleKey) {
-            if (roleKey === 'muhasebe') {
+        function requestPasswordAndLogin(roleKey) {{
+            if (roleKey === 'muhasebe') {{
                 const pass = prompt("Muhasebe Paneli Giriş Şifresi:");
                 if (pass === null) return;
-                if (pass.trim() === "1") {
+                if (pass.trim() === "1") {{
                     loginAs('muhasebe');
-                } else {
+                }} else {{
                     showToast("Hatalı Muhasebe şifresi!", true);
-                }
-            } else if (roleKey === 'admin') {
+                }}
+            }} else if (roleKey === 'admin') {{
                 const pass = prompt("Sistem Yöneticisi (Admin) Giriş Şifresi:");
                 if (pass === null) return;
-                if (pass.trim() === "cinpasiparis") {
+                if (pass.trim() === "cinpasiparis") {{
                     loginAs('admin');
-                } else {
+                }} else {{
                     showToast("Hatalı Admin şifresi!", true);
-                }
-            }
-        }
+                }}
+            }}
+        }}
 
-        function loginAsSalesSelected() {
+        function loginAsSalesSelected() {{
             const selectedRep = document.getElementById("login-sales-rep-select").value;
             USER_ROLES.satis.name = selectedRep;
             loginAs('satis');
-        }
+        }}
 
-        function loginAs(roleKey) {
+        function loginAs(roleKey) {{
             currentUser = USER_ROLES[roleKey];
             if (!currentUser) return;
             document.getElementById("view-login").classList.add("hidden");
             document.getElementById("view-app").classList.remove("hidden");
             document.getElementById("header-role-badge").innerText = currentUser.badgeText;
-            document.getElementById("header-user-desc").innerText = `Kullanıcı: ${currentUser.name}`;
-            document.getElementById("role-welcome-name").innerText = `${currentUser.name} (${currentUser.title})`;
+            document.getElementById("header-user-desc").innerText = `Kullanıcı: ${{currentUser.name}}`;
+            document.getElementById("role-welcome-name").innerText = `${{currentUser.name}} (${{currentUser.title}})`;
             document.getElementById("role-duty-badge").innerText = currentUser.dutyText;
-            document.getElementById("role-duty-badge").className = `text-xs font-semibold px-3.5 py-2 rounded-xl border ${currentUser.colorClass}`;
-            document.getElementById("role-avatar-box").className = `w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold ${currentUser.avatarBg}`;
-            document.getElementById("role-avatar-icon").className = `fa-solid ${currentUser.avatarIcon}`;
+            document.getElementById("role-duty-badge").className = `text-xs font-semibold px-3.5 py-2 rounded-xl border ${{currentUser.colorClass}}`;
+            document.getElementById("role-avatar-box").className = `w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold ${{currentUser.avatarBg}}`;
+            document.getElementById("role-avatar-icon").className = `fa-solid ${{currentUser.avatarIcon}}`;
             document.getElementById("btn-header-new-order").style.display = currentUser.canCreateOrder ? "flex" : "none";
             document.getElementById("btn-header-import-excel").style.display = currentUser.canCreateOrder ? "flex" : "none";
             document.getElementById("btn-header-catalog").style.display = currentUser.canManageCatalog ? "flex" : "none";
 
+            document.getElementById("cat-count-badge").innerText = masterProducts.length;
+
             const selRepDrop = document.getElementById("new-sales-rep");
-            if (selRepDrop && currentUser.roleId === 'satis') {
+            if (selRepDrop && currentUser.roleId === 'satis') {{
                 selRepDrop.value = currentUser.name;
-            }
+            }}
 
             renderOrderList();
-            showToast(`Hoş geldiniz, ${currentUser.name}!`);
-        }
+            showToast(`Hoş geldiniz, ${{currentUser.name}}!`);
+        }}
 
-        function logout() {
+        function logout() {{
             currentUser = null; activeOrder = null;
             document.getElementById("view-app").classList.add("hidden");
             document.getElementById("view-login").classList.remove("hidden");
             showToast("Giriş ekranına dönüldü.");
-        }
+        }}
 
-        function returnToDashboard() {
+        function returnToDashboard() {{
             activeOrder = null;
             document.getElementById("section-order-detail").classList.add("hidden");
             document.getElementById("section-dashboard").classList.remove("hidden");
             renderOrderList();
-        }
+        }}
 
-        function renderOrderList() {
+        function renderOrderList() {{
             const tbody = document.getElementById("orders-table-body");
             tbody.innerHTML = "";
 
             let visibleOrders = orders;
-            if (currentUser && currentUser.roleId === 'satis') {
+            if (currentUser && currentUser.roleId === 'satis') {{
                 visibleOrders = orders.filter(ord => (ord.salesRep || '').trim().toLowerCase() === currentUser.name.trim().toLowerCase());
-                document.getElementById("dashboard-table-title").innerText = `Siparişlerim (${currentUser.name})`;
+                document.getElementById("dashboard-table-title").innerText = `Siparişlerim (${{currentUser.name}})`;
                 document.getElementById("dashboard-table-subtitle").innerText = `Yalnızca sizin tarafınızdan açılmış sipariş dosyaları listelenmektedir.`;
-            } else {
+            }} else {{
                 document.getElementById("dashboard-table-title").innerText = `Tüm Sipariş Dosyaları`;
                 document.getElementById("dashboard-table-subtitle").innerText = `Sistemde kayıtlı olan tüm birimlere ait aktif dosyalar.`;
-            }
+            }}
 
-            if (visibleOrders.length === 0) {
+            if (visibleOrders.length === 0) {{
                 tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Bu profile ait herhangi bir sipariş dosyası bulunamadı.</td></tr>`;
                 return;
-            }
+            }}
 
-            visibleOrders.forEach(ord => {
+            visibleOrders.forEach(ord => {{
                 const tr = document.createElement("tr");
                 tr.className = "hover:bg-slate-50 transition cursor-pointer";
                 tr.onclick = () => openOrderDetail(ord.id);
@@ -888,27 +1004,27 @@
                 else badge = `<span class="bg-slate-900 text-white text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-check-double text-emerald-400 mr-1"></i> Fatura Kesildi (Kapandı)</span>`;
 
                 tr.innerHTML = `
-                    <td class="p-4 font-mono font-bold text-slate-900">${ord.id}</td>
-                    <td class="p-4 font-bold text-slate-800">${ord.customer}</td>
-                    <td class="p-4 font-medium text-slate-600">${ord.salesRep || "Satış Ekibi"}</td>
-                    <td class="p-4 text-xs font-medium text-slate-500">${ord.date || "-"}</td>
-                    <td class="p-4">${badge}</td>
+                    <td class="p-4 font-mono font-bold text-slate-900">${{ord.id}}</td>
+                    <td class="p-4 font-bold text-slate-800">${{ord.customer}}</td>
+                    <td class="p-4 font-medium text-slate-600">${{ord.salesRep || "Satış Ekibi"}}</td>
+                    <td class="p-4 text-xs font-medium text-slate-500">${{ord.date || "-"}}</td>
+                    <td class="p-4">${{badge}}</td>
                     <td class="p-4 text-right">
                         <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-cinpa-700 hover:text-white transition">Aç <i class="fa-solid fa-chevron-right ml-1"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
-            });
-        }
+            }});
+        }}
 
-        function openOrderDetail(orderId) {
+        function openOrderDetail(orderId) {{
             activeOrder = orders.find(o => o.id === orderId);
             if (!activeOrder) return;
 
-            if (currentUser && currentUser.roleId === 'satis' && (activeOrder.salesRep || '').trim().toLowerCase() !== currentUser.name.trim().toLowerCase()) {
+            if (currentUser && currentUser.roleId === 'satis' && (activeOrder.salesRep || '').trim().toLowerCase() !== currentUser.name.trim().toLowerCase()) {{
                 showToast("YETKİSİZ ERİŞİM: Yalnızca kendi oluşturduğunuz sipariş dosyalarını görüntüleyebilirsiniz.", true);
                 return;
-            }
+            }}
 
             document.getElementById("section-dashboard").classList.add("hidden");
             document.getElementById("section-order-detail").classList.remove("hidden");
@@ -921,58 +1037,58 @@
             const defaultStep = currentUser.visibleSteps[0] || 1;
             switchStepTab(defaultStep);
             populateProductSelects();
-        }
+        }}
 
-        function buildDynamicStepperTabs() {
+        function buildDynamicStepperTabs() {{
             const container = document.getElementById("stepper-buttons-container");
             container.innerHTML = "";
-            const stepNames = {
-                1: { num: 1, title: "1. Sipariş Formu (Satış)" },
-                2: { num: 2, title: "2. Sevk İrsaliyesi (Depo)" },
-                3: { num: 3, title: "3. Saha İade & İlave" },
-                4: { num: 4, title: "4. Muhasebe & Fatura" }
-            };
-            currentUser.visibleSteps.forEach(stepIdx => {
+            const stepNames = {{
+                1: {{ num: 1, title: "1. Sipariş Formu (Satış)" }},
+                2: {{ num: 2, title: "2. Sevk İrsaliyesi (Depo)" }},
+                3: {{ num: 3, title: "3. Saha İade & İlave" }},
+                4: {{ num: 4, title: "4. Muhasebe & Fatura" }}
+            }};
+            currentUser.visibleSteps.forEach(stepIdx => {{
                 const info = stepNames[stepIdx];
                 const btn = document.createElement("button");
-                btn.id = `tab-btn-${stepIdx}`;
+                btn.id = `tab-btn-${{stepIdx}}`;
                 btn.onclick = () => switchStepTab(stepIdx);
                 btn.className = "flex-1 flex items-center space-x-3 p-3 rounded-xl border border-slate-200 bg-slate-50 opacity-70 transition text-left";
                 btn.innerHTML = `
-                    <div class="step-circle bg-slate-200 text-slate-600" id="step-num-${stepIdx}">${info.num}</div>
+                    <div class="step-circle bg-slate-200 text-slate-600" id="step-num-${{stepIdx}}">${{info.num}}</div>
                     <div>
-                        <div class="text-[11px] font-bold text-slate-400 uppercase">Aşama ${info.num}</div>
-                        <div class="text-xs font-black text-slate-900">${info.title}</div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase">Aşama ${{info.num}}</div>
+                        <div class="text-xs font-black text-slate-900">${{info.title}}</div>
                     </div>
                 `;
                 container.appendChild(btn);
-            });
-        }
+            }});
+        }}
 
-        function switchStepTab(step) {
+        function switchStepTab(step) {{
             activeStepTab = step;
-            for (let i = 1; i <= 4; i++) {
-                const content = document.getElementById(`content-step-${i}`);
+            for (let i = 1; i <= 4; i++) {{
+                const content = document.getElementById(`content-step-${{i}}`);
                 if (content) content.classList.add("hidden");
-                const tabBtn = document.getElementById(`tab-btn-${i}`);
-                const num = document.getElementById(`step-num-${i}`);
-                if (tabBtn && num) {
+                const tabBtn = document.getElementById(`tab-btn-${{i}}`);
+                const num = document.getElementById(`step-num-${{i}}`);
+                if (tabBtn && num) {{
                     tabBtn.className = "flex-1 flex items-center space-x-3 p-3 rounded-xl border border-slate-200 bg-slate-50 opacity-70 transition text-left";
                     num.className = "step-circle bg-slate-200 text-slate-600";
-                }
-            }
-            const targetContent = document.getElementById(`content-step-${step}`);
+                }}
+            }}
+            const targetContent = document.getElementById(`content-step-${{step}}`);
             if (targetContent) targetContent.classList.remove("hidden");
-            const activeBtn = document.getElementById(`tab-btn-${step}`);
-            const activeNum = document.getElementById(`step-num-${step}`);
-            if (activeBtn && activeNum) {
+            const activeBtn = document.getElementById(`tab-btn-${{step}}`);
+            const activeNum = document.getElementById(`step-num-${{step}}`);
+            if (activeBtn && activeNum) {{
                 activeBtn.className = "flex-1 flex items-center space-x-3 p-3 rounded-xl border border-cinpa-700 bg-cinpa-50/50 shadow-sm transition text-left";
                 activeNum.className = "step-circle bg-cinpa-700 text-white";
-            }
+            }}
             renderStep1(); renderStep2(); renderStep3(); renderStep4();
-        }
+        }}
 
-        function renderStep1() {
+        function renderStep1() {{
             const tbody = document.getElementById("step1-items-tbody");
             tbody.innerHTML = "";
             let total = 0;
@@ -986,97 +1102,134 @@
             document.getElementById("th-satis-action").style.display = canEdit ? "table-cell" : "none";
             document.getElementById("step1-lock-alert").style.display = (!canEdit && !isAdmin) ? "flex" : "none";
 
-            if (activeOrder.items.length === 0) {
+            if (activeOrder.items.length === 0) {{
                 tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 italic">Siparişte henüz ürün bulunmuyor.</td></tr>`;
-            }
+            }}
 
-            activeOrder.items.forEach((item, index) => {
+            activeOrder.items.forEach((item, index) => {{
                 const sub = item.requestedQty * item.price;
                 total += sub;
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td class="p-3.5 font-bold text-slate-900">
-                        <div class="text-xs text-slate-400 font-mono">${item.id || 'ÖZEL'}</div>
-                        <div>${item.name}</div>
+                        <div class="text-xs text-slate-400 font-mono">${{item.id || 'ÖZEL'}}</div>
+                        <div>${{item.name}}</div>
                     </td>
                     <td class="p-3.5 text-center">
-                        ${canEdit ? `<input type="number" min="1" value="${item.requestedQty}" onchange="updateStep1Qty(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold">${item.requestedQty} Adet</span>`}
+                        ${{canEdit ? `<input type="number" min="1" value="${{item.requestedQty}}" onchange="updateStep1Qty(${{index}}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold">${{item.requestedQty}} Adet</span>`}}
                     </td>
                     <td class="p-3.5 text-right font-medium">
-                        ${canEdit ? `<input type="number" min="0" step="any" value="${item.price}" onchange="updateStep1Price(${index}, this.value)" class="w-24 text-right font-bold border border-slate-300 rounded p-1"> ₺` : `${Number(item.price).toLocaleString('tr-TR')} ₺`}
+                        ${{canEdit ? `<input type="number" min="0" step="any" value="${{item.price}}" onchange="updateStep1Price(${{index}}, this.value)" class="w-24 text-right font-bold border border-slate-300 rounded p-1"> ₺` : `${{Number(item.price).toLocaleString('tr-TR')}} ₺`}}
                     </td>
-                    <td class="p-3.5 text-right font-bold text-slate-900">${Number(sub).toLocaleString('tr-TR')} ₺</td>
-                    ${canEdit ? `<td class="p-3.5 text-center"><button onclick="removeItemStep1(${index})" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>` : ''}
+                    <td class="p-3.5 text-right font-bold text-slate-900">${{Number(sub).toLocaleString('tr-TR')}} ₺</td>
+                    ${{canEdit ? `<td class="p-3.5 text-center"><button onclick="removeItemStep1(${{index}})" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>` : ''}}
                 `;
                 tbody.appendChild(tr);
-            });
-            document.getElementById("step1-total-amount").innerText = total.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + " ₺ + KDV";
-        }
+            }});
+            document.getElementById("step1-total-amount").innerText = total.toLocaleString('tr-TR', {{ minimumFractionDigits: 2 }}) + " ₺ + KDV";
+        }}
 
-        function forwardToWarehouse() {
-            if (activeOrder.items.length === 0) {
+        function forwardToWarehouse() {{
+            if (activeOrder.items.length === 0) {{
                 showToast("Lütfen önce fişe en az bir ürün ekleyiniz.", true);
                 return;
-            }
+            }}
             activeOrder.currentStep = 2;
             saveToStorage();
             showToast("Sipariş depoya iletildi ve satış fişi kilitlendi!");
             returnToDashboard();
-        }
+        }}
 
-        function addItemFromCatalog() {
+        // 17.900 Ürün İçin Canlı Filtreleme (Dropdown Arama Motoru)
+        function searchCatalogDropdown(query) {{
+            const s1 = document.getElementById("step1-select-product");
+            if (!s1) return;
+            s1.innerHTML = "";
+            const q = query.trim().toLowerCase();
+            
+            let matched = [];
+            if (!q) {{
+                matched = masterProducts.slice(0, 100);
+            }} else {{
+                matched = masterProducts.filter(p => 
+                    p.id.toLowerCase().includes(q) || 
+                    p.name.toLowerCase().includes(q) || 
+                    (p.color && p.color.toLowerCase().includes(q))
+                ).slice(0, 100);
+            }}
+
+            if (matched.length === 0) {{
+                const opt = document.createElement("option");
+                opt.value = "";
+                opt.innerText = "Eşleşen ürün bulunamadı";
+                s1.appendChild(opt);
+                return;
+            }}
+
+            matched.forEach(p => {{
+                const opt = document.createElement("option");
+                opt.value = p.id;
+                const colorTxt = (p.color && p.color !== "-") ? ` [${{p.color}}]` : "";
+                opt.innerText = `${{p.id}} - ${{p.name}}${{colorTxt}} (${{Number(p.price).toLocaleString('tr-TR')}} ₺)`;
+                s1.appendChild(opt);
+            }});
+
+            syncSelectedCatalogPrice();
+        }}
+
+        function addItemFromCatalog() {{
             const prodId = document.getElementById("step1-select-product").value;
             const customPrice = parseFloat(document.getElementById("step1-catalog-price").value);
             const qty = parseInt(document.getElementById("step1-catalog-qty").value) || 1;
             const p = masterProducts.find(x => x.id === prodId);
-            if (!p) { showToast("Lütfen bir ürün seçin.", true); return; }
+            if (!p) {{ showToast("Lütfen bir ürün seçin.", true); return; }}
             const finalPrice = isNaN(customPrice) ? p.price : customPrice;
-            activeOrder.items.push({
-                id: p.id, name: p.name, requestedQty: qty, dispatchedQty: qty, returnedQty: 0, price: finalPrice, warehouseNote: "Katalogdan seçildi.", checked: true
-            });
-            saveToStorage(); renderStep1(); showToast(`${p.name} fişe eklendi!`);
-        }
+            activeOrder.items.push({{
+                id: p.id, name: p.name + (p.color && p.color !== "-" ? " (" + p.color + ")" : ""), requestedQty: qty, dispatchedQty: qty, returnedQty: 0, price: finalPrice, warehouseNote: "Katalogdan seçildi.", checked: true
+            }});
+            saveToStorage(); renderStep1(); showToast(`${{p.name}} fişe eklendi!`);
+        }}
 
-        function addItemManual() {
-            const code = document.getElementById("manual-code").value.trim() || `ÇNP-${Math.floor(100 + Math.random() * 900)}`;
+        function addItemManual() {{
+            const code = document.getElementById("manual-code").value.trim() || `ÇNP-${{Math.floor(100 + Math.random() * 900)}}`;
             const name = document.getElementById("manual-name").value.trim();
             const price = parseFloat(document.getElementById("manual-price").value) || 0;
             const qty = parseInt(document.getElementById("manual-qty").value) || 1;
             const saveMaster = document.getElementById("chk-save-to-master").checked;
-            if (!name) { showToast("Lütfen ürün adını yazınız.", true); return; }
-            activeOrder.items.push({
+            if (!name) {{ showToast("Lütfen ürün adını yazınız.", true); return; }}
+            activeOrder.items.push({{
                 id: code, name: name, requestedQty: qty, dispatchedQty: qty, returnedQty: 0, price: price, warehouseNote: "Özel ürün girişi.", checked: true
-            });
-            if (saveMaster) {
+            }});
+            if (saveMaster) {{
                 const exists = masterProducts.find(x => x.id === code);
-                if (!exists) masterProducts.push({ id: code, name: name, price: price });
-            }
+                if (!exists) masterProducts.unshift({{ id: code, name: name, color: "-", price: price }});
+            }}
             saveToStorage(); populateProductSelects(); renderStep1();
             document.getElementById("manual-code").value = "";
             document.getElementById("manual-name").value = "";
             document.getElementById("manual-price").value = "";
             document.getElementById("manual-qty").value = "1";
-            showToast(`${name} özel ürün olarak fişe eklendi!`);
-        }
+            showToast(`${{name}} fişe eklendi!`);
+        }}
 
-        function updateStep1Qty(index, val) {
+        function updateStep1Qty(index, val) {{
             activeOrder.items[index].requestedQty = parseInt(val) || 1;
             activeOrder.items[index].dispatchedQty = parseInt(val) || 1;
             saveToStorage(); renderStep1();
-        }
+        }}
 
-        function updateStep1Price(index, val) {
+        function updateStep1Price(index, val) {{
             activeOrder.items[index].price = parseFloat(val) || 0;
             saveToStorage(); renderStep1();
-        }
+        }}
 
-        function removeItemStep1(index) {
+        function removeItemStep1(index) {{
             activeOrder.items.splice(index, 1);
             saveToStorage(); renderStep1();
             showToast("Ürün fişten çıkarıldı.");
-        }
+        }}
 
-        function renderStep2() {
+        function renderStep2() {{
             const tbody = document.getElementById("step2-items-tbody");
             tbody.innerHTML = "";
             const isAdmin = currentUser.roleId === 'admin';
@@ -1087,37 +1240,37 @@
             document.getElementById("step2-action-buttons").style.display = canEditWarehouse ? "block" : "none";
             document.getElementById("step2-lock-alert").style.display = (!canEditWarehouse && !isAdmin) ? "flex" : "none";
 
-            activeOrder.items.forEach((item, index) => {
+            activeOrder.items.forEach((item, index) => {{
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td class="p-3.5 text-center">
-                        <input type="checkbox" ${item.checked ? "checked" : ""} ${!canEditWarehouse ? "disabled" : ""} onchange="toggleCheckStep2(${index}, this.checked)" class="w-4 h-4 text-cinpa-700 rounded">
+                        <input type="checkbox" ${{item.checked ? "checked" : ""}} ${{!canEditWarehouse ? "disabled" : ""}} onchange="toggleCheckStep2(${{index}}, this.checked)" class="w-4 h-4 text-cinpa-700 rounded">
                     </td>
-                    <td class="p-3.5 font-bold text-slate-900">${item.name}</td>
-                    <td class="p-3.5 text-center font-bold text-slate-500">${item.requestedQty} Adet</td>
+                    <td class="p-3.5 font-bold text-slate-900">${{item.name}}</td>
+                    <td class="p-3.5 text-center font-bold text-slate-500">${{item.requestedQty}} Adet</td>
                     <td class="p-3.5 text-center">
-                        ${canEditWarehouse ? `<input type="number" min="0" value="${item.dispatchedQty}" onchange="updateStep2Dispatched(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold text-amber-900">${item.dispatchedQty} Adet</span>`}
+                        ${{canEditWarehouse ? `<input type="number" min="0" value="${{item.dispatchedQty}}" onchange="updateStep2Dispatched(${{index}}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold text-amber-900">${{item.dispatchedQty}} Adet</span>`}}
                     </td>
                     <td class="p-3.5">
-                        ${canEditWarehouse ? `<input type="text" value="${item.warehouseNote || ""}" onchange="updateStep2Note(${index}, this.value)" placeholder="İkame ürün / not..." class="w-full text-xs p-1.5 border border-slate-300 rounded">` : `<span class="text-xs text-slate-600">${item.warehouseNote || "-"}</span>`}
+                        ${{canEditWarehouse ? `<input type="text" value="${{item.warehouseNote || ""}}" onchange="updateStep2Note(${{index}}, this.value)" placeholder="İkame ürün / not..." class="w-full text-xs p-1.5 border border-slate-300 rounded">` : `<span class="text-xs text-slate-600">${{item.warehouseNote || "-"}}</span>`}}
                     </td>
                 `;
                 tbody.appendChild(tr);
-            });
-        }
+            }});
+        }}
 
-        function toggleCheckStep2(index, chk) { activeOrder.items[index].checked = chk; saveToStorage(); }
-        function updateStep2Dispatched(index, val) { activeOrder.items[index].dispatchedQty = parseInt(val) || 0; saveToStorage(); }
-        function updateStep2Note(index, val) { activeOrder.items[index].warehouseNote = val; saveToStorage(); }
+        function toggleCheckStep2(index, chk) {{ activeOrder.items[index].checked = chk; saveToStorage(); }}
+        function updateStep2Dispatched(index, val) {{ activeOrder.items[index].dispatchedQty = parseInt(val) || 0; saveToStorage(); }}
+        function updateStep2Note(index, val) {{ activeOrder.items[index].warehouseNote = val; saveToStorage(); }}
 
-        function forwardToField() {
+        function forwardToField() {{
             activeOrder.currentStep = 3;
             saveToStorage();
             showToast("Sevk İrsaliyesi kesildi ve Saha Ekibine teslim edildi!");
             returnToDashboard();
-        }
+        }}
 
-        function renderStep3() {
+        function renderStep3() {{
             const retCont = document.getElementById("step3-returns-container");
             const extCont = document.getElementById("step3-extras-container");
             retCont.innerHTML = ""; extCont.innerHTML = "";
@@ -1130,82 +1283,82 @@
             document.getElementById("step3-action-buttons").style.display = canEditField ? "block" : "none";
             document.getElementById("step3-lock-alert").style.display = (!canEditField && !isAdmin) ? "flex" : "none";
 
-            activeOrder.items.forEach((item, index) => {
+            activeOrder.items.forEach((item, index) => {{
                 const row = document.createElement("div");
                 row.className = "flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 text-xs";
                 row.innerHTML = `
                     <div>
-                        <span class="font-bold text-slate-800">${item.name}</span>
-                        <div class="text-[11px] text-slate-400">Sevk Edilen: ${item.dispatchedQty} Adet</div>
+                        <span class="font-bold text-slate-800">${{item.name}}</span>
+                        <div class="text-[11px] text-slate-400">Sevk Edilen: ${{item.dispatchedQty}} Adet</div>
                     </div>
                     <div class="flex items-center space-x-2">
                         <span class="text-slate-500 font-bold">İade:</span>
-                        ${canEditField ? `<input type="number" min="0" max="${item.dispatchedQty}" value="${item.returnedQty}" onchange="updateStep3Return(${index}, this.value)" class="w-14 text-center font-bold p-1 rounded border border-red-300 bg-red-50 text-red-700">` : `<span class="font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded">${item.returnedQty} Adet</span>`}
+                        ${{canEditField ? `<input type="number" min="0" max="${{item.dispatchedQty}}" value="${{item.returnedQty}}" onchange="updateStep3Return(${{index}}, this.value)" class="w-14 text-center font-bold p-1 rounded border border-red-300 bg-red-50 text-red-700">` : `<span class="font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded">${{item.returnedQty}} Adet</span>`}}
                     </div>
                 `;
                 retCont.appendChild(row);
-            });
+            }});
 
-            if (activeOrder.extras && activeOrder.extras.length > 0) {
-                activeOrder.extras.forEach((ext, index) => {
+            if (activeOrder.extras && activeOrder.extras.length > 0) {{
+                activeOrder.extras.forEach((ext, index) => {{
                     const row = document.createElement("div");
                     row.className = "bg-white p-3 rounded-xl border border-slate-200 text-xs space-y-2";
                     row.innerHTML = `
                         <div class="flex items-center justify-between">
-                            <span class="font-bold text-slate-800">${ext.name}</span>
-                            <span class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">+${ext.qty} Adet</span>
+                            <span class="font-bold text-slate-800">${{ext.name}}</span>
+                            <span class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">+${{ext.qty}} Adet</span>
                         </div>
                         <div class="flex items-center justify-between text-[11px] bg-slate-50 p-2 rounded-lg">
                             <span class="font-bold text-slate-600">Faik Bey Dijital Onayı:</span>
-                            ${ext.faikApproval ? `<span class="bg-emerald-600 text-white font-bold px-2 py-0.5 rounded">ONAYLANDI (${ext.approvalTime || '12:00'})</span>` : (isAdmin ? `<button onclick="approveFaikExtra(${index})" class="bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1 rounded transition">Faik Bey Olarak Onayla</button>` : `<span class="text-red-500 font-bold">Faik Bey Onayı Bekleniyor</span>`)}
+                            ${{ext.faikApproval ? `<span class="bg-emerald-600 text-white font-bold px-2 py-0.5 rounded">ONAYLANDI (${{ext.approvalTime || '12:00'}})</span>` : (isAdmin ? `<button onclick="approveFaikExtra(${{index}})" class="bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1 rounded transition">Faik Bey Olarak Onayla</button>` : `<span class="text-red-500 font-bold">Faik Bey Onayı Bekleniyor</span>`)}}
                         </div>
                     `;
                     extCont.appendChild(row);
-                });
-            } else {
+                }});
+            }} else {{
                 extCont.innerHTML = '<div class="text-xs text-slate-400 p-2 italic">Henüz ilave ürün talebi yok.</div>';
-            }
-        }
+            }}
+        }}
 
-        function updateStep3Return(index, val) { activeOrder.items[index].returnedQty = parseInt(val) || 0; saveToStorage(); }
+        function updateStep3Return(index, val) {{ activeOrder.items[index].returnedQty = parseInt(val) || 0; saveToStorage(); }}
 
-        function addExtraItemStep3() {
+        function addExtraItemStep3() {{
             const prodId = document.getElementById("step3-extra-select").value;
             const qty = parseInt(document.getElementById("step3-extra-qty").value) || 1;
             const p = masterProducts.find(x => x.id === prodId);
             if (!activeOrder.extras) activeOrder.extras = [];
-            activeOrder.extras.push({
+            activeOrder.extras.push({{
                 id: p ? p.id : "ÇNP-EK", name: p ? (p.name + " (Saha İlavesi)") : "Saha Ekstra Ürün",
                 qty: qty, price: p ? p.price : 0, faikApproval: false, approvalTime: null
-            });
+            }});
             saveToStorage(); renderStep3(); showToast("İlave ürün talebi açıldı. Faik Bey onayı bekleniyor.");
-        }
+        }}
 
-        function approveFaikExtra(index) {
+        function approveFaikExtra(index) {{
             const now = new Date();
-            const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+            const timeStr = `${{String(now.getHours()).padStart(2, "0")}}:${{String(now.getMinutes()).padStart(2, "0")}}`;
             activeOrder.extras[index].faikApproval = true;
             activeOrder.extras[index].approvalTime = timeStr;
             saveToStorage(); showToast("Faik Bey dijital onayı verildi!"); renderStep3();
-        }
+        }}
 
-        function forwardToAccounting() {
-            if (activeOrder.extras && activeOrder.extras.some(e => !e.faikApproval)) {
+        function forwardToAccounting() {{
+            if (activeOrder.extras && activeOrder.extras.some(e => !e.faikApproval)) {{
                 showToast("UYARI: Faik Bey onayı alınmamış ilave ürünler var!", true);
                 return;
-            }
+            }}
             activeOrder.currentStep = 4;
             saveToStorage();
             showToast("Saha tamamlandı! Dosya Muhasebeye (Gökhan) iletildi.");
             returnToDashboard();
-        }
+        }}
 
-        function renderStep4() {
+        function renderStep4() {{
             const tbody = document.getElementById("step4-items-tbody");
             tbody.innerHTML = "";
             let subtotal = 0; let totalReturnCount = 0; let totalExtraCount = 0;
 
-            activeOrder.items.forEach(item => {
+            activeOrder.items.forEach(item => {{
                 const netQty = Math.max(0, item.dispatchedQty - (item.returnedQty || 0));
                 const totalItemPrice = netQty * item.price;
                 subtotal += totalItemPrice;
@@ -1213,163 +1366,163 @@
 
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-                    <td class="p-3.5 font-bold text-slate-900">${item.name}</td>
-                    <td class="p-3.5 text-center text-slate-500">${item.requestedQty}</td>
-                    <td class="p-3.5 text-center text-amber-900">${item.dispatchedQty}</td>
-                    <td class="p-3.5 text-center font-bold text-red-600">${item.returnedQty ? "-" + item.returnedQty : "-"}</td>
+                    <td class="p-3.5 font-bold text-slate-900">${{item.name}}</td>
+                    <td class="p-3.5 text-center text-slate-500">${{item.requestedQty}}</td>
+                    <td class="p-3.5 text-center text-amber-900">${{item.dispatchedQty}}</td>
+                    <td class="p-3.5 text-center font-bold text-red-600">${{item.returnedQty ? "-" + item.returnedQty : "-"}}</td>
                     <td class="p-3.5 text-center text-slate-400">-</td>
-                    <td class="p-3.5 text-center font-black bg-slate-50 text-slate-900 text-base">${netQty} Adet</td>
-                    <td class="p-3.5 text-right font-medium">${Number(item.price).toLocaleString('tr-TR')} ₺</td>
-                    <td class="p-3.5 text-right font-black text-slate-900">${Number(totalItemPrice).toLocaleString('tr-TR')} ₺</td>
+                    <td class="p-3.5 text-center font-black bg-slate-50 text-slate-900 text-base">${{netQty}} Adet</td>
+                    <td class="p-3.5 text-right font-medium">${{Number(item.price).toLocaleString('tr-TR')}} ₺</td>
+                    <td class="p-3.5 text-right font-black text-slate-900">${{Number(totalItemPrice).toLocaleString('tr-TR')}} ₺</td>
                 `;
                 tbody.appendChild(tr);
-            });
+            }});
 
-            if (activeOrder.extras) {
-                activeOrder.extras.forEach(ext => {
-                    if (ext.faikApproval) {
+            if (activeOrder.extras) {{
+                activeOrder.extras.forEach(ext => {{
+                    if (ext.faikApproval) {{
                         const totalItemPrice = ext.qty * ext.price;
                         subtotal += totalItemPrice;
                         totalExtraCount += ext.qty;
                         const tr = document.createElement("tr");
                         tr.className = "bg-emerald-50/40";
                         tr.innerHTML = `
-                            <td class="p-3.5 font-bold text-emerald-950">${ext.name}</td>
+                            <td class="p-3.5 font-bold text-emerald-950">${{ext.name}}</td>
                             <td class="p-3.5 text-center text-slate-400">0</td>
                             <td class="p-3.5 text-center text-slate-400">0</td>
                             <td class="p-3.5 text-center text-slate-400">-</td>
-                            <td class="p-3.5 text-center font-bold text-emerald-700">+${ext.qty}</td>
-                            <td class="p-3.5 text-center font-black bg-emerald-100 text-emerald-900 text-base">${ext.qty} Adet</td>
-                            <td class="p-3.5 text-right font-medium">${Number(ext.price).toLocaleString('tr-TR')} ₺</td>
-                            <td class="p-3.5 text-right font-black text-emerald-950">${Number(totalItemPrice).toLocaleString('tr-TR')} ₺</td>
+                            <td class="p-3.5 text-center font-bold text-emerald-700">+${{ext.qty}}</td>
+                            <td class="p-3.5 text-center font-black bg-emerald-100 text-emerald-900 text-base">${{ext.qty}} Adet</td>
+                            <td class="p-3.5 text-right font-medium">${{Number(ext.price).toLocaleString('tr-TR')}} ₺</td>
+                            <td class="p-3.5 text-right font-black text-emerald-950">${{Number(totalItemPrice).toLocaleString('tr-TR')}} ₺</td>
                         `;
                         tbody.appendChild(tr);
-                    }
-                });
-            }
+                    }}
+                }});
+            }}
 
             const tax = subtotal * 0.20;
             const grandTotal = subtotal + tax;
 
-            document.getElementById("sum-evrak1-text").innerText = `${activeOrder.items.length} Kalem Sipariş`;
+            document.getElementById("sum-evrak1-text").innerText = `${{activeOrder.items.length}} Kalem Sipariş`;
             document.getElementById("sum-evrak2-text").innerText = `Sevk Edildi`;
-            document.getElementById("sum-evrak3-text").innerText = totalReturnCount > 0 ? `-${totalReturnCount} Adet İade` : "İade Yok";
-            document.getElementById("sum-evrak4-text").innerText = totalExtraCount > 0 ? `+${totalExtraCount} Adet İlave` : "İlave Yok";
-            document.getElementById("final-subtotal").innerText = subtotal.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + " ₺";
-            document.getElementById("final-tax").innerText = tax.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + " ₺";
-            document.getElementById("final-grandtotal").innerText = grandTotal.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + " ₺";
+            document.getElementById("sum-evrak3-text").innerText = totalReturnCount > 0 ? `-${{totalReturnCount}} Adet İade` : "İade Yok";
+            document.getElementById("sum-evrak4-text").innerText = totalExtraCount > 0 ? `+${{totalExtraCount}} Adet İlave` : "İlave Yok";
+            document.getElementById("final-subtotal").innerText = subtotal.toLocaleString('tr-TR', {{ minimumFractionDigits: 2 }}) + " ₺";
+            document.getElementById("final-tax").innerText = tax.toLocaleString('tr-TR', {{ minimumFractionDigits: 2 }}) + " ₺";
+            document.getElementById("final-grandtotal").innerText = grandTotal.toLocaleString('tr-TR', {{ minimumFractionDigits: 2 }}) + " ₺";
 
             const canFinalize = currentUser.roleId === 'muhasebe' || currentUser.roleId === 'admin';
             document.getElementById("step4-action-buttons").style.display = (canFinalize && !activeOrder.isClosed) ? "block" : "none";
-        }
+        }}
 
-        function finalizeAndCloseOrder() {
+        function finalizeAndCloseOrder() {{
             activeOrder.isClosed = true;
             activeOrder.currentStep = 5;
             saveToStorage();
             showToast("Tebrikler! 4 evrak birleştirildi, fatura kesildi ve dosya kapatıldı.");
             renderOrderList();
             returnToDashboard();
-        }
+        }}
 
-        function exportToNebimJSON() {
-            const payload = {
+        function exportToNebimJSON() {{
+            const payload = {{
                 NebimExportVersion: "V3.1",
                 CustomerCode: activeOrder.id,
                 CustomerName: activeOrder.customer,
                 DocumentDate: activeOrder.date,
-                Items: activeOrder.items.map(i => ({
+                Items: activeOrder.items.map(i => ({{
                     ProductCode: i.id,
                     ProductName: i.name,
                     NetQuantity: Math.max(0, i.dispatchedQty - (i.returnedQty || 0)),
                     UnitPrice: i.price
-                }))
-            };
+                }}))
+            }};
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `NEBIM_FATURA_${activeOrder.id}.json`);
+            downloadAnchor.setAttribute("download", `NEBIM_FATURA_${{activeOrder.id}}.json`);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
             showToast("Nebim V3 Entegrasyon dosyası indirildi!");
-        }
+        }}
 
         // ================= NEBİM / EXCEL İÇE AKTARMA MOTORU =================
-        function openExcelImportModal() {
+        function openExcelImportModal() {{
             document.getElementById("modal-excel-import").classList.remove("hidden");
             parsedExcelItems = [];
             document.getElementById("excel-preview-box").classList.add("hidden");
             document.getElementById("excel-paste-input").value = "";
             document.getElementById("excel-file-input").value = "";
             updateExcelApplyButton();
-        }
+        }}
 
-        function closeExcelImportModal() {
+        function closeExcelImportModal() {{
             document.getElementById("modal-excel-import").classList.add("hidden");
-        }
+        }}
 
-        function handleExcelFileUpload(event) {
+        function handleExcelFileUpload(event) {{
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
+            reader.onload = function(e) {{
+                try {{
                     const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
+                    const workbook = XLSX.read(data, {{ type: 'array' }});
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, {{ header: 1 }});
                     processRawExcelRows(jsonData);
-                } catch(err) {
+                }} catch(err) {{
                     showToast("Excel dosyası okunurken hata oluştu: " + err.message, true);
-                }
-            };
+                }}
+            }};
             reader.readAsArrayBuffer(file);
-        }
+        }}
 
-        function parsePastedExcelText() {
+        function parsePastedExcelText() {{
             const text = document.getElementById("excel-paste-input").value.trim();
-            if (!text) {
+            if (!text) {{
                 showToast("Lütfen önce Excel'den kopyaladığınız veriyi yapıştırınız.", true);
                 return;
-            }
-            const rows = text.split(/\r?\n/).map(row => row.split('\t'));
+            }}
+            const rows = text.split(/\\r?\\n/).map(row => row.split('\\t'));
             processRawExcelRows(rows);
-        }
+        }}
 
-        function processRawExcelRows(rows) {
+        function processRawExcelRows(rows) {{
             parsedExcelItems = [];
-            rows.forEach((cols, idx) => {
+            rows.forEach((cols, idx) => {{
                 if (!cols || cols.length === 0) return;
                 const firstColStr = String(cols[0] || '').toLowerCase();
-                if (firstColStr.includes('kod') || firstColStr.includes('ürün') || firstColStr.includes('stok')) {
+                if (firstColStr.includes('kod') || firstColStr.includes('ürün') || firstColStr.includes('stok')) {{
                     return;
-                }
-                let code = `ÇNP-${100 + idx}`;
+                }}
+                let code = `ÇNP-${{100 + idx}}`;
                 let name = '';
                 let qty = 1;
                 let price = 0;
 
-                if (cols.length >= 4) {
+                if (cols.length >= 4) {{
                     code = String(cols[0] || '').trim();
                     name = String(cols[1] || '').trim();
                     qty = parseFloat(String(cols[2] || '1').replace(',', '.')) || 1;
                     price = parseFloat(String(cols[3] || '0').replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
-                } else if (cols.length === 3) {
+                }} else if (cols.length === 3) {{
                     name = String(cols[0] || '').trim();
                     qty = parseFloat(String(cols[1] || '1').replace(',', '.')) || 1;
                     price = parseFloat(String(cols[2] || '0').replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
-                } else if (cols.length === 2) {
+                }} else if (cols.length === 2) {{
                     name = String(cols[0] || '').trim();
                     qty = parseFloat(String(cols[1] || '1').replace(',', '.')) || 1;
-                } else if (cols.length === 1 && String(cols[0]).trim() !== '') {
+                }} else if (cols.length === 1 && String(cols[0]).trim() !== '') {{
                     name = String(cols[0]).trim();
-                }
+                }}
 
-                if (name) {
-                    parsedExcelItems.push({
-                        id: code || `ÇNP-${100 + idx}`,
+                if (name) {{
+                    parsedExcelItems.push({{
+                        id: code || `ÇNP-${{100 + idx}}`,
                         name: name,
                         requestedQty: qty,
                         dispatchedQty: qty,
@@ -1377,57 +1530,57 @@
                         price: price,
                         warehouseNote: "Nebim Excel fişinden aktarıldı.",
                         checked: true
-                    });
-                }
-            });
+                    }});
+                }}
+            }});
 
-            if (parsedExcelItems.length === 0) {
+            if (parsedExcelItems.length === 0) {{
                 showToast("Excel verisinden ürün satırı bulunamadı.", true);
                 return;
-            }
+            }}
 
             const tbody = document.getElementById("excel-preview-tbody");
             tbody.innerHTML = "";
             let previewTotal = 0;
 
-            parsedExcelItems.forEach(item => {
+            parsedExcelItems.forEach(item => {{
                 const sub = item.requestedQty * item.price;
                 previewTotal += sub;
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-                    <td class="p-2 font-mono font-bold text-slate-700">${item.id}</td>
-                    <td class="p-2 font-medium text-slate-900">${item.name}</td>
-                    <td class="p-2 text-center font-bold">${item.requestedQty} Adet</td>
-                    <td class="p-2 text-right font-bold">${Number(item.price).toLocaleString('tr-TR')} ₺</td>
+                    <td class="p-2 font-mono font-bold text-slate-700">${{item.id}}</td>
+                    <td class="p-2 font-medium text-slate-900">${{item.name}}</td>
+                    <td class="p-2 text-center font-bold">${{item.requestedQty}} Adet</td>
+                    <td class="p-2 text-right font-bold">${{Number(item.price).toLocaleString('tr-TR')}} ₺</td>
                 `;
                 tbody.appendChild(tr);
-            });
+            }});
 
             document.getElementById("excel-preview-box").classList.remove("hidden");
-            document.getElementById("excel-preview-count").innerText = `${parsedExcelItems.length} Kalem Ürün`;
-            document.getElementById("excel-preview-total").innerText = `Toplam: ${previewTotal.toLocaleString('tr-TR')} ₺`;
+            document.getElementById("excel-preview-count").innerText = `${{parsedExcelItems.length}} Kalem Ürün`;
+            document.getElementById("excel-preview-total").innerText = `Toplam: ${{previewTotal.toLocaleString('tr-TR')}} ₺`;
             updateExcelApplyButton();
-            showToast(`${parsedExcelItems.length} kalem ürün başarıyla okundu!`);
-        }
+            showToast(`${{parsedExcelItems.length}} kalem ürün başarıyla okundu!`);
+        }}
 
-        function updateExcelApplyButton() {
+        function updateExcelApplyButton() {{
             const btn = document.getElementById("btn-apply-excel");
-            if (parsedExcelItems.length > 0) {
+            if (parsedExcelItems.length > 0) {{
                 btn.disabled = false;
                 btn.className = "px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-200 transition flex items-center space-x-2";
-            } else {
+            }} else {{
                 btn.disabled = true;
                 btn.className = "px-5 py-2.5 rounded-xl bg-slate-300 text-white font-bold text-xs cursor-not-allowed transition flex items-center space-x-2";
-            }
-        }
+            }}
+        }}
 
-        function applyExcelImportToOrder() {
+        function applyExcelImportToOrder() {{
             if (parsedExcelItems.length === 0) return;
             const custName = prompt("Nebim'den aktarılan bu sipariş için Müşteri / Proje Adı giriniz:", "Nebim Excel Fişi - Yeni Proje");
             if (!custName) return;
 
             const newId = "CNP-2026-" + String(Math.floor(100 + Math.random() * 900));
-            const newOrd = {
+            const newOrd = {{
                 id: newId,
                 customer: custName,
                 salesRep: currentUser ? currentUser.name : "Orhan Özen",
@@ -1437,131 +1590,161 @@
                 items: JSON.parse(JSON.stringify(parsedExcelItems)),
                 extras: [],
                 isClosed: false
-            };
+            }};
 
             orders.unshift(newOrd);
             saveToStorage();
             closeExcelImportModal();
-            showToast(`Nebim fişi başarıyla sipariş #${newId} olarak oluşturuldu!`);
+            showToast(`Nebim fişi başarıyla sipariş #${{newId}} olarak oluşturuldu!`);
             openOrderDetail(newId);
-        }
+        }}
 
-        function sendWhatsAppNotification() {
+        function sendWhatsAppNotification() {{
             if (!activeOrder) return;
             const stepNames = ["", "1. Satış Formu", "2. Depo Hazırlığı", "3. Saha Montajı", "4. Muhasebe Kontrolü", "5. Fatura Kesildi"];
             const statusText = stepNames[activeOrder.currentStep] || "Aktif";
-            const text = encodeURIComponent(`*ÇİNPA BOTANİK SİPARİŞ BİLDİRİMİ*\n\nSipariş No: ${activeOrder.id}\nMüşteri: ${activeOrder.customer}\nAşama: ${statusText}\nİşlem Yapan: ${currentUser.name}\n\nDetaylar ERP panelinde güncellenmiştir.`);
-            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
-        }
+            const text = encodeURIComponent(`*ÇİNPA BOTANİK SİPARİŞ BİLDİRİMİ*\\n\\nSipariş No: ${{activeOrder.id}}\\nMüşteri: ${{activeOrder.customer}}\\nAşama: ${{statusText}}\\nİşlem Yapan: ${{currentUser.name}}\\n\\nDetaylar ERP panelinde güncellenmiştir.`);
+            window.open(`https://api.whatsapp.com/send?text=${{text}}`, '_blank');
+        }}
 
-        function populateProductSelects() {
-            const s1 = document.getElementById("step1-select-product");
+        function populateProductSelects() {{
+            searchCatalogDropdown("");
             const s3 = document.getElementById("step3-extra-select");
-            if (!s1 || !s3) return;
-            s1.innerHTML = ""; s3.innerHTML = "";
-            masterProducts.forEach(p => {
-                const opt1 = document.createElement("option");
-                opt1.value = p.id; opt1.innerText = `${p.id} - ${p.name} (${Number(p.price).toLocaleString('tr-TR')} ₺)`;
-                s1.appendChild(opt1);
+            if (!s3) return;
+            s3.innerHTML = "";
+            masterProducts.slice(0, 100).forEach(p => {{
                 const opt3 = document.createElement("option");
-                opt3.value = p.id; opt3.innerText = `${p.id} - ${p.name} (${Number(p.price).toLocaleString('tr-TR')} ₺)`;
+                opt3.value = p.id;
+                opt3.innerText = `${{p.id}} - ${{p.name}} (${{Number(p.price).toLocaleString('tr-TR')}} ₺)`;
                 s3.appendChild(opt3);
-            });
-            syncSelectedCatalogPrice();
-        }
+            }});
+        }}
 
-        function syncSelectedCatalogPrice() {
+        function syncSelectedCatalogPrice() {{
             const s1 = document.getElementById("step1-select-product");
             if (!s1 || s1.options.length === 0) return;
             const p = masterProducts.find(x => x.id === s1.value);
             if (p) document.getElementById("step1-catalog-price").value = p.price;
-        }
+        }}
 
-        function toggleAddMode(mode) {
+        function toggleAddMode(mode) {{
             const catBox = document.getElementById("add-mode-catalog-box");
             const manBox = document.getElementById("add-mode-manual-box");
             const btnCat = document.getElementById("btn-mode-catalog");
             const btnMan = document.getElementById("btn-mode-manual");
-            if (mode === "catalog") {
+            if (mode === "catalog") {{
                 catBox.classList.remove("hidden"); manBox.classList.add("hidden");
                 btnCat.className = "px-3 py-1 rounded-md bg-white text-slate-900 shadow-sm";
                 btnMan.className = "px-3 py-1 rounded-md text-slate-600";
-            } else {
+            }} else {{
                 catBox.classList.add("hidden"); manBox.classList.remove("hidden");
                 btnMan.className = "px-3 py-1 rounded-md bg-white text-slate-900 shadow-sm";
                 btnCat.className = "px-3 py-1 rounded-md text-slate-600";
-            }
-        }
+            }}
+        }}
 
-        function createNewOrderModal() {
+        function createNewOrderModal() {{
             document.getElementById("modal-new-order").classList.remove("hidden");
             document.getElementById("new-cust-name").value = "";
             document.getElementById("new-notes").value = "";
             document.getElementById("new-date").value = new Date().toISOString().split("T")[0];
-            if (currentUser && currentUser.roleId === 'satis') {
+            if (currentUser && currentUser.roleId === 'satis') {{
                 document.getElementById("new-sales-rep").value = currentUser.name;
-            }
+            }}
             document.getElementById("new-cust-name").focus();
-        }
+        }}
 
-        function closeModal() { document.getElementById("modal-new-order").classList.add("hidden"); }
+        function closeModal() {{ document.getElementById("modal-new-order").classList.add("hidden"); }}
 
-        function saveNewOrder() {
+        function saveNewOrder() {{
             const cust = document.getElementById("new-cust-name").value.trim();
-            if (!cust) { showToast("Lütfen müşteri veya proje adını giriniz.", true); return; }
+            if (!cust) {{ showToast("Lütfen müşteri veya proje adını giriniz.", true); return; }}
             const newId = "CNP-2026-" + String(Math.floor(100 + Math.random() * 900));
             const rep = (currentUser && currentUser.roleId === 'satis') ? currentUser.name : (document.getElementById("new-sales-rep").value || "Orhan Özen");
-            const newOrd = {
+            const newOrd = {{
                 id: newId, customer: cust, salesRep: rep,
                 date: document.getElementById("new-date").value, notes: document.getElementById("new-notes").value,
                 currentStep: 1, items: [], extras: [], isClosed: false
-            };
+            }};
             orders.unshift(newOrd); saveToStorage(); closeModal();
-            showToast(`Yeni sipariş açıldı: ${newId}`); openOrderDetail(newId);
-        }
+            showToast(`Yeni sipariş açıldı: ${{newId}}`); openOrderDetail(newId);
+        }}
 
-        function openCatalogModal() { document.getElementById("modal-catalog").classList.remove("hidden"); renderCatalogTable(); }
-        function closeCatalogModal() { document.getElementById("modal-catalog").classList.add("hidden"); populateProductSelects(); }
+        function openCatalogModal() {{
+            document.getElementById("modal-catalog").classList.remove("hidden");
+            renderCatalogTable();
+        }}
 
-        function renderCatalogTable() {
+        function closeCatalogModal() {{
+            document.getElementById("modal-catalog").classList.add("hidden");
+            populateProductSelects();
+        }}
+
+        function renderCatalogTable(filteredList = null) {{
             const tbody = document.getElementById("catalog-table-body");
             tbody.innerHTML = "";
-            masterProducts.forEach((p, idx) => {
+            const list = filteredList || masterProducts;
+
+            document.getElementById("cat-count-badge").innerText = masterProducts.length;
+
+            list.slice(0, 200).forEach((p, idx) => {{
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-                    <td class="p-3 font-mono font-bold text-slate-900">${p.id}</td>
-                    <td class="p-3 font-medium">${p.name}</td>
-                    <td class="p-3 text-right font-bold">${Number(p.price).toLocaleString('tr-TR')} ₺</td>
-                    <td class="p-3 text-center"><button onclick="removeProductFromMaster(${idx})" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                    <td class="p-3 font-mono font-bold text-slate-900">${{p.id}}</td>
+                    <td class="p-3 font-medium">${{p.name}}</td>
+                    <td class="p-3 text-slate-500 font-semibold">${{p.color || '-'}}</td>
+                    <td class="p-3 text-right font-bold text-emerald-800">${{Number(p.price).toLocaleString('tr-TR')}} ₺</td>
+                    <td class="p-3 text-center"><button onclick="removeProductFromMaster(${{idx}})" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
                 `;
                 tbody.appendChild(tr);
-            });
-        }
+            }});
+        }}
 
-        function saveProductToMasterCatalog() {
-            const code = document.getElementById("cat-new-code").value.trim() || `ÇNP-${Math.floor(100 + Math.random() * 900)}`;
+        function filterCatalogTable() {{
+            const q = document.getElementById("cat-search-input").value.toLowerCase();
+            const filtered = masterProducts.filter(p => 
+                p.id.toLowerCase().includes(q) || 
+                p.name.toLowerCase().includes(q) || 
+                (p.color && p.color.toLowerCase().includes(q))
+            );
+            renderCatalogTable(filtered);
+        }}
+
+        function saveProductToMasterCatalog() {{
+            const code = document.getElementById("cat-new-code").value.trim() || `ÇNP-${{Math.floor(100 + Math.random() * 900)}}`;
             const name = document.getElementById("cat-new-name").value.trim();
+            const color = document.getElementById("cat-new-color").value.trim() || "-";
             const price = parseFloat(document.getElementById("cat-new-price").value) || 0;
-            if (!name) { showToast("Lütfen ürün adını yazınız.", true); return; }
-            masterProducts.push({ id: code, name: name, price: price });
-            saveToStorage(); renderCatalogTable();
+
+            if (!name) {{ showToast("Lütfen ürün adını yazınız.", true); return; }}
+            masterProducts.unshift({{ id: code, name: name, color: color, price: price }});
+            saveToStorage();
+            renderCatalogTable();
             document.getElementById("cat-new-code").value = "";
             document.getElementById("cat-new-name").value = "";
+            document.getElementById("cat-new-color").value = "";
             document.getElementById("cat-new-price").value = "";
-            showToast(`${name} kataloğa eklendi!`);
-        }
+            showToast(`${{name}} kataloğa eklendi!`);
+        }}
 
-        function removeProductFromMaster(idx) {
+        function removeProductFromMaster(idx) {{
             masterProducts.splice(idx, 1);
-            saveToStorage(); renderCatalogTable();
+            saveToStorage();
+            renderCatalogTable();
             showToast("Ürün katalogdan silindi.");
-        }
+        }}
 
-        function filterOrders() {
+        function filterOrders() {{
             const q = document.getElementById("search-input").value.toLowerCase();
             const rows = document.querySelectorAll("#orders-table-body tr");
-            rows.forEach(r => { r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; });
-        }
+            rows.forEach(r => {{ r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; }});
+        }}
     </script>
 </body>
 </html>
+"""
+
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print("index.html 17.900 ürünün tamamı eklenerek başarıyla yazıldı!")
