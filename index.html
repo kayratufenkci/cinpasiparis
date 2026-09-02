@@ -9,7 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- SheetJS CDN (Excel Okuyucu) -->
+    <!-- SheetJS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <script>
@@ -36,7 +36,7 @@
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased">
 
-    <!-- Dinamik Bildirim (Sadece İşlem Yapılınca Geçici Çıkar, Ekranda Asla Sabit Kalmaz) -->
+    <!-- Dinamik Bildirim -->
     <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs sm:text-sm font-bold px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-2.5 no-print">
         <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
         <span id="toast-msg"></span>
@@ -167,7 +167,6 @@
                     </div>
 
                     <div class="flex items-center space-x-2 sm:space-x-3">
-                        <!-- Kullanıcı Değiştir / Geri Dön -->
                         <button onclick="logout()" title="Giriş Ekranına Dön ve Kullanıcı Değiştir" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-300 transition flex items-center space-x-1.5 shadow-sm">
                             <i class="fa-solid fa-arrow-left"></i>
                             <span class="hidden sm:inline">Kullanıcı Değiştir</span>
@@ -570,7 +569,7 @@
         </main>
     </div>
 
-    <!-- NEBİM / EXCEL'DEN FİŞ İÇE AKTAR MODAL -->
+    <!-- NEBİM / EXCEL'den FİŞ İÇE AKTAR MODAL -->
     <div id="modal-excel-import" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -707,7 +706,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE, KORUMALI MOTOR & GÜNCEL KATALOG -->
+    <!-- JAVASCRIPT STATE VE KATALOG MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -744,77 +743,31 @@
             }
         };
 
-        // PDF'TEN ÇEKİLEN TEMEL VE GÜNCEL ÜRÜN KATALOĞU
-        const DEFAULT_PRODUCTS = [
-            {"id":"0101007","name":"YUCCA BUSH X 36 W/WHITE FLOWERS","color":"-","price":350},
-            {"id":"0101018","name":"67 MİNG ARALİA (GREEN)","color":"-","price":330},
-            {"id":"0101024","name":"GUZMANIA KIRMIZI BÜYÜK","color":"-","price":130},
-            {"id":"0101025","name":"GUZMANIA SARI BÜYÜK","color":"SARI","price":0},
-            {"id":"0101026","name":"GUZMANIA MOR BÜYÜK","color":"PEMBE","price":160},
-            {"id":"0101027","name":"GUZMANIA KIRMIZI KÜÇÜK","color":"-","price":130},
-            {"id":"0101028","name":"GUZMANIA SARI KÜÇÜK","color":"-","price":130},
-            {"id":"0101029","name":"GUZMANIA MOR KÜÇÜK","color":"-","price":130},
-            {"id":"0101030","name":"PEPEROMIA TOPIARY","color":"-","price":620},
-            {"id":"0101031","name":"SWEETBAY TOPIARY","color":"-","price":620},
-            {"id":"0101101","name":"HEDERA SARMAŞIK 80CM","color":"-","price":890},
-            {"id":"0101102","name":"HEDERA YEŞİL BEYAZ 80CM","color":"-","price":890},
-            {"id":"0101103","name":"PETUNYA SARKAN 60CM BEYAZ","color":"-","price":530},
-            {"id":"0101104","name":"60 CM PETUNIA HANGING BUSH","color":"MOR","price":530},
-            {"id":"0101110","name":"SARDUNYA DEMET KIRMIZI 40CM","color":"-","price":470},
-            {"id":"0101111","name":"SARDUNYA DEMET PEMBE 40CM","color":"-","price":470},
-            {"id":"0101112","name":"SARDUNYA DEMET KREM 40CM","color":"-","price":470},
-            {"id":"0101123","name":"POTHOS SARKAN 80CM","color":"-","price":890},
-            {"id":"0101124","name":"HEDERA GARLAND 180CM","color":"-","price":340},
-            {"id":"0102002","name":"DRACENCA 150CM","color":"-","price":10920},
-            {"id":"0102003","name":"DRECENA 150CM","color":"-","price":5280},
-            {"id":"0102012","name":"POTHOS 160CM","color":"-","price":5500},
-            {"id":"0102014","name":"RAINBOW 220CM","color":"-","price":25760},
-            {"id":"0102015","name":"RAINBOW 160CM","color":"-","price":12240},
-            {"id":"0102025","name":"NARCISSUSS 4'LÜ","color":"BEYAZ","price":540},
-            {"id":"0102055","name":"KAKTÜS 150CM","color":"-","price":11980},
-            {"id":"0102058","name":"BAMBU YAPRAĞI","color":"-","price":220},
-            {"id":"0102060","name":"STARLİÇE ÇİÇEKLİ 80CM","color":"-","price":3480},
-            {"id":"0102062","name":"DRACENA 190CM","color":"-","price":6904},
-            {"id":"0102063","name":"SPATIFILYUM 145CM","color":"-","price":8280},
-            {"id":"0102066","name":"STARLİÇE ÇİÇEKLİ 140CM","color":"-","price":6240},
-            {"id":"0102078","name":"OLIVE SPRAY","color":"-","price":260},
-            {"id":"0102089","name":"SANSEVERIA 65CM","color":"-","price":4080},
-            {"id":"0102141","name":"PORTAKAL AĞACI 150CM","color":"-","price":8832},
-            {"id":"0102142","name":"LİMON AĞACI 150CM","color":"-","price":8832},
-            {"id":"01021458","name":"SCHEFLERA DEMET SARI YEŞİL BÜYÜK","color":"-","price":1490},
-            {"id":"0102157","name":"DEVE TABANI 160CM","color":"-","price":7900},
-            {"id":"0102158","name":"FICUS LYRATA 180CM","color":"-","price":8280},
-            {"id":"0102163","name":"STARLİÇE İNCE DAL 210CM","color":"-","price":9840},
-            {"id":"0102170","name":"ZEYTİN DALI","color":"-","price":790},
-            {"id":"0102177","name":"SALON PALMİYESİ 150CM","color":"-","price":8096},
-            {"id":"0102184","name":"MUZ AĞACI 4'LÜ 320CM","color":"-","price":18360},
-            {"id":"0102187","name":"BONZAİ AĞAÇ 150CM","color":"-","price":79200},
-            {"id":"0102204","name":"HAZIR GÖVDE ZEYTİN AĞACI 230CM","color":"-","price":39270},
-            {"id":"0102205","name":"HAZIR GÖVDE LİMON AĞACI 250CM","color":"-","price":45430},
-            {"id":"0102210","name":"AREKA PALM 150CM","color":"-","price":5880},
-            {"id":"0102245","name":"ZEYTİN AĞACI 180CM","color":"-","price":6960},
-            {"id":"0102246","name":"ZEYTİN AĞACI 240CM","color":"-","price":20640},
-            {"id":"0102250","name":"AREKA PALM 180CM","color":"-","price":10240},
-            {"id":"0104006","name":"MAZI DİKEY BAHÇE 100X100CM","color":"-","price":5060},
-            {"id":"0104017","name":"LUX DİKEY BAHÇE 100X100CM","color":"-","price":5480},
-            {"id":"0104028","name":"HAZIR DİKEY BAHÇE PANEL 100X100CM UV","color":"-","price":12980}
-        ];
-
         let masterProducts = [];
-        try {
-            const stored = localStorage.getItem("cinpa_master_products_v4");
-            masterProducts = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
-        } catch(e) {
-            masterProducts = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+
+        async function loadFullCatalog() {
+            try {
+                const res = await fetch('products.json');
+                if (res.ok) {
+                    masterProducts = await res.json();
+                } else {
+                    masterProducts = [{"id":"0101007","name":"YUCCA BUSH X 36 W/WHITE FLOWERS","color":"-","price":350}];
+                }
+            } catch(e) {
+                masterProducts = [{"id":"0101007","name":"YUCCA BUSH X 36 W/WHITE FLOWERS","color":"-","price":350}];
+            }
+            const badge = document.getElementById("cat-count-badge");
+            if (badge) badge.innerText = masterProducts.length;
         }
+
+        loadFullCatalog();
 
         const INITIAL_ORDERS = [
             {
                 id: "CNP-2026-084", customer: "Hilton Bosphorus Projesi", salesRep: "Orhan Özen", date: "2026-08-25",
                 notes: "İlk sipariş kaydı.", currentStep: 1,
                 items: [
-                    { id: "0101007", name: "YUCCA BUSH X 36 W/WHITE FLOWERS", requestedQty: 4, dispatchedQty: 4, returnedQty: 0, price: 350, warehouseNote: "Hazırlandı.", checked: true },
-                    { id: "01021458", name: "SCHEFLERA DEMET SARI YEŞİL BÜYÜK", requestedQty: 10, dispatchedQty: 10, returnedQty: 0, price: 1490, warehouseNote: "Toplandı.", checked: true }
+                    { id: "0101007", name: "YUCCA BUSH X 36 W/WHITE FLOWERS", requestedQty: 4, dispatchedQty: 4, returnedQty: 0, price: 350, warehouseNote: "Hazırlandı.", checked: true }
                 ],
                 extras: [], isClosed: false
             }
@@ -822,7 +775,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v4");
+            const stored = localStorage.getItem("cinpa_orders_v5");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -835,8 +788,7 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v4", JSON.stringify(orders));
-                localStorage.setItem("cinpa_master_products_v4", JSON.stringify(masterProducts));
+                localStorage.setItem("cinpa_orders_v5", JSON.stringify(orders));
             } catch(e) {}
         }
 
@@ -853,7 +805,6 @@
             }, 3000);
         }
 
-        // ================= GİRİŞ KONTROLLERİ =================
         function requestPasswordAndLogin(roleKey) {
             if (roleKey === 'muhasebe') {
                 const pass = prompt("Muhasebe Paneli Giriş Şifresi:");
@@ -1459,7 +1410,6 @@
             showToast("Nebim V3 Entegrasyon dosyası indirildi!");
         }
 
-        // ================= EXCEL İÇE AKTAR =================
         function openExcelImportModal() {
             document.getElementById("modal-excel-import").classList.remove("hidden");
             parsedExcelItems = [];
