@@ -627,31 +627,41 @@
         </div>
     </div>
 
-    <!-- KATALOG VE YENİ SİPARİŞ MODALLARI -->
+    <!-- KATALOG VE YENİ SİPARİŞ MODALLARI (TOPLU SİLME VE FİYATLI EXCEL EKLENDİ) -->
     <div id="modal-catalog" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-        <div class="bg-white rounded-3xl max-w-4xl w-full p-6 shadow-2xl space-y-5 max-h-[90vh] flex flex-col">
+        <div class="bg-white rounded-3xl max-w-5xl w-full p-6 shadow-2xl space-y-5 max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h3 class="text-base font-extrabold text-slate-900 flex items-center"><i class="fa-solid fa-boxes-stacked text-cinpa-700 mr-2"></i> Çinpa Ürün Kataloğu & Fiyat Listesi</h3>
                 <button type="button" onclick="closeCatalogModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <!-- Excel'den Toplu Katalog Yükleme ve Kalıcı Hafıza Alanı -->
-            <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
+            <!-- Excel'den Toplu Katalog Yükleme ve Toplu Silme Araçları -->
+            <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex flex-col lg:flex-row items-center justify-between gap-3">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
                         <i class="fa-solid fa-file-excel"></i>
                     </div>
                     <div>
-                        <div class="text-xs font-black text-emerald-900">Excel'den Kalıcı Katalog Yükle</div>
-                        <div class="text-[11px] text-emerald-700">Sütun Sırası: <strong>Ürün Kodu | Ürün Adı | Renk | Fiyat</strong> (Kayıtlı Ürün: <span id="master-count-label" class="font-bold">0</span>)</div>
+                        <div class="text-xs font-black text-slate-900">Excel'den Fiyatlı Katalog Yükle (Kalıcı)</div>
+                        <div class="text-[11px] text-slate-500">Sıralama: <strong>Kod | Ürün Adı | Renk | Fiyat</strong> (Kayıtlı: <span id="master-count-label" class="font-bold text-emerald-700">0</span>)</div>
                     </div>
                 </div>
-                <div class="flex items-center space-x-2 w-full sm:w-auto">
-                    <button type="button" onclick="document.getElementById('catalog-excel-file').click()" class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center space-x-1.5">
+                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                    <button type="button" onclick="document.getElementById('catalog-excel-file').click()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <span>Excel Dosyası Seç & Kaydet</span>
+                        <span>Excel Seç & Kaydet</span>
                     </button>
                     <input type="file" id="catalog-excel-file" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleCatalogExcelUpload(event)">
+
+                    <button type="button" onclick="deleteSelectedCatalogItems()" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-square-check"></i>
+                        <span>Seçilenleri Sil</span>
+                    </button>
+
+                    <button type="button" onclick="deleteAllCatalogItems()" class="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span>Hepsini Sil</span>
+                    </button>
                 </div>
             </div>
 
@@ -674,6 +684,7 @@
                 <table class="w-full text-left text-xs">
                     <thead class="bg-slate-100 text-slate-700 font-bold uppercase sticky top-0 border-b border-slate-200">
                         <tr>
+                            <th class="p-3 w-10 text-center"><input type="checkbox" id="select-all-catalog" onchange="toggleSelectAllCatalog(this.checked)" class="w-4 h-4 text-cinpa-700 rounded"></th>
                             <th class="p-3">Ürün Kodu</th>
                             <th class="p-3">Ürün Adı</th>
                             <th class="p-3">Renk</th>
@@ -726,7 +737,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE KALICI LOCALSTORAGE KATALOG MOTORU -->
+    <!-- JAVASCRIPT STATE VE KATALOG İŞLEMLERİ -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -774,7 +785,7 @@
 
         let masterProducts = [];
         try {
-            const stored = localStorage.getItem("cinpa_permanent_catalog_v11");
+            const stored = localStorage.getItem("cinpa_permanent_catalog_v12");
             masterProducts = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
         } catch(e) {
             masterProducts = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
@@ -793,7 +804,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v11");
+            const stored = localStorage.getItem("cinpa_orders_v12");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -806,8 +817,8 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v11", JSON.stringify(orders));
-                localStorage.setItem("cinpa_permanent_catalog_v11", JSON.stringify(masterProducts));
+                localStorage.setItem("cinpa_orders_v12", JSON.stringify(orders));
+                localStorage.setItem("cinpa_permanent_catalog_v12", JSON.stringify(masterProducts));
             } catch(e) {}
         }
 
@@ -824,7 +835,7 @@
             }, 3000);
         }
 
-        // --- EXCEL DOSYASINDAN TOPLU KALICI KATALOG YÜKLEME ---
+        // --- EXCEL DOSYASINDAN FİYATLI VE EKSİKSİZ KATALOG YÜKLEME ---
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -841,18 +852,27 @@
                     jsonData.forEach((cols, idx) => {
                         if (!cols || cols.length === 0) return;
                         const firstColStr = String(cols[0] || '').toLowerCase();
-                        if (firstColStr.includes('kod') || firstColStr.includes('ürün') || firstColStr.includes('toptan')) {
-                            return;
+                        if (firstColStr.includes('kod') || firstColStr.includes('ürün') || firstColStr.includes('toptan') || firstColStr.includes('fiyat')) {
+                            return; // Başlık satırını yoksay
                         }
                         
                         let code = String(cols[0] || '').trim();
                         let name = String(cols[1] || '').trim();
-                        let color = String(cols[2] || '-').trim();
-                        let price = parseFloat(String(cols[3] || '0').replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
+                        let color = "-";
+                        let price = 0;
 
-                        if (cols.length === 3 && !isNaN(parseFloat(String(cols[2]).replace(',', '.')))) {
-                            color = "-";
-                            price = parseFloat(String(cols[2]).replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
+                        // Esnek sütun yapısı kontrolü (Renk veya Fiyat yer değiştirmelerine karşı)
+                        if (cols.length >= 4) {
+                            color = String(cols[2] || '-').trim();
+                            price = parseFloat(String(cols[3] || '0').replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
+                        } else if (cols.length === 3) {
+                            // Eğer 3 sütun varsa 3. sütun fiyat veya renk olabilir; sayısal ise fiyattır
+                            const candPrice = parseFloat(String(cols[2] || '0').replace(/[^0-9,.-]/g, '').replace(',', '.'));
+                            if (!isNaN(candPrice) && candPrice > 0) {
+                                price = candPrice;
+                            } else {
+                                color = String(cols[2] || '-').trim();
+                            }
                         }
 
                         if (code && name) {
@@ -870,7 +890,7 @@
                         saveToStorage();
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
-                        showToast(`Başarıyla ${newProducts.length} ürün kalıcı olarak kaydedildi!`);
+                        showToast(`Başarıyla ${newProducts.length} ürün fiyatlarıyla birlikte yüklendi!`);
                     } else {
                         showToast("Excel dosyasından geçerli ürün satırı okunamadı.", true);
                     }
@@ -1732,9 +1752,15 @@
 
             updateHeaderBadgeCounts();
 
-            list.slice(0, 150).forEach((p, idx) => {
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 italic">Katalogda kayıtlı ürün bulunmuyor.</td></tr>`;
+                return;
+            }
+
+            list.slice(0, 200).forEach((p) => {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
+                    <td class="p-3 text-center"><input type="checkbox" value="${p.id}" class="catalog-row-checkbox w-4 h-4 text-cinpa-700 rounded"></td>
                     <td class="p-3 font-mono font-bold text-slate-900">${p.id}</td>
                     <td class="p-3 font-medium">${p.name}</td>
                     <td class="p-3 text-slate-500 font-semibold">${p.color || '-'}</td>
@@ -1743,6 +1769,34 @@
                 `;
                 tbody.appendChild(tr);
             });
+        }
+
+        function toggleSelectAllCatalog(checked) {
+            const checkboxes = document.querySelectorAll(".catalog-row-checkbox");
+            checkboxes.forEach(cb => cb.checked = checked);
+        }
+
+        function deleteSelectedCatalogItems() {
+            const checkboxes = document.querySelectorAll(".catalog-row-checkbox:checked");
+            if (checkboxes.length === 0) {
+                showToast("Lütfen silmek için en az bir ürün seçiniz.", true);
+                return;
+            }
+            if (!confirm(`Seçilen ${checkboxes.length} ürünü silmek istediğinize emin misiniz?`)) return;
+
+            const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+            masterProducts = masterProducts.filter(p => !selectedIds.includes(p.id));
+            saveToStorage();
+            renderCatalogTable();
+            showToast(`${selectedIds.length} ürün katalogdan silindi.`);
+        }
+
+        function deleteAllCatalogItems() {
+            if (!confirm("DİKKAT: Tüm katalog listesi kalıcı olarak silinecek! Emin misiniz?")) return;
+            masterProducts = [];
+            saveToStorage();
+            renderCatalogTable();
+            showToast("Tüm katalog tamamen temizlendi.");
         }
 
         function filterCatalogTable() {
@@ -1785,7 +1839,6 @@
             rows.forEach(r => { r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; });
         }
 
-        // Sayfa açıldığında sayaçları güncelle
         window.addEventListener('DOMContentLoaded', () => {
             updateHeaderBadgeCounts();
         });
