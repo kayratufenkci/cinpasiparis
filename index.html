@@ -627,7 +627,7 @@
         </div>
     </div>
 
-    <!-- KATALOG VE YENİ SİPARİŞ MODALLARI (EXCEL İLE KATALOG YÜKLEME EKLENDİ) -->
+    <!-- KATALOG VE YENİ SİPARİŞ MODALLARI -->
     <div id="modal-catalog" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-3xl max-w-4xl w-full p-6 shadow-2xl space-y-5 max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -726,7 +726,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE EXCEL KATALOG YÜKLEME MOTORU -->
+    <!-- JAVASCRIPT STATE VE KATALOG İŞLEMLERİ (SİLME + EXCEL YÜKLEME) -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -774,7 +774,7 @@
 
         let masterProducts = [];
         try {
-            const stored = localStorage.getItem("cinpa_master_products_v9");
+            const stored = localStorage.getItem("cinpa_master_products_v10");
             masterProducts = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
         } catch(e) {
             masterProducts = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
@@ -793,7 +793,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v9");
+            const stored = localStorage.getItem("cinpa_orders_v10");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -806,8 +806,8 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v9", JSON.stringify(orders));
-                localStorage.setItem("cinpa_master_products_v9", JSON.stringify(masterProducts));
+                localStorage.setItem("cinpa_orders_v10", JSON.stringify(orders));
+                localStorage.setItem("cinpa_master_products_v10", JSON.stringify(masterProducts));
             } catch(e) {}
         }
 
@@ -824,7 +824,7 @@
             }, 3000);
         }
 
-        // --- EXCEL DOSYASINDAN TÜM KATALOĞU YÜKLEME FONKSİYONU ---
+        // --- EXCEL DOSYASINDAN TOPLU KATALOG YÜKLEME ---
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -842,7 +842,7 @@
                         if (!cols || cols.length === 0) return;
                         const firstColStr = String(cols[0] || '').toLowerCase();
                         if (firstColStr.includes('kod') || firstColStr.includes('ürün') || firstColStr.includes('toptan')) {
-                            return; // Başlık satırını atla
+                            return;
                         }
                         
                         let code = String(cols[0] || '').trim();
@@ -850,7 +850,6 @@
                         let color = String(cols[2] || '-').trim();
                         let price = parseFloat(String(cols[3] || '0').replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
 
-                        // Eğer sütun sayısı 3 ise (Kod | İsim | Fiyat ve renk yoksa)
                         if (cols.length === 3 && !isNaN(parseFloat(String(cols[2]).replace(',', '.')))) {
                             color = "-";
                             price = parseFloat(String(cols[2]).replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
@@ -1726,14 +1725,14 @@
             const badge = document.getElementById("cat-count-badge");
             if (badge) badge.innerText = masterProducts.length;
 
-            list.slice(0, 100).forEach((p, idx) => {
+            list.slice(0, 150).forEach((p, idx) => {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td class="p-3 font-mono font-bold text-slate-900">${p.id}</td>
                     <td class="p-3 font-medium">${p.name}</td>
                     <td class="p-3 text-slate-500 font-semibold">${p.color || '-'}</td>
                     <td class="p-3 text-right font-bold text-emerald-800">${Number(p.price).toLocaleString('tr-TR')} ₺</td>
-                    <td class="p-3 text-center"><button type="button" onclick="removeProductFromMaster(${idx})" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                    <td class="p-3 text-center"><button type="button" onclick="removeProductFromMaster('${p.id}')" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1766,8 +1765,8 @@
             showToast(`${name} kataloğa eklendi!`);
         }
 
-        function removeProductFromMaster(idx) {
-            masterProducts.splice(idx, 1);
+        function removeProductFromMaster(productId) {
+            masterProducts = masterProducts.filter(p => p.id !== productId);
             saveToStorage();
             renderCatalogTable();
             showToast("Ürün katalogdan silindi.");
