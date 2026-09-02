@@ -706,7 +706,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE TAM GÖMÜLÜ 17.900 ÜRÜN MOTORU -->
+    <!-- JAVASCRIPT STATE VE TAM GÖMÜLÜ ÜRÜN MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -800,7 +800,7 @@
 
         let masterProducts = [];
         try {
-            const stored = localStorage.getItem("cinpa_master_products_v7");
+            const stored = localStorage.getItem("cinpa_master_products_v8");
             masterProducts = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
         } catch(e) {
             masterProducts = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
@@ -820,7 +820,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v7");
+            const stored = localStorage.getItem("cinpa_orders_v8");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -833,8 +833,8 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v7", JSON.stringify(orders));
-                localStorage.setItem("cinpa_master_products_v7", JSON.stringify(masterProducts));
+                localStorage.setItem("cinpa_orders_v8", JSON.stringify(orders));
+                localStorage.setItem("cinpa_master_products_v8", JSON.stringify(masterProducts));
             } catch(e) {}
         }
 
