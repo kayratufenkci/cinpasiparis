@@ -737,7 +737,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE KESİN 4 SÜTUN EŞLEME MOTORU (A:KOD, B:İSİM, C:RENK, D:FİYAT) -->
+    <!-- JAVASCRIPT STATE VE SABİT A(0), B(1), C(2), D(3) SÜTUN OKUMA MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -785,7 +785,7 @@
 
         let masterProducts = [];
         try {
-            const stored = localStorage.getItem("cinpa_permanent_catalog_v17");
+            const stored = localStorage.getItem("cinpa_permanent_catalog_v18");
             masterProducts = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
         } catch(e) {
             masterProducts = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
@@ -804,7 +804,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v17");
+            const stored = localStorage.getItem("cinpa_orders_v18");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -817,8 +817,8 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v17", JSON.stringify(orders));
-                localStorage.setItem("cinpa_permanent_catalog_v17", JSON.stringify(masterProducts));
+                localStorage.setItem("cinpa_orders_v18", JSON.stringify(orders));
+                localStorage.setItem("cinpa_permanent_catalog_v18", JSON.stringify(masterProducts));
             } catch(e) {}
         }
 
@@ -835,7 +835,7 @@
             }, 3000);
         }
 
-        // --- SABİT SÜTUN OKUMA MOTORU (0: Kod, 1: Ad, 2: Renk, 3: Fiyat) ---
+        // --- SABİT EXCEL OKUMA: A(0):Kod, B(1):Ürün Adı, C(2):Renk, D(3):Fiyat ---
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -852,35 +852,29 @@
                     jsonData.forEach((cols, idx) => {
                         if (!cols || cols.length === 0) return;
                         
-                        // Başlık satırını atla
-                        const col0 = String(cols[0] || '').trim();
-                        const col1 = String(cols[1] || '').trim();
+                        let col0 = String(cols[0] !== undefined ? cols[0] : "").trim();
+                        let col1 = String(cols[1] !== undefined ? cols[1] : "").trim();
+
+                        // İlk satır başlık ise (Ürün Kodu, Ürün Adı vb.) atla
                         if (idx === 0 && (col0.toLowerCase().includes('kod') || col1.toLowerCase().includes('ad') || col0.toLowerCase().includes('ürün'))) {
                             return; 
                         }
+                        if (!col0 && !col1) return;
 
                         let code = col0;
                         let name = col1;
-                        let color = "-";
-                        let rawPrice = 0;
+                        let color = String(cols[2] !== undefined && cols[2] !== null ? cols[2] : "-").trim();
+                        let rawPrice = cols[3] !== undefined && cols[3] !== null ? cols[3] : 0;
 
-                        if (cols.length >= 4) {
-                            color = String(cols[2] !== undefined ? cols[2] : '-').trim();
-                            rawPrice = cols[3];
-                        } else if (cols.length === 3) {
-                            // Eğer 3 sütun varsa: Kod | Ad | Fiyat (Renk yok)
-                            let cand3 = String(cols[2]).trim();
-                            let parsedNum = parseFloat(cand3.replace(/[^0-9,.-]/g, '').replace(',', '.'));
-                            if (!isNaN(parsedNum)) {
-                                rawPrice = cols[2];
-                            } else {
-                                color = cand3;
-                            }
+                        // Eğer 3 sütunlu geldiyse (Kod | Ad | Fiyat ve C sütunu boş/fiyat ise)
+                        if (cols.length === 3) {
+                            color = "-";
+                            rawPrice = cols[2];
                         }
 
-                        let price = parseFloat(String(rawPrice || '0').replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
+                        let price = parseFloat(String(rawPrice).replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
 
-                        if (code && name && code.toLowerCase() !== 'ürün kodu') {
+                        if (code && name) {
                             newProducts.push({
                                 id: code,
                                 name: name,
