@@ -643,7 +643,7 @@
                     </div>
                     <div>
                         <div class="text-xs font-black text-slate-900">Excel'den Fiyatlı Katalog Yükle (Kalıcı)</div>
-                        <div class="text-[11px] text-slate-500">Sıralama: <strong>A: Kod | B: Ürün Adı | C: Renk | D: Fiyat</strong> (Kayıtlı: <span id="master-count-label" class="font-bold text-emerald-700">0</span>)</div>
+                        <div class="text-[11px] text-slate-500">Sütun A: Kod | Sütun B: Ürün Adı | Sütun C: Renk | Sütun D: Toptan Fiyat (Kayıtlı: <span id="master-count-label" class="font-bold text-emerald-700">0</span>)</div>
                     </div>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
@@ -737,7 +737,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE SABİT A(0), B(1), C(2), D(3) SÜTUN OKUMA MOTORU -->
+    <!-- JAVASCRIPT STATE VE EXCEL D SÜTUNU KESİN BAĞLAMA MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -785,7 +785,7 @@
 
         let masterProducts = [];
         try {
-            const stored = localStorage.getItem("cinpa_permanent_catalog_v18");
+            const stored = localStorage.getItem("cinpa_permanent_catalog_v20");
             masterProducts = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
         } catch(e) {
             masterProducts = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
@@ -804,7 +804,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v18");
+            const stored = localStorage.getItem("cinpa_orders_v20");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -817,8 +817,8 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v18", JSON.stringify(orders));
-                localStorage.setItem("cinpa_permanent_catalog_v18", JSON.stringify(masterProducts));
+                localStorage.setItem("cinpa_orders_v20", JSON.stringify(orders));
+                localStorage.setItem("cinpa_permanent_catalog_v20", JSON.stringify(masterProducts));
             } catch(e) {}
         }
 
@@ -835,7 +835,7 @@
             }, 3000);
         }
 
-        // --- SABİT EXCEL OKUMA: A(0):Kod, B(1):Ürün Adı, C(2):Renk, D(3):Fiyat ---
+        // --- KESİN EXCEL SÜTUNLARI: A(KOD), B(AD), C(RENK), D(FİYAT) ---
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -846,42 +846,34 @@
                     const workbook = XLSX.read(data, { type: 'array' });
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    
+                    // Header: "A" ile kesin olarak A, B, C, D sütunlarını ayrı ayrı okuyoruz!
+                    const rows = XLSX.utils.sheet_to_json(worksheet, { header: "A", defval: "" });
                     
                     let newProducts = [];
-                    jsonData.forEach((cols, idx) => {
-                        if (!cols || cols.length === 0) return;
-                        
-                        let col0 = String(cols[0] !== undefined ? cols[0] : "").trim();
-                        let col1 = String(cols[1] !== undefined ? cols[1] : "").trim();
+                    rows.forEach((row, idx) => {
+                        let colA = String(row.A || "").trim();
+                        let colB = String(row.B || "").trim();
+                        let colC = String(row.C || "").trim();
+                        let colD = String(row.D || "").trim();
 
-                        // İlk satır başlık ise (Ürün Kodu, Ürün Adı vb.) atla
-                        if (idx === 0 && (col0.toLowerCase().includes('kod') || col1.toLowerCase().includes('ad') || col0.toLowerCase().includes('ürün'))) {
-                            return; 
+                        // İlk satır başlık ise ("Ürün Kodu", "Ürün Adı" vb.) atla
+                        if (idx === 0 && (colA.toLowerCase().includes("kod") || colB.toLowerCase().includes("ad"))) {
+                            return;
                         }
-                        if (!col0 && !col1) return;
+                        if (!colA && !colB) return;
 
-                        let code = col0;
-                        let name = col1;
-                        let color = String(cols[2] !== undefined && cols[2] !== null ? cols[2] : "-").trim();
-                        let rawPrice = cols[3] !== undefined && cols[3] !== null ? cols[3] : 0;
+                        // D sütunundaki değeri sayıya çeviriyoruz (Toptan Satış Fiyatı)
+                        let cleanPriceStr = colD.replace(/[^0-9,.-]/g, "").replace(",", ".");
+                        let price = parseFloat(cleanPriceStr);
+                        if (isNaN(price)) price = 0;
 
-                        // Eğer 3 sütunlu geldiyse (Kod | Ad | Fiyat ve C sütunu boş/fiyat ise)
-                        if (cols.length === 3) {
-                            color = "-";
-                            rawPrice = cols[2];
-                        }
-
-                        let price = parseFloat(String(rawPrice).replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
-
-                        if (code && name) {
-                            newProducts.push({
-                                id: code,
-                                name: name,
-                                color: (color && color !== "" && color !== "-") ? color : "-",
-                                price: price
-                            });
-                        }
+                        newProducts.push({
+                            id: colA,
+                            name: colB,
+                            color: colC !== "" ? colC : "-",
+                            price: price
+                        });
                     });
 
                     if (newProducts.length > 0) {
@@ -889,9 +881,9 @@
                         saveToStorage();
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
-                        showToast(`Başarıyla ${newProducts.length} ürün ve gerçek fiyatları yüklendi!`);
+                        showToast(`Başarıyla ${newProducts.length} ürün yüklendi! (İlk ürün fiyatı: ${newProducts[0].price} ₺)`);
                     } else {
-                        showToast("Excel dosyasından geçerli ürün satırı okunamadı.", true);
+                        showToast("Excel dosyasından ürün okunamadı.", true);
                     }
                 } catch(err) {
                     showToast("Excel okunurken hata oluştu: " + err.message, true);
