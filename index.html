@@ -635,21 +635,21 @@
                 <button type="button" onclick="closeCatalogModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <!-- Excel'den Toplu Katalog Yükleme Alanı -->
+            <!-- Excel'den Toplu Katalog Yükleme ve Kalıcı Hafıza Alanı -->
             <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
                         <i class="fa-solid fa-file-excel"></i>
                     </div>
                     <div>
-                        <div class="text-xs font-black text-emerald-900">Excel'den Tüm Kataloğu Güncelle</div>
-                        <div class="text-[11px] text-emerald-700">Sütun Sırası: <strong>Ürün Kodu | Ürün Adı | Renk | Fiyat</strong></div>
+                        <div class="text-xs font-black text-emerald-900">Excel'den Kalıcı Katalog Yükle</div>
+                        <div class="text-[11px] text-emerald-700">Sütun Sırası: <strong>Ürün Kodu | Ürün Adı | Renk | Fiyat</strong> (Kayıtlı Ürün: <span id="master-count-label" class="font-bold">0</span>)</div>
                     </div>
                 </div>
                 <div class="flex items-center space-x-2 w-full sm:w-auto">
                     <button type="button" onclick="document.getElementById('catalog-excel-file').click()" class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center space-x-1.5">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <span>Excel Dosyası Seç & Yükle</span>
+                        <span>Excel Dosyası Seç & Kaydet</span>
                     </button>
                     <input type="file" id="catalog-excel-file" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleCatalogExcelUpload(event)">
                 </div>
@@ -726,7 +726,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE KATALOG İŞLEMLERİ (SİLME + EXCEL YÜKLEME) -->
+    <!-- JAVASCRIPT STATE VE KALICI LOCALSTORAGE KATALOG MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -774,7 +774,7 @@
 
         let masterProducts = [];
         try {
-            const stored = localStorage.getItem("cinpa_master_products_v10");
+            const stored = localStorage.getItem("cinpa_permanent_catalog_v11");
             masterProducts = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
         } catch(e) {
             masterProducts = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
@@ -793,7 +793,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v10");
+            const stored = localStorage.getItem("cinpa_orders_v11");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -806,8 +806,8 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v10", JSON.stringify(orders));
-                localStorage.setItem("cinpa_master_products_v10", JSON.stringify(masterProducts));
+                localStorage.setItem("cinpa_orders_v11", JSON.stringify(orders));
+                localStorage.setItem("cinpa_permanent_catalog_v11", JSON.stringify(masterProducts));
             } catch(e) {}
         }
 
@@ -824,7 +824,7 @@
             }, 3000);
         }
 
-        // --- EXCEL DOSYASINDAN TOPLU KATALOG YÜKLEME ---
+        // --- EXCEL DOSYASINDAN TOPLU KALICI KATALOG YÜKLEME ---
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -869,7 +869,8 @@
                         masterProducts = newProducts;
                         saveToStorage();
                         renderCatalogTable();
-                        showToast(`Başarıyla ${newProducts.length} ürün kataloğa yüklendi!`);
+                        updateHeaderBadgeCounts();
+                        showToast(`Başarıyla ${newProducts.length} ürün kalıcı olarak kaydedildi!`);
                     } else {
                         showToast("Excel dosyasından geçerli ürün satırı okunamadı.", true);
                     }
@@ -878,6 +879,13 @@
                 }
             };
             reader.readAsArrayBuffer(file);
+        }
+
+        function updateHeaderBadgeCounts() {
+            const badge = document.getElementById("cat-count-badge");
+            if (badge) badge.innerText = masterProducts.length;
+            const lbl = document.getElementById("master-count-label");
+            if (lbl) lbl.innerText = masterProducts.length;
         }
 
         function requestPasswordAndLogin(roleKey) {
@@ -946,8 +954,7 @@
             const btnCatalog = document.getElementById("btn-header-catalog");
             if (btnCatalog) btnCatalog.style.display = currentUser.canManageCatalog ? "flex" : "none";
 
-            const catBadge = document.getElementById("cat-count-badge");
-            if (catBadge) catBadge.innerText = masterProducts.length;
+            updateHeaderBadgeCounts();
 
             const repSelect = document.getElementById("new-sales-rep");
             if (repSelect && currentUser.roleId === 'satis') {
@@ -1709,6 +1716,7 @@
         function openCatalogModal() {
             document.getElementById("modal-catalog").classList.remove("hidden");
             renderCatalogTable();
+            updateHeaderBadgeCounts();
         }
 
         function closeCatalogModal() {
@@ -1722,8 +1730,7 @@
             tbody.innerHTML = "";
             const list = filteredList || masterProducts;
 
-            const badge = document.getElementById("cat-count-badge");
-            if (badge) badge.innerText = masterProducts.length;
+            updateHeaderBadgeCounts();
 
             list.slice(0, 150).forEach((p, idx) => {
                 const tr = document.createElement("tr");
@@ -1777,6 +1784,11 @@
             const rows = document.querySelectorAll("#orders-table-body tr");
             rows.forEach(r => { r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; });
         }
+
+        // Sayfa açıldığında sayaçları güncelle
+        window.addEventListener('DOMContentLoaded', () => {
+            updateHeaderBadgeCounts();
+        });
     </script>
 </body>
 </html>
