@@ -7,7 +7,7 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- SheetJS CDN (Excel okuma ve yazma kütüphanesi) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -47,9 +47,62 @@
         <div class="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl space-y-6">
             <div class="text-center space-y-2">
                 
-                <!-- ATTIGINIZ BİREBİR ORİJİNAL ÇİNPA LOGOSU -->
+                <!-- TAM VEKTÖREL ÇİNPA LOGOSU (HARİCİ RESME GEREK KALMAZ) -->
                 <div class="flex items-center justify-center pt-2 px-2">
-                    <img src="logo.png" alt="ÇİNPA" class="w-full max-w-[280px] h-auto object-contain mx-auto" onerror="this.src='https://raw.githubusercontent.com/kayratufenkci/cinpasiparis/main/logo.png';">
+                    <svg class="w-full max-w-[310px] h-auto" viewBox="0 0 650 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Sol Amblem: Ağaç / Kök / Yaprak Dalları -->
+                        <g stroke="#184a28" stroke-linecap="round" stroke-linejoin="round">
+                            <!-- Ana Gövde Hatları -->
+                            <path d="M62 100 Q105 72 145 52" stroke-width="13" />
+                            <path d="M58 100 Q108 96 156 90" stroke-width="12" />
+                            <path d="M60 100 Q104 122 145 142" stroke-width="13" />
+                            
+                            <!-- İkincil Dallar -->
+                            <path d="M98 84 Q128 54 158 32" stroke-width="8.5" />
+                            <path d="M112 76 Q138 65 160 58" stroke-width="7.5" />
+                            <path d="M124 93 Q148 83 168 80" stroke-width="7" />
+                            <path d="M118 108 Q146 118 166 126" stroke-width="7.5" />
+                            <path d="M98 116 Q128 144 154 164" stroke-width="8.5" />
+
+                            <!-- Dış Sarmal Yapraklar -->
+                            <path d="M72 88 Q56 64 76 38 Q92 24 116 18" stroke-width="8" />
+                            <path d="M72 112 Q56 136 72 162 Q92 180 118 184" stroke-width="8" />
+                            <path d="M78 38 Q94 54 122 44" stroke-width="6.5" />
+                            <path d="M72 162 Q94 146 122 154" stroke-width="6.5" />
+                            <path d="M138 36 Q154 22 165 16" stroke-width="6" />
+                            <path d="M138 164 Q156 178 166 186" stroke-width="6" />
+                        </g>
+
+                        <!-- Dikey İnce Çizgi -->
+                        <line x1="200" y1="26" x2="200" y2="174" stroke="#184a28" stroke-width="2.2" stroke-opacity="0.7" />
+
+                        <!-- Sağ Logotype: CİNPA -->
+                        <g fill="#211e1f">
+                            <!-- C Harfi -->
+                            <path d="M312 60 C298 48 280 44 260 44 C220 44 190 70 190 109 C190 148 220 174 260 174 C280 174 298 170 312 158 L312 132 C298 142 282 147 263 147 C238 147 222 131 222 109 C222 87 238 71 263 71 C282 71 298 76 312 86 Z" />
+                            
+                            <!-- İ Harfi -->
+                            <rect x="338" y="73" width="23" height="97" rx="3.5" />
+                            <circle cx="349.5" cy="46" r="13" />
+
+                            <!-- N Harfi -->
+                            <path d="M392 73 L392 170 L413 170 L460 97 L460 170 L481 170 L481 73 L460 73 L413 146 L413 73 Z" />
+
+                            <!-- P Harfi -->
+                            <path d="M515 73 L515 170 L537 170 L537 131 L560 131 C582 131 598 118 598 102 C598 86 582 73 560 73 Z M537 93 L558 93 C568 93 576 97 576 102 C576 107 568 111 558 111 L537 111 Z" />
+
+                            <!-- A Harfi Gövdesi -->
+                            <polygon points="652,170 605,73 628,73 674,170" />
+                            <polygon points="698,170 651,73 674,73 720,170" transform="translate(1372, 0) scale(-1, 1)" />
+                        </g>
+
+                        <!-- C ve A Harfi İçindeki Yeşil Üçgen Detaylar -->
+                        <polygon points="260,154 252,168 268,168" fill="#184a28" />
+                        <polygon points="662.5,136 650,162 675,162" fill="#184a28" />
+
+                        <!-- Alt Başlık: PLANTS & FLOWERS -->
+                        <text x="465" y="196" font-family="'Montserrat', sans-serif" font-size="20" font-weight="600" fill="#211e1f" letter-spacing="7.5" text-anchor="middle">PLANTS &amp; FLOWERS</text>
+                    </svg>
                 </div>
 
                 <p class="text-xs text-slate-500 font-medium pt-1">Nebim Entegreli Rol & Görev Bazlı Yetkili Giriş Portalı</p>
@@ -157,9 +210,35 @@
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center space-x-3 cursor-pointer" onclick="returnToDashboard()">
                         
-                        <!-- ÜST MENÜDEKİ LOGO -->
+                        <!-- ÜST MENÜ VEKTÖREL LOGO -->
                         <div class="flex items-center">
-                            <img src="logo.png" alt="ÇİNPA" class="h-9 w-auto object-contain" onerror="this.src='https://raw.githubusercontent.com/kayratufenkci/cinpasiparis/main/logo.png';">
+                            <svg class="h-9 w-auto" viewBox="0 0 650 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g stroke="#184a28" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M62 100 Q105 72 145 52" stroke-width="13" />
+                                    <path d="M58 100 Q108 96 156 90" stroke-width="12" />
+                                    <path d="M60 100 Q104 122 145 142" stroke-width="13" />
+                                    <path d="M98 84 Q128 54 158 32" stroke-width="8.5" />
+                                    <path d="M112 76 Q138 65 160 58" stroke-width="7.5" />
+                                    <path d="M124 93 Q148 83 168 80" stroke-width="7" />
+                                    <path d="M118 108 Q146 118 166 126" stroke-width="7.5" />
+                                    <path d="M98 116 Q128 144 154 164" stroke-width="8.5" />
+                                    <path d="M72 88 Q56 64 76 38 Q92 24 116 18" stroke-width="8" />
+                                    <path d="M72 112 Q56 136 72 162 Q92 180 118 184" stroke-width="8" />
+                                </g>
+                                <line x1="200" y1="26" x2="200" y2="174" stroke="#184a28" stroke-width="2.2" stroke-opacity="0.7" />
+                                <g fill="#211e1f">
+                                    <path d="M312 60 C298 48 280 44 260 44 C220 44 190 70 190 109 C190 148 220 174 260 174 C280 174 298 170 312 158 L312 132 C298 142 282 147 263 147 C238 147 222 131 222 109 C222 87 238 71 263 71 C282 71 298 76 312 86 Z" />
+                                    <rect x="338" y="73" width="23" height="97" rx="3.5" />
+                                    <circle cx="349.5" cy="46" r="13" />
+                                    <path d="M392 73 L392 170 L413 170 L460 97 L460 170 L481 170 L481 73 L460 73 L413 146 L413 73 Z" />
+                                    <path d="M515 73 L515 170 L537 170 L537 131 L560 131 C582 131 598 118 598 102 C598 86 582 73 560 73 Z M537 93 L558 93 C568 93 576 97 576 102 C576 107 568 111 558 111 L537 111 Z" />
+                                    <polygon points="652,170 605,73 628,73 674,170" />
+                                    <polygon points="698,170 651,73 674,73 720,170" transform="translate(1372, 0) scale(-1, 1)" />
+                                </g>
+                                <polygon points="260,154 252,168 268,168" fill="#184a28" />
+                                <polygon points="662.5,136 650,162 675,162" fill="#184a28" />
+                                <text x="465" y="196" font-family="'Montserrat', sans-serif" font-size="20" font-weight="600" fill="#211e1f" letter-spacing="7.5" text-anchor="middle">PLANTS &amp; FLOWERS</text>
+                            </svg>
                         </div>
 
                         <div class="border-l border-slate-200 pl-3">
@@ -793,7 +872,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v36");
+            const stored = localStorage.getItem("cinpa_orders_v37");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -859,7 +938,7 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v36", JSON.stringify(orders));
+                localStorage.setItem("cinpa_orders_v37", JSON.stringify(orders));
             } catch(e) {}
         }
 
@@ -1716,7 +1795,7 @@
             if (activeOrder.extras) {
                 activeOrder.extras.forEach(ext => {
                     if (ext.faikApproval && ext.qty > 0) {
-                        const totalItemPrice = ext.qty * ext.price;
+                        const lineTotal = ext.qty * ext.price;
                         subtotal += totalItemPrice;
                         totalExtraCount += ext.qty;
                         const tr = document.createElement("tr");
