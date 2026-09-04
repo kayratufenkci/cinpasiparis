@@ -7,7 +7,7 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- SheetJS CDN (Excel okuma ve yazma kütüphanesi) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -29,6 +29,8 @@
     </script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .font-logo-title { font-family: 'Cinzel', serif; letter-spacing: 0.12em; }
+        .font-logo-sub { font-family: 'Montserrat', sans-serif; letter-spacing: 0.28em; }
         .step-circle { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 9999px; font-weight: 800; font-size: 13px; }
         @media print { .no-print { display: none !important; } .print-only { display: block !important; } body { background: white; } }
         .print-only { display: none; }
@@ -45,15 +47,21 @@
     <!-- ================= 1. GİRİŞ EKRANI ================= -->
     <section id="view-login" class="min-h-screen flex items-center justify-center p-4 bg-slate-950 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950">
         <div class="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl space-y-6">
-            <div class="text-center space-y-2">
-                <!-- Kurumsal Logo Alanı -->
-                <div class="flex flex-col items-center justify-center mb-1">
-                    <img src="logo.png" alt="ÇİNPA" class="h-16 object-contain mb-1" onerror="this.style.display='none'; document.getElementById('login-fallback-logo').classList.remove('hidden');">
-                    <div id="login-fallback-logo" class="hidden flex flex-col items-center">
-                        <span class="text-4xl font-black tracking-tight text-slate-900">ÇİNPA</span>
-                        <span class="text-[9px] font-extrabold tracking-[0.25em] text-slate-400 uppercase mt-0.5">PLANTS & FLOWERS</span>
-                    </div>
+            <div class="text-center space-y-3">
+                
+                <!-- TAM KURUMSAL ÇİNPA LOGOSU (AMBLEM + LOGOTYPE) -->
+                <div class="flex flex-col items-center justify-center pt-2">
+                    <svg class="w-20 h-20 text-cinpa-700 drop-shadow-md mb-2" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Çinpa Botanik Stilize Monogram & Yaprak Amblemi -->
+                        <path d="M50 8C48 24 34 38 18 40C34 42 48 56 50 72C52 56 66 42 82 40C66 38 52 24 50 8Z" fill="#15803d" />
+                        <circle cx="50" cy="40" r="7" fill="#22c55e" />
+                        <path d="M50 47C45 60 38 72 26 84C42 80 58 80 74 84C62 72 55 60 50 47Z" fill="#166534" opacity="0.9" />
+                        <path d="M49 84L49 94M51 84L51 94" stroke="#15803d" stroke-width="2.5" stroke-linecap="round" />
+                    </svg>
+                    <span class="font-logo-title text-3xl font-black text-slate-900 tracking-[0.18em]">CİNPA</span>
+                    <span class="font-logo-sub text-[8.5px] font-bold text-slate-400 tracking-[0.32em] uppercase mt-1">PLANTS & FLOWERS</span>
                 </div>
+
                 <p class="text-xs text-slate-500 font-medium">Nebim Entegreli Rol & Görev Bazlı Yetkili Giriş Portalı</p>
             </div>
 
@@ -158,19 +166,26 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center space-x-3 cursor-pointer" onclick="returnToDashboard()">
-                        <!-- Üst Menü Logo Alanı -->
-                        <div class="flex items-center">
-                            <img src="logo.png" alt="ÇİNPA" class="h-10 object-contain mr-2" onerror="this.style.display='none'; document.getElementById('header-fallback-logo').classList.remove('hidden');">
-                            <div id="header-fallback-logo" class="hidden flex flex-col justify-center">
-                                <span class="text-xl font-black tracking-tight text-slate-900 leading-none">ÇİNPA</span>
-                                <span class="text-[7.5px] font-extrabold tracking-[0.2em] text-slate-400 uppercase mt-0.5">PLANTS & FLOWERS</span>
+                        
+                        <!-- ÜST MENÜ TAM VEKTÖREL ÇİNPA LOGOSU -->
+                        <div class="flex items-center space-x-2.5">
+                            <svg class="w-9 h-9 text-cinpa-700 flex-shrink-0" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M50 8C48 24 34 38 18 40C34 42 48 56 50 72C52 56 66 42 82 40C66 38 52 24 50 8Z" fill="#15803d" />
+                                <circle cx="50" cy="40" r="7" fill="#22c55e" />
+                                <path d="M50 47C45 60 38 72 26 84C42 80 58 80 74 84C62 72 55 60 50 47Z" fill="#166534" opacity="0.9" />
+                                <path d="M49 84L49 94M51 84L51 94" stroke="#15803d" stroke-width="2.5" stroke-linecap="round" />
+                            </svg>
+                            <div class="flex flex-col justify-center">
+                                <span class="font-logo-title text-lg font-black text-slate-900 leading-none tracking-[0.16em]">CİNPA</span>
+                                <span class="font-logo-sub text-[6.5px] font-bold text-slate-400 tracking-[0.24em] uppercase mt-0.5">PLANTS & FLOWERS</span>
                             </div>
                         </div>
-                        <div>
+
+                        <div class="border-l border-slate-200 pl-3">
                             <div class="flex items-center space-x-2">
                                 <span class="bg-cinpa-100 text-cinpa-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-cinpa-200" id="header-role-badge">SATIŞ PANELİ</span>
                             </div>
-                            <p class="text-xs text-slate-500 font-medium mt-0.5" id="header-user-desc">Kullanıcı: -</p>
+                            <p class="text-[11px] text-slate-500 font-medium mt-0.5" id="header-user-desc">Kullanıcı: -</p>
                         </div>
                     </div>
 
@@ -797,7 +812,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v33");
+            const stored = localStorage.getItem("cinpa_orders_v34");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -863,7 +878,7 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v33", JSON.stringify(orders));
+                localStorage.setItem("cinpa_orders_v34", JSON.stringify(orders));
             } catch(e) {}
         }
 
@@ -1719,7 +1734,7 @@
 
             if (activeOrder.extras) {
                 activeOrder.extras.forEach(ext => {
-                    if (ext.faikApproval) {
+                    if (ext.faikApproval && ext.qty > 0) {
                         const totalItemPrice = ext.qty * ext.price;
                         subtotal += totalItemPrice;
                         totalExtraCount += ext.qty;
