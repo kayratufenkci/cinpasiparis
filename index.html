@@ -7,7 +7,7 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Cinzel:wght@700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- SheetJS CDN (Excel okuma ve yazma kütüphanesi) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -29,8 +29,6 @@
     </script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        .logo-text { font-family: 'Cinzel', serif; letter-spacing: 0.2em; font-weight: 800; color: #1a1a1a; }
-        .logo-sub { font-family: 'Montserrat', sans-serif; letter-spacing: 0.35em; font-weight: 600; color: #555555; }
         .step-circle { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 9999px; font-weight: 800; font-size: 13px; }
         @media print { .no-print { display: none !important; } .print-only { display: block !important; } body { background: white; } }
         .print-only { display: none; }
@@ -49,13 +47,42 @@
         <div class="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl space-y-6">
             <div class="text-center space-y-2">
                 
-                <!-- METİN TABANLI NET KURUMSAL LOGO -->
-                <div class="flex flex-col items-center justify-center pt-2">
-                    <h1 class="logo-text text-4xl m-0 leading-none">CİNPA</h1>
-                    <span class="logo-sub text-[9.5px] uppercase mt-2">PLANTS &amp; FLOWERS</span>
+                <!-- Orijinal Çinpa Logosu (SVG) -->
+                <div class="flex items-center justify-center pt-2 px-1">
+                    <svg viewBox="0 0 740 240" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-[320px] h-auto drop-shadow-sm" style="aspect-ratio: 740/240; display: block;">
+                        <g stroke="#1b4d2b" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M145 115 Q95 78 48 54" stroke-width="15" fill="none" />
+                            <path d="M150 115 Q90 110 35 104" stroke-width="14" fill="none" />
+                            <path d="M148 115 Q95 140 48 166" stroke-width="15" fill="none" />
+                            <path d="M104 97 Q70 62 35 36" stroke-width="10" fill="none" />
+                            <path d="M88 88 Q58 74 32 67" stroke-width="9" fill="none" />
+                            <path d="M72 107 Q44 96 22 93" stroke-width="8" fill="none" />
+                            <path d="M80 124 Q46 136 22 145" stroke-width="8.5" fill="none" />
+                            <path d="M104 133 Q70 166 40 190" stroke-width="10" fill="none" />
+                            <path d="M132 88 Q150 74 128 44 Q110 28 82 21" stroke-width="9" fill="none" />
+                            <path d="M132 129 Q150 156 132 186 Q110 208 80 212" stroke-width="9" fill="none" />
+                            <path d="M126 44 Q108 62 74 51" stroke-width="7.5" fill="none" />
+                            <path d="M132 186 Q108 168 74 178" stroke-width="7.5" fill="none" />
+                            <path d="M56 42 Q38 26 25 19" stroke-width="7" fill="none" />
+                            <path d="M56 190 Q36 206 24 215" stroke-width="7" fill="none" />
+                        </g>
+                        <line x1="195" y1="30" x2="195" y2="200" stroke="#1b4d2b" stroke-width="2.5" stroke-opacity="0.65" />
+                        <g fill="#201e1f">
+                            <path d="M336 68 C322 56 302 50 280 50 C236 50 204 78 204 121 C204 164 236 192 280 192 C302 192 322 186 336 174 L336 145 C322 156 304 162 283 162 C255 162 237 144 237 121 C237 98 255 80 283 80 C304 80 322 86 336 97 Z" />
+                            <rect x="364" y="81" width="25" height="108" rx="4" />
+                            <circle cx="376.5" cy="51" r="14.5" />
+                            <path d="M424 81 L424 189 L447 189 L500 107 L500 189 L523 189 L523 81 L500 81 L447 163 L447 81 Z" />
+                            <path d="M562 81 L562 189 L587 189 L587 146 L612 146 C637 146 655 131 655 113.5 C655 96 637 81 612 81 Z M587 103 L610 103 C621 103 630 107 630 113.5 C630 120 621 124 610 124 L587 124 Z" />
+                            <polygon points="712,189 660,81 685,81 737,189" />
+                            <polygon points="762,189 710,81 735,81 787,189" transform="translate(1497, 0) scale(-1, 1)" />
+                        </g>
+                        <polygon points="280,170 271,186 289,186" fill="#1b4d2b" />
+                        <polygon points="723.5,150 710,180 737,180" fill="#1b4d2b" />
+                        <text x="500" y="218" font-family="'Montserrat', sans-serif" font-size="22" font-weight="600" fill="#201e1f" letter-spacing="8" text-anchor="middle">PLANTS &amp; FLOWERS</text>
+                    </svg>
                 </div>
 
-                <p class="text-xs text-slate-500 font-medium pt-2">Nebim Entegreli Rol & Görev Bazlı Yetkili Giriş Portalı</p>
+                <p class="text-xs text-slate-500 font-medium pt-1">Nebim Entegreli Rol & Görev Bazlı Yetkili Giriş Portalı</p>
             </div>
 
             <div class="space-y-3 pt-2">
@@ -161,9 +188,34 @@
                     <div class="flex items-center space-x-3 cursor-pointer" onclick="returnToDashboard()">
                         
                         <!-- Üst Menü Logo -->
-                        <div class="flex flex-col justify-center">
-                            <span class="logo-text text-xl leading-none">CİNPA</span>
-                            <span class="logo-sub text-[6px] tracking-[0.2em] uppercase mt-0.5">PLANTS &amp; FLOWERS</span>
+                        <div class="flex items-center">
+                            <svg viewBox="0 0 740 240" xmlns="http://www.w3.org/2000/svg" class="h-10 w-auto" style="aspect-ratio: 740/240; display: block;">
+                                <g stroke="#1b4d2b" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M145 115 Q95 78 48 54" stroke-width="15" fill="none" />
+                                    <path d="M150 115 Q90 110 35 104" stroke-width="14" fill="none" />
+                                    <path d="M148 115 Q95 140 48 166" stroke-width="15" fill="none" />
+                                    <path d="M104 97 Q70 62 35 36" stroke-width="10" fill="none" />
+                                    <path d="M88 88 Q58 74 32 67" stroke-width="9" fill="none" />
+                                    <path d="M72 107 Q44 96 22 93" stroke-width="8" fill="none" />
+                                    <path d="M80 124 Q46 136 22 145" stroke-width="8.5" fill="none" />
+                                    <path d="M104 133 Q70 166 40 190" stroke-width="10" fill="none" />
+                                    <path d="M132 88 Q150 74 128 44 Q110 28 82 21" stroke-width="9" fill="none" />
+                                    <path d="M132 129 Q150 156 132 186 Q110 208 80 212" stroke-width="9" fill="none" />
+                                </g>
+                                <line x1="195" y1="30" x2="195" y2="200" stroke="#1b4d2b" stroke-width="2.5" stroke-opacity="0.65" />
+                                <g fill="#201e1f">
+                                    <path d="M336 68 C322 56 302 50 280 50 C236 50 204 78 204 121 C204 164 236 192 280 192 C302 192 322 186 336 174 L336 145 C322 156 304 162 283 162 C255 162 237 144 237 121 C237 98 255 80 283 80 C304 80 322 86 336 97 Z" />
+                                    <rect x="364" y="81" width="25" height="108" rx="4" />
+                                    <circle cx="376.5" cy="51" r="14.5" />
+                                    <path d="M424 81 L424 189 L447 189 L500 107 L500 189 L523 189 L523 81 L500 81 L447 163 L447 81 Z" />
+                                    <path d="M562 81 L562 189 L587 189 L587 146 L612 146 C637 146 655 131 655 113.5 C655 96 637 81 612 81 Z M587 103 L610 103 C621 103 630 107 630 113.5 C630 120 621 124 610 124 L587 124 Z" />
+                                    <polygon points="712,189 660,81 685,81 737,189" />
+                                    <polygon points="762,189 710,81 735,81 787,189" transform="translate(1497, 0) scale(-1, 1)" />
+                                </g>
+                                <polygon points="280,170 271,186 289,186" fill="#1b4d2b" />
+                                <polygon points="723.5,150 710,180 737,180" fill="#1b4d2b" />
+                                <text x="500" y="218" font-family="'Montserrat', sans-serif" font-size="22" font-weight="600" fill="#201e1f" letter-spacing="8" text-anchor="middle">PLANTS &amp; FLOWERS</text>
+                            </svg>
                         </div>
 
                         <div class="border-l border-slate-200 pl-3">
@@ -255,7 +307,7 @@
                                     <th class="p-4">Satış Uzmanı</th>
                                     <th class="p-4">Tarih</th>
                                     <th class="p-4">Aşama</th>
-                                    <th class="p-4 text-right">İşlem</th>
+                                    <th class="p-4 text-right">Islem</th>
                                 </tr>
                             </thead>
                             <tbody id="orders-table-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
@@ -797,7 +849,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v41");
+            const stored = localStorage.getItem("cinpa_orders_v42");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -863,7 +915,7 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v41", JSON.stringify(orders));
+                localStorage.setItem("cinpa_orders_v42", JSON.stringify(orders));
             } catch(e) {}
         }
 
