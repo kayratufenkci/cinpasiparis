@@ -737,7 +737,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE EXCEL D SÜTUNU KESİN BAĞLAMA MOTORU -->
+    <!-- JAVASCRIPT STATE VE AKILLI EXCEL SÜTUN AYIRICI MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -785,7 +785,7 @@
 
         let masterProducts = [];
         try {
-            const stored = localStorage.getItem("cinpa_permanent_catalog_v20");
+            const stored = localStorage.getItem("cinpa_permanent_catalog_v30");
             masterProducts = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
         } catch(e) {
             masterProducts = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
@@ -804,7 +804,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v20");
+            const stored = localStorage.getItem("cinpa_orders_v30");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -817,8 +817,8 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v20", JSON.stringify(orders));
-                localStorage.setItem("cinpa_permanent_catalog_v20", JSON.stringify(masterProducts));
+                localStorage.setItem("cinpa_orders_v30", JSON.stringify(orders));
+                localStorage.setItem("cinpa_permanent_catalog_v30", JSON.stringify(masterProducts));
             } catch(e) {}
         }
 
@@ -835,7 +835,7 @@
             }, 3000);
         }
 
-        // --- KESİN EXCEL SÜTUNLARI: A(KOD), B(AD), C(RENK), D(FİYAT) ---
+        // --- TAM AKILLI BAŞLIK VE HÜCRE AYIRICI MOTOR ---
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -847,43 +847,69 @@
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     
-                    // Header: "A" ile kesin olarak A, B, C, D sütunlarını ayrı ayrı okuyoruz!
-                    const rows = XLSX.utils.sheet_to_json(worksheet, { header: "A", defval: "" });
-                    
-                    let newProducts = [];
-                    rows.forEach((row, idx) => {
-                        let colA = String(row.A || "").trim();
-                        let colB = String(row.B || "").trim();
-                        let colC = String(row.C || "").trim();
-                        let colD = String(row.D || "").trim();
+                    // 2 Boyutlu Array olarak okuyoruz (Boşluklar atlanmaz)
+                    const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+                    if (rawData.length === 0) {
+                        showToast("Excel boş görünüyor!", true);
+                        return;
+                    }
 
-                        // İlk satır başlık ise ("Ürün Kodu", "Ürün Adı" vb.) atla
-                        if (idx === 0 && (colA.toLowerCase().includes("kod") || colB.toLowerCase().includes("ad"))) {
-                            return;
+                    // Başlık satırını bulup sütun numaralarını tespit edelim
+                    let headerIndex = -1;
+                    let codeCol = 0, nameCol = 1, colorCol = 2, priceCol = 3;
+
+                    for (let r = 0; r < Math.min(10, rawData.length); r++) {
+                        let row = rawData[r].map(c => String(c || '').toLowerCase().trim());
+                        let hasCode = row.some(c => c.includes('kod') || c.includes('stok') || c.includes('sku'));
+                        let hasName = row.some(c => c.includes('ürün') || c.includes('ad') || c.includes('tanım'));
+                        if (hasCode || hasName) {
+                            headerIndex = r;
+                            row.forEach((h, colIdx) => {
+                                if (h.includes('kod') || h.includes('stok') || h.includes('sku')) codeCol = colIdx;
+                                else if (h.includes('toptan') || h.includes('satış fiyatı') || h.includes('fiyatı') || h.includes('fiyat')) priceCol = colIdx;
+                                else if (h.includes('renk')) colorCol = colIdx;
+                                else if (h.includes('ad') || h.includes('açıklama') || h.includes('tanım') || h.includes('ürün')) nameCol = colIdx;
+                            });
+                            break;
                         }
-                        if (!colA && !colB) return;
+                    }
 
-                        // D sütunundaki değeri sayıya çeviriyoruz (Toptan Satış Fiyatı)
-                        let cleanPriceStr = colD.replace(/[^0-9,.-]/g, "").replace(",", ".");
-                        let price = parseFloat(cleanPriceStr);
+                    let newProducts = [];
+                    let startRow = headerIndex >= 0 ? headerIndex + 1 : 0;
+
+                    for (let i = startRow; i < rawData.length; i++) {
+                        let row = rawData[i];
+                        if (!row || row.length === 0) continue;
+
+                        let code = String(row[codeCol] !== undefined ? row[codeCol] : '').trim();
+                        let name = String(row[nameCol] !== undefined ? row[nameCol] : '').trim();
+                        let color = String(row[colorCol] !== undefined ? row[colorCol] : '').trim();
+                        let rawPrice = row[priceCol] !== undefined ? row[priceCol] : 0;
+
+                        if (!code && !name) continue;
+                        if (code.toLowerCase().includes('kod') || name.toLowerCase().includes('ürün adı')) continue;
+
+                        // Fiyatı temizleme ve sayıya çevirme
+                        let cleanPrice = String(rawPrice).replace(/[^0-9,.-]/g, '').replace(',', '.');
+                        let price = parseFloat(cleanPrice);
                         if (isNaN(price)) price = 0;
 
                         newProducts.push({
-                            id: colA,
-                            name: colB,
-                            color: colC !== "" ? colC : "-",
+                            id: code,
+                            name: name,
+                            color: (color && color !== "" && color !== "0") ? color : "-",
                             price: price
                         });
-                    });
+                    }
 
                     if (newProducts.length > 0) {
                         masterProducts = newProducts;
                         saveToStorage();
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
-                        showToast(`Başarıyla ${newProducts.length} ürün yüklendi! (İlk ürün fiyatı: ${newProducts[0].price} ₺)`);
+                        showToast(`Başarıyla ${newProducts.length} ürün ve gerçek toptan fiyatları yüklendi!`);
                     } else {
-                        showToast("Excel dosyasından ürün okunamadı.", true);
+                        showToast("Excel'den ürün okunamadı. Lütfen dosyanızı kontrol edin.", true);
                     }
                 } catch(err) {
                     showToast("Excel okunurken hata oluştu: " + err.message, true);
