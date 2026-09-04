@@ -9,7 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- SheetJS CDN (Excel okuma kütüphanesi) -->
+    <!-- SheetJS CDN (Excel okuma ve yazma kütüphanesi) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <script>
@@ -174,7 +174,7 @@
 
                         <button onclick="openExcelImportModal()" id="btn-header-import-excel" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs sm:text-sm rounded-xl border border-emerald-200 transition flex items-center space-x-1.5 shadow-sm">
                             <i class="fa-solid fa-file-excel text-emerald-600"></i>
-                            <span class="hidden sm:inline">Nebim / Excel'den Al</span>
+                            <span class="hidden sm:inline">Nebim / Excel Fişi Yükle</span>
                         </button>
 
                         <button onclick="createNewOrderModal()" id="btn-header-new-order" class="px-4 py-2 bg-cinpa-700 hover:bg-cinpa-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center space-x-2">
@@ -554,9 +554,14 @@
                             </table>
                         </div>
                         <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-slate-100 gap-4">
-                            <button type="button" onclick="exportToNebimJSON()" class="px-5 py-3 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 text-xs font-bold flex items-center space-x-2 transition">
-                                <i class="fa-solid fa-cloud-arrow-down"></i><span>Nebim V3 Formatında Faturayı Dışa Aktar</span>
-                            </button>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <button type="button" onclick="exportToNebimExcel()" class="px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center space-x-2 shadow transition">
+                                    <i class="fa-solid fa-file-excel text-sm"></i><span>Nebim V3 Excel Şablonu İndir (.xlsx)</span>
+                                </button>
+                                <button type="button" onclick="exportToNebimJSON()" class="px-4 py-3 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 text-xs font-bold flex items-center space-x-2 transition">
+                                    <i class="fa-solid fa-cloud-arrow-down"></i><span>Nebim V3 JSON Formatında Aktar</span>
+                                </button>
+                            </div>
                             <div id="step4-action-buttons">
                                 <button type="button" onclick="finalizeAndCloseOrder()" class="px-8 py-3.5 bg-slate-900 hover:bg-black text-white font-black text-sm rounded-xl shadow-lg transition flex items-center space-x-2">
                                     <i class="fa-solid fa-check-double text-emerald-400"></i><span>Cariye ve Faturaya İşle (Dosyayı Kapat)</span>
@@ -577,26 +582,26 @@
                     <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg"><i class="fa-solid fa-file-excel"></i></div>
                     <div>
                         <h3 class="text-base font-extrabold text-slate-900">Nebim / Excel'den Fiş İçe Aktar</h3>
-                        <p class="text-xs text-slate-500">Nebim'den aldığınız Excel dosyasını seçin veya kopyalayıp yapıştırın.</p>
+                        <p class="text-xs text-slate-500">Nebim'den dışa aktarılan fişi seçtiğinizde ürünler doğrudan siparişe dökülür.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeExcelImportModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-700 uppercase">1. Yöntem: Excel Dosyası Seçin (.xlsx / .xls / .csv)</label>
+                <label class="block text-xs font-bold text-slate-700 uppercase">1. Yöntem: Nebim Excel Dosyası Seçin (.xlsx / .xls / .csv)</label>
                 <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/40 rounded-2xl p-5 text-center cursor-pointer hover:bg-emerald-50 transition" onclick="document.getElementById('excel-file-input').click()">
                     <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-600 mb-1.5"></i>
-                    <div class="text-xs font-extrabold text-slate-800">Bilgisayardan Excel Dosyasını Seçmek İçin Tıklayın</div>
-                    <div class="text-[11px] text-slate-500">Dosya satırları otomatik taranacaktır.</div>
+                    <div class="text-xs font-extrabold text-slate-800">Bilgisayardan Nebim Excel Fişini Seçmek İçin Tıklayın</div>
+                    <div class="text-[11px] text-slate-500">Kod, Ad, Miktar ve Fiyatlar otomatik tespit edilir.</div>
                     <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleExcelFileUpload(event)">
                 </div>
             </div>
             <div class="space-y-2">
                 <div class="flex items-center justify-between">
-                    <label class="text-xs font-bold text-slate-700 uppercase">2. Yöntem: Excel'den Tabloyu Kopyalayıp Buraya Yapıştırın</label>
+                    <label class="text-xs font-bold text-slate-700 uppercase">2. Yöntem: Nebim Tablosunu Kopyalayıp Buraya Yapıştırın</label>
                     <span class="text-[11px] text-slate-400">Ctrl + V</span>
                 </div>
-                <textarea id="excel-paste-input" rows="3" placeholder="Excel'den kopyaladığınız satırları buraya yapıştırabilirsiniz..." class="w-full text-xs font-mono p-3 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white"></textarea>
+                <textarea id="excel-paste-input" rows="3" placeholder="Nebim veya Excel'den kopyaladığınız satırları buraya yapıştırabilirsiniz..." class="w-full text-xs font-mono p-3 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white"></textarea>
                 <button type="button" onclick="parsePastedExcelText()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Yapıştırılan Metni Çözümle</button>
             </div>
             <div id="excel-preview-box" class="hidden flex-1 overflow-y-auto border border-slate-200 rounded-2xl p-3 bg-slate-50 space-y-2">
@@ -737,7 +742,7 @@
         </div>
     </div>
 
-    <!-- INDEXEDDB BENZERSİZ KİMLİK MOTORU (SİLİNME / EKSİLME ÖNLEYİCİ) -->
+    <!-- JAVASCRIPT STATE VE NEBİM V3 ENTEGRASYON MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -784,7 +789,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v31");
+            const stored = localStorage.getItem("cinpa_orders_v32");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -796,7 +801,7 @@
         let activeStepTab = 1;
         let parsedExcelItems = [];
 
-        // --- INDEXEDDB: OTOMATİK ARTAN BENZERSİZ KİMLİK (ÜSTÜNE YAZMA SORUNUNU ÇÖZER) ---
+        // --- INDEXEDDB VERİTABANI BAĞLANTISI ---
         const DB_NAME = "CinpaCatalogDB_v2";
         const DB_VERSION = 1;
         const STORE_NAME = "products_store";
@@ -839,7 +844,7 @@
             const store = tx.objectStore(STORE_NAME);
             store.clear();
             productsList.forEach(p => {
-                delete p.uid; // Temiz benzersiz anahtarlar üretilsin
+                delete p.uid;
                 store.add(p);
             });
             return new Promise((resolve, reject) => {
@@ -850,7 +855,7 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v31", JSON.stringify(orders));
+                localStorage.setItem("cinpa_orders_v32", JSON.stringify(orders));
             } catch(e) {}
         }
 
@@ -867,11 +872,11 @@
             }, 3000);
         }
 
-        // --- TAM 17.946 ÜRÜNÜ EKSİKSİZ VE KAYIPSIZ OKUYAN MOTOR ---
+        // --- EXCEL DOSYASINI OKUYUP INDEXEDDB'YE KAYDETME ---
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Excel okunuyor ve 17.946 ürün kaydediliyor...");
+            showToast("Excel okunuyor ve ürünler kaydediliyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -887,7 +892,6 @@
                         return;
                     }
 
-                    // Sütun indekslerini başlık satırından tespit et
                     let codeCol = 0, nameCol = 1, colorCol = 2, priceCol = 3;
                     let startRow = 0;
 
@@ -933,15 +937,251 @@
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
                         populateProductSelects();
-                        showToast(`Başarıyla ${newProducts.length} ürün kaydedildi! Sayı artık asla düşmeyecektir.`);
+                        showToast(`Başarıyla ${newProducts.length} ürün kalıcı olarak kaydedildi!`);
                     } else {
-                        showToast("Excel'den ürün satırı okunamadı!", true);
+                        showToast("Excel'den ürün okunamadı!", true);
                     }
                 } catch(err) {
                     showToast("Excel okunurken hata oluştu: " + err.message, true);
                 }
             };
             reader.readAsArrayBuffer(file);
+        }
+
+        // --- MUHASEBE İÇİN NEBİM V3 UYUMLU EXCEL ÇIKTISI (.XLSX) ---
+        function exportToNebimExcel() {
+            if (!activeOrder) return;
+            
+            // Nebim V3 Fatura Aktarım Tablosu Satırları
+            const nebimRows = [];
+            
+            // Fiş Başlığı / Bilgi Satırları
+            activeOrder.items.forEach(item => {
+                const netQty = Math.max(0, item.dispatchedQty - (item.returnedQty || 0));
+                if (netQty > 0) {
+                    const lineTotal = netQty * item.price;
+                    const taxAmount = lineTotal * 0.20;
+                    nebimRows.push({
+                        "Evrak No": activeOrder.id,
+                        "Evrak Tarihi": activeOrder.date,
+                        "Cari Kodu / Ünvanı": activeOrder.customer,
+                        "Satış Temsilcisi": activeOrder.salesRep,
+                        "Stok Kodu": item.id,
+                        "Ürün Açıklaması": item.name,
+                        "Miktar": netQty,
+                        "Birim": "AD",
+                        "Birim Fiyat (TL)": item.price,
+                        "KDV Oranı (%)": 20,
+                        "KDV Tutarı (TL)": Number(taxAmount.toFixed(2)),
+                        "Satır Tutarı (TL)": Number((lineTotal + taxAmount).toFixed(2)),
+                        "İşlem Türü": "Toptan Satış Faturası",
+                        "Depo Notu": item.warehouseNote || ""
+                    });
+                }
+            });
+
+            // Ekstra Ürünler (Varsa)
+            if (activeOrder.extras) {
+                activeOrder.extras.forEach(ext => {
+                    if (ext.faikApproval && ext.qty > 0) {
+                        const lineTotal = ext.qty * ext.price;
+                        const taxAmount = lineTotal * 0.20;
+                        nebimRows.push({
+                            "Evrak No": activeOrder.id,
+                            "Evrak Tarihi": activeOrder.date,
+                            "Cari Kodu / Ünvanı": activeOrder.customer,
+                            "Satış Temsilcisi": activeOrder.salesRep,
+                            "Stok Kodu": ext.id,
+                            "Ürün Açıklaması": ext.name,
+                            "Miktar": ext.qty,
+                            "Birim": "AD",
+                            "Birim Fiyat (TL)": ext.price,
+                            "KDV Oranı (%)": 20,
+                            "KDV Tutarı (TL)": Number(taxAmount.toFixed(2)),
+                            "Satır Tutarı (TL)": Number((lineTotal + taxAmount).toFixed(2)),
+                            "İşlem Türü": "Saha Ek İlave Faturası",
+                            "Depo Notu": "Faik Bey Onaylı Ekstra"
+                        });
+                    }
+                });
+            }
+
+            if (nebimRows.length === 0) {
+                showToast("Dışa aktarılacak faturalanabilir ürün bulunamadı.", true);
+                return;
+            }
+
+            // SheetJS ile Excel Oluşturma
+            const worksheet = XLSX.utils.json_to_sheet(nebimRows);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Nebim_Aktarim");
+
+            // Sütun genişliklerini otomatik ayarla
+            worksheet['!cols'] = [
+                { wch: 15 }, { wch: 12 }, { wch: 30 }, { wch: 16 },
+                { wch: 14 }, { wch: 35 }, { wch: 8 }, { wch: 6 },
+                { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 16 },
+                { wch: 22 }, { wch: 20 }
+            ];
+
+            const fileName = `NEBIM_V3_FATURA_${activeOrder.id}_${activeOrder.date}.xlsx`;
+            XLSX.writeFile(workbook, fileName);
+            showToast("Nebim V3 Excel şablonu başarıyla indirildi!");
+        }
+
+        // --- NEBİM'DEN ALINAN EXCEL DOSYASINI / FİŞİNİ DOĞRUDAN OKUMA ---
+        function handleExcelFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+                    processRawExcelRows(jsonData);
+                } catch(err) {
+                    showToast("Excel dosyası okunurken hata oluştu: " + err.message, true);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function parsePastedExcelText() {
+            const text = document.getElementById("excel-paste-input").value.trim();
+            if (!text) {
+                showToast("Lütfen önce Excel'den kopyaladığınız veriyi yapıştırınız.", true);
+                return;
+            }
+            const rows = text.split(/\r?\n/).map(row => row.split('\t'));
+            processRawExcelRows(rows);
+        }
+
+        function processRawExcelRows(rows) {
+            parsedExcelItems = [];
+            if (!rows || rows.length === 0) return;
+
+            let codeCol = 0, nameCol = 1, qtyCol = 2, priceCol = 3;
+            let startRow = 0;
+
+            // Başlık satırını tespit et
+            for (let r = 0; r < Math.min(5, rows.length); r++) {
+                const headerCandidate = rows[r].map(c => String(c || '').toLowerCase().trim());
+                if (headerCandidate.some(c => c.includes('kod') || c.includes('ürün') || c.includes('stok') || c.includes('miktar') || c.includes('adet'))) {
+                    startRow = r + 1;
+                    headerCandidate.forEach((h, idx) => {
+                        if (h.includes('kod') || h.includes('stok')) codeCol = idx;
+                        else if (h.includes('ad') || h.includes('ürün') || h.includes('açıklama')) nameCol = idx;
+                        else if (h.includes('adet') || h.includes('miktar') || h.includes('koli')) qtyCol = idx;
+                        else if (h.includes('fiyat') || h.includes('tutar') || h.includes('toptan')) priceCol = idx;
+                    });
+                    break;
+                }
+            }
+
+            for (let i = startRow; i < rows.length; i++) {
+                const cols = rows[i];
+                if (!cols || cols.length === 0) continue;
+
+                let code = String(cols[codeCol] !== undefined ? cols[codeCol] : `ÇNP-${100 + i}`).trim();
+                let name = String(cols[nameCol] !== undefined ? cols[nameCol] : '').trim();
+                let rawQty = cols[qtyCol] !== undefined ? cols[qtyCol] : 1;
+                let rawPrice = cols[priceCol] !== undefined ? cols[priceCol] : 0;
+
+                if (!name && code) {
+                    name = code;
+                    code = `ÇNP-${100 + i}`;
+                }
+                if (!name) continue;
+
+                let qty = parseFloat(String(rawQty).replace(/[^0-9,.-]/g, '').replace(',', '.')) || 1;
+                let price = parseFloat(String(rawPrice).replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
+
+                // Fiyat katalogdan eşleşebilir mi kontrol et
+                if (price === 0 && masterProducts.length > 0) {
+                    const matchedProd = masterProducts.find(p => p.id.toLowerCase() === code.toLowerCase());
+                    if (matchedProd && matchedProd.price > 0) {
+                        price = matchedProd.price;
+                    }
+                }
+
+                parsedExcelItems.push({
+                    id: code,
+                    name: name,
+                    requestedQty: qty,
+                    dispatchedQty: qty,
+                    returnedQty: 0,
+                    price: price,
+                    warehouseNote: "Nebim Excel fişinden doğrudan çekildi.",
+                    checked: true
+                });
+            }
+
+            if (parsedExcelItems.length === 0) {
+                showToast("Excel verisinden ürün satırı bulunamadı.", true);
+                return;
+            }
+
+            const tbody = document.getElementById("excel-preview-tbody");
+            tbody.innerHTML = "";
+            let previewTotal = 0;
+
+            parsedExcelItems.forEach(item => {
+                const sub = item.requestedQty * item.price;
+                previewTotal += sub;
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td class="p-2 font-mono font-bold text-slate-700">${item.id}</td>
+                    <td class="p-2 font-medium text-slate-900">${item.name}</td>
+                    <td class="p-2 text-center font-bold">${item.requestedQty} Adet</td>
+                    <td class="p-2 text-right font-bold">${Number(item.price).toLocaleString('tr-TR')} ₺</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById("excel-preview-box").classList.remove("hidden");
+            document.getElementById("excel-preview-count").innerText = `${parsedExcelItems.length} Kalem Ürün`;
+            document.getElementById("excel-preview-total").innerText = `Toplam: ${previewTotal.toLocaleString('tr-TR')} ₺`;
+            updateExcelApplyButton();
+            showToast(`${parsedExcelItems.length} kalem ürün Nebim fişinden okundu!`);
+        }
+
+        function updateExcelApplyButton() {
+            const btn = document.getElementById("btn-apply-excel");
+            if (parsedExcelItems.length > 0) {
+                btn.disabled = false;
+                btn.className = "px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-200 transition flex items-center space-x-2";
+            } else {
+                btn.disabled = true;
+                btn.className = "px-5 py-2.5 rounded-xl bg-slate-300 text-white font-bold text-xs cursor-not-allowed transition flex items-center space-x-2";
+            }
+        }
+
+        function applyExcelImportToOrder() {
+            if (parsedExcelItems.length === 0) return;
+            const custName = prompt("Nebim'den aktarılan bu sipariş için Müşteri / Proje Adı giriniz:", "Nebim Excel Fişi - Yeni Proje");
+            if (!custName) return;
+
+            const newId = "CNP-2026-" + String(Math.floor(100 + Math.random() * 900));
+            const newOrd = {
+                id: newId,
+                customer: custName,
+                salesRep: currentUser ? currentUser.name : "Orhan Özen",
+                date: new Date().toISOString().split("T")[0],
+                notes: "Nebim Excel dosyasından otomatik aktarıldı.",
+                currentStep: 1,
+                items: JSON.parse(JSON.stringify(parsedExcelItems)),
+                extras: [],
+                isClosed: false
+            };
+
+            orders.unshift(newOrd);
+            saveToStorage();
+            closeExcelImportModal();
+            showToast(`Nebim fişi başarıyla sipariş #${newId} olarak oluşturuldu!`);
+            openOrderDetail(newId);
         }
 
         function updateHeaderBadgeCounts() {
@@ -1552,7 +1792,7 @@
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
-            showToast("Nebim V3 Entegrasyon dosyası indirildi!");
+            showToast("Nebim V3 Entegrasyon JSON dosyası indirildi!");
         }
 
         function openExcelImportModal() {
@@ -1566,151 +1806,6 @@
 
         function closeExcelImportModal() {
             document.getElementById("modal-excel-import").classList.add("hidden");
-        }
-
-        function handleExcelFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                    processRawExcelRows(jsonData);
-                } catch(err) {
-                    showToast("Excel dosyası okunurken hata oluştu: " + err.message, true);
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function parsePastedExcelText() {
-            const text = document.getElementById("excel-paste-input").value.trim();
-            if (!text) {
-                showToast("Lütfen önce Excel'den kopyaladığınız veriyi yapıştırınız.", true);
-                return;
-            }
-            const rows = text.split(/\r?\n/).map(row => row.split('\t'));
-            processRawExcelRows(rows);
-        }
-
-        function processRawExcelRows(rows) {
-            parsedExcelItems = [];
-            rows.forEach((cols, idx) => {
-                if (!cols || cols.length === 0) return;
-                const firstColStr = String(cols[0] || '').toLowerCase();
-                if (firstColStr.includes('kod') || firstColStr.includes('ürün') || firstColStr.includes('stok')) {
-                    return;
-                }
-                let code = `ÇNP-${100 + idx}`;
-                let name = '';
-                let qty = 1;
-                let price = 0;
-
-                if (cols.length >= 4) {
-                    code = String(cols[0] || '').trim();
-                    name = String(cols[1] || '').trim();
-                    qty = parseFloat(String(cols[2] || '1').replace(',', '.')) || 1;
-                    price = parseFloat(String(cols[3] || '0').replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
-                } else if (cols.length === 3) {
-                    name = String(cols[0] || '').trim();
-                    qty = parseFloat(String(cols[1] || '1').replace(',', '.')) || 1;
-                    price = parseFloat(String(cols[2] || '0').replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
-                } else if (cols.length === 2) {
-                    name = String(cols[0] || '').trim();
-                    qty = parseFloat(String(cols[1] || '1').replace(',', '.')) || 1;
-                } else if (cols.length === 1 && String(cols[0]).trim() !== '') {
-                    name = String(cols[0]).trim();
-                }
-
-                if (name) {
-                    parsedExcelItems.push({
-                        id: code || `ÇNP-${100 + idx}`,
-                        name: name,
-                        requestedQty: qty,
-                        dispatchedQty: qty,
-                        returnedQty: 0,
-                        price: price,
-                        warehouseNote: "Nebim Excel fişinden aktarıldı.",
-                        checked: true
-                    });
-                }
-            });
-
-            if (parsedExcelItems.length === 0) {
-                showToast("Excel verisinden ürün satırı bulunamadı.", true);
-                return;
-            }
-
-            const tbody = document.getElementById("excel-preview-tbody");
-            tbody.innerHTML = "";
-            let previewTotal = 0;
-
-            parsedExcelItems.forEach(item => {
-                const sub = item.requestedQty * item.price;
-                previewTotal += sub;
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td class="p-2 font-mono font-bold text-slate-700">${item.id}</td>
-                    <td class="p-2 font-medium text-slate-900">${item.name}</td>
-                    <td class="p-2 text-center font-bold">${item.requestedQty} Adet</td>
-                    <td class="p-2 text-right font-bold">${Number(item.price).toLocaleString('tr-TR')} ₺</td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            document.getElementById("excel-preview-box").classList.remove("hidden");
-            document.getElementById("excel-preview-count").innerText = `${parsedExcelItems.length} Kalem Ürün`;
-            document.getElementById("excel-preview-total").innerText = `Toplam: ${previewTotal.toLocaleString('tr-TR')} ₺`;
-            updateExcelApplyButton();
-            showToast(`${parsedExcelItems.length} kalem ürün başarıyla okundu!`);
-        }
-
-        function updateExcelApplyButton() {
-            const btn = document.getElementById("btn-apply-excel");
-            if (parsedExcelItems.length > 0) {
-                btn.disabled = false;
-                btn.className = "px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-200 transition flex items-center space-x-2";
-            } else {
-                btn.disabled = true;
-                btn.className = "px-5 py-2.5 rounded-xl bg-slate-300 text-white font-bold text-xs cursor-not-allowed transition flex items-center space-x-2";
-            }
-        }
-
-        function applyExcelImportToOrder() {
-            if (parsedExcelItems.length === 0) return;
-            const custName = prompt("Nebim'den aktarılan bu sipariş için Müşteri / Proje Adı giriniz:", "Nebim Excel Fişi - Yeni Proje");
-            if (!custName) return;
-
-            const newId = "CNP-2026-" + String(Math.floor(100 + Math.random() * 900));
-            const newOrd = {
-                id: newId,
-                customer: custName,
-                salesRep: currentUser ? currentUser.name : "Orhan Özen",
-                date: new Date().toISOString().split("T")[0],
-                notes: "Nebim Excel dosyasından otomatik aktarıldı.",
-                currentStep: 1,
-                items: JSON.parse(JSON.stringify(parsedExcelItems)),
-                extras: [],
-                isClosed: false
-            };
-
-            orders.unshift(newOrd);
-            saveToStorage();
-            closeExcelImportModal();
-            showToast(`Nebim fişi başarıyla sipariş #${newId} olarak oluşturuldu!`);
-            openOrderDetail(newId);
-        }
-
-        function sendWhatsAppNotification() {
-            if (!activeOrder) return;
-            const stepNames = ["", "1. Satış Formu", "2. Depo Hazırlığı", "3. Saha Montajı", "4. Muhasebe Kontrolü", "5. Fatura Kesildi"];
-            const statusText = stepNames[activeOrder.currentStep] || "Aktif";
-            const text = encodeURIComponent(`*ÇİNPA BOTANİK SİPARİŞ BİLDİRİMİ*\n\nSipariş No: ${activeOrder.id}\nMüşteri: ${activeOrder.customer}\nAşama: ${statusText}\nİşlem Yapan: ${currentUser.name}\n\nDetaylar ERP panelinde güncellenmiştir.`);
-            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
         }
 
         function populateProductSelects() {
@@ -1800,15 +1895,15 @@
                 return;
             }
 
-            list.slice(0, 200).forEach((p, idx) => {
+            list.slice(0, 200).forEach((p) => {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-                    <td class="p-3 text-center"><input type="checkbox" value="${idx}" class="catalog-row-checkbox w-4 h-4 text-cinpa-700 rounded"></td>
+                    <td class="p-3 text-center"><input type="checkbox" value="${p.id}" class="catalog-row-checkbox w-4 h-4 text-cinpa-700 rounded"></td>
                     <td class="p-3 font-mono font-bold text-slate-900">${p.id}</td>
                     <td class="p-3 font-medium">${p.name}</td>
                     <td class="p-3 text-slate-500 font-semibold">${p.color || '-'}</td>
                     <td class="p-3 text-right font-bold text-emerald-800">${Number(p.price).toLocaleString('tr-TR')} ₺</td>
-                    <td class="p-3 text-center"><button type="button" onclick="removeProductByIndex(${idx})" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
+                    <td class="p-3 text-center"><button type="button" onclick="removeProductFromMaster('${p.id}')" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1827,14 +1922,11 @@
             }
             if (!confirm(`Seçilen ${checkboxes.length} ürünü silmek istediğinize emin misiniz?`)) return;
 
-            const selectedIndices = Array.from(checkboxes).map(cb => parseInt(cb.value)).sort((a, b) => b - a);
-            selectedIndices.forEach(idx => {
-                masterProducts.splice(idx, 1);
-            });
-
+            const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+            masterProducts = masterProducts.filter(p => !selectedIds.includes(p.id));
             await saveProductsToDB(masterProducts);
             renderCatalogTable();
-            showToast(`${selectedIndices.length} ürün katalogdan silindi.`);
+            showToast(`${selectedIds.length} ürün katalogdan silindi.`);
         }
 
         async function deleteAllCatalogItems() {
@@ -1872,8 +1964,8 @@
             showToast(`${name} kataloğa eklendi!`);
         }
 
-        async function removeProductByIndex(idx) {
-            masterProducts.splice(idx, 1);
+        async function removeProductFromMaster(productId) {
+            masterProducts = masterProducts.filter(p => p.id !== productId);
             await saveProductsToDB(masterProducts);
             renderCatalogTable();
             showToast("Ürün katalogdan silindi.");
@@ -1885,7 +1977,6 @@
             rows.forEach(r => { r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; });
         }
 
-        // Sayfa ilk yüklendiğinde diske kaydedilmiş tüm ürünleri geri yükle
         window.addEventListener('DOMContentLoaded', () => {
             loadProductsFromDB();
         });
