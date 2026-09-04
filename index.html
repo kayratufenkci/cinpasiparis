@@ -7,7 +7,7 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Cinzel:wght@700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
     
     <!-- SheetJS CDN (Excel okuma ve yazma kütüphanesi) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -29,6 +29,8 @@
     </script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .logo-text { font-family: 'Cinzel', serif; letter-spacing: 0.18em; font-weight: 800; color: #111827; }
+        .logo-sub { font-family: 'Montserrat', sans-serif; letter-spacing: 0.3em; font-weight: 600; color: #64748b; }
         .step-circle { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 9999px; font-weight: 800; font-size: 13px; }
         @media print { .no-print { display: none !important; } .print-only { display: block !important; } body { background: white; } }
         .print-only { display: none; }
@@ -47,39 +49,10 @@
         <div class="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl space-y-6">
             <div class="text-center space-y-2">
                 
-                <!-- ORİJİNAL ÇİNPA KURUMSAL LOGOSU (GÖMÜLÜ SVG) -->
-                <div class="flex items-center justify-center pt-2 px-1">
-                    <svg viewBox="0 0 740 240" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-[320px] h-auto drop-shadow-sm" style="aspect-ratio: 740/240; display: block;">
-                        <g stroke="#1b4d2b" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M145 115 Q95 78 48 54" stroke-width="15" fill="none" />
-                            <path d="M150 115 Q90 110 35 104" stroke-width="14" fill="none" />
-                            <path d="M148 115 Q95 140 48 166" stroke-width="15" fill="none" />
-                            <path d="M104 97 Q70 62 35 36" stroke-width="10" fill="none" />
-                            <path d="M88 88 Q58 74 32 67" stroke-width="9" fill="none" />
-                            <path d="M72 107 Q44 96 22 93" stroke-width="8" fill="none" />
-                            <path d="M80 124 Q46 136 22 145" stroke-width="8.5" fill="none" />
-                            <path d="M104 133 Q70 166 40 190" stroke-width="10" fill="none" />
-                            <path d="M132 88 Q150 74 128 44 Q110 28 82 21" stroke-width="9" fill="none" />
-                            <path d="M132 129 Q150 156 132 186 Q110 208 80 212" stroke-width="9" fill="none" />
-                            <path d="M126 44 Q108 62 74 51" stroke-width="7.5" fill="none" />
-                            <path d="M132 186 Q108 168 74 178" stroke-width="7.5" fill="none" />
-                            <path d="M56 42 Q38 26 25 19" stroke-width="7" fill="none" />
-                            <path d="M56 190 Q36 206 24 215" stroke-width="7" fill="none" />
-                        </g>
-                        <line x1="195" y1="30" x2="195" y2="200" stroke="#1b4d2b" stroke-width="2.5" stroke-opacity="0.65" />
-                        <g fill="#201e1f">
-                            <path d="M336 68 C322 56 302 50 280 50 C236 50 204 78 204 121 C204 164 236 192 280 192 C302 192 322 186 336 174 L336 145 C322 156 304 162 283 162 C255 162 237 144 237 121 C237 98 255 80 283 80 C304 80 322 86 336 97 Z" />
-                            <rect x="364" y="81" width="25" height="108" rx="4" />
-                            <circle cx="376.5" cy="51" r="14.5" />
-                            <path d="M424 81 L424 189 L447 189 L500 107 L500 189 L523 189 L523 81 L500 81 L447 163 L447 81 Z" />
-                            <path d="M562 81 L562 189 L587 189 L587 146 L612 146 C637 146 655 131 655 113.5 C655 96 637 81 612 81 Z M587 103 L610 103 C621 103 630 107 630 113.5 C630 120 621 124 610 124 L587 124 Z" />
-                            <polygon points="712,189 660,81 685,81 737,189" />
-                            <polygon points="762,189 710,81 735,81 787,189" transform="translate(1497, 0) scale(-1, 1)" />
-                        </g>
-                        <polygon points="280,170 271,186 289,186" fill="#1b4d2b" />
-                        <polygon points="723.5,150 710,180 737,180" fill="#1b4d2b" />
-                        <text x="500" y="218" font-family="'Montserrat', sans-serif" font-size="22" font-weight="600" fill="#201e1f" letter-spacing="8" text-anchor="middle">PLANTS &amp; FLOWERS</text>
-                    </svg>
+                <!-- DÜZ YAZI TİPOGRAFİK ÇİNPA LOGOSU -->
+                <div class="flex flex-col items-center justify-center pt-2">
+                    <h1 class="logo-text text-3xl m-0 leading-none">CİNPA</h1>
+                    <span class="logo-sub text-[8.5px] uppercase mt-1">PLANTS &amp; FLOWERS</span>
                 </div>
 
                 <p class="text-xs text-slate-500 font-medium pt-1">Nebim Entegreli Rol & Görev Bazlı Yetkili Giriş Portalı</p>
@@ -187,35 +160,10 @@
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center space-x-3 cursor-pointer" onclick="returnToDashboard()">
                         
-                        <!-- Üst Menü Logo -->
-                        <div class="flex items-center">
-                            <svg viewBox="0 0 740 240" xmlns="http://www.w3.org/2000/svg" class="h-10 w-auto" style="aspect-ratio: 740/240; display: block;">
-                                <g stroke="#1b4d2b" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M145 115 Q95 78 48 54" stroke-width="15" fill="none" />
-                                    <path d="M150 115 Q90 110 35 104" stroke-width="14" fill="none" />
-                                    <path d="M148 115 Q95 140 48 166" stroke-width="15" fill="none" />
-                                    <path d="M104 97 Q70 62 35 36" stroke-width="10" fill="none" />
-                                    <path d="M88 88 Q58 74 32 67" stroke-width="9" fill="none" />
-                                    <path d="M72 107 Q44 96 22 93" stroke-width="8" fill="none" />
-                                    <path d="M80 124 Q46 136 22 145" stroke-width="8.5" fill="none" />
-                                    <path d="M104 133 Q70 166 40 190" stroke-width="10" fill="none" />
-                                    <path d="M132 88 Q150 74 128 44 Q110 28 82 21" stroke-width="9" fill="none" />
-                                    <path d="M132 129 Q150 156 132 186 Q110 208 80 212" stroke-width="9" fill="none" />
-                                </g>
-                                <line x1="195" y1="30" x2="195" y2="200" stroke="#1b4d2b" stroke-width="2.5" stroke-opacity="0.65" />
-                                <g fill="#201e1f">
-                                    <path d="M336 68 C322 56 302 50 280 50 C236 50 204 78 204 121 C204 164 236 192 280 192 C302 192 322 186 336 174 L336 145 C322 156 304 162 283 162 C255 162 237 144 237 121 C237 98 255 80 283 80 C304 80 322 86 336 97 Z" />
-                                    <rect x="364" y="81" width="25" height="108" rx="4" />
-                                    <circle cx="376.5" cy="51" r="14.5" />
-                                    <path d="M424 81 L424 189 L447 189 L500 107 L500 189 L523 189 L523 81 L500 81 L447 163 L447 81 Z" />
-                                    <path d="M562 81 L562 189 L587 189 L587 146 L612 146 C637 146 655 131 655 113.5 C655 96 637 81 612 81 Z M587 103 L610 103 C621 103 630 107 630 113.5 C630 120 621 124 610 124 L587 124 Z" />
-                                    <polygon points="712,189 660,81 685,81 737,189" />
-                                    <polygon points="762,189 710,81 735,81 787,189" transform="translate(1497, 0) scale(-1, 1)" />
-                                </g>
-                                <polygon points="280,170 271,186 289,186" fill="#1b4d2b" />
-                                <polygon points="723.5,150 710,180 737,180" fill="#1b4d2b" />
-                                <text x="500" y="218" font-family="'Montserrat', sans-serif" font-size="22" font-weight="600" fill="#201e1f" letter-spacing="8" text-anchor="middle">PLANTS &amp; FLOWERS</text>
-                            </svg>
+                        <!-- Üst Menü Düz Yazı Logo -->
+                        <div class="flex flex-col justify-center">
+                            <span class="logo-text text-xl leading-none">CİNPA</span>
+                            <span class="logo-sub text-[6px] tracking-[0.2em] uppercase mt-0.5">PLANTS &amp; FLOWERS</span>
                         </div>
 
                         <div class="border-l border-slate-200 pl-3">
@@ -459,7 +407,7 @@
                     </div>
                 </div>
 
-                <!-- 2. ADIM: DEPO -->
+                <!-- 2. ADIM: DEPO (KAMBER BEY İÇİN ÜRÜN EKLEME ALANI İLE) -->
                 <div id="content-step-2" class="hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
@@ -482,11 +430,35 @@
                                         <th class="p-3.5 text-center">Sipariş Miktarı</th>
                                         <th class="p-3.5 text-center w-36">Fiili Sevk Miktarı</th>
                                         <th class="p-3.5">Depo Hazırlık & İkame Notu</th>
+                                        <th class="p-3.5 text-center w-16" id="th-depo-action">Sil</th>
                                     </tr>
                                 </thead>
                                 <tbody id="step2-items-tbody" class="divide-y divide-slate-100 font-medium text-slate-800"></tbody>
                             </table>
                         </div>
+
+                        <!-- KAMBER USTA İÇİN KATALOGDAN YENİ ÜRÜN / İKAME EKLEME PANELİ -->
+                        <div id="depo-add-item-panel" class="bg-amber-50/50 p-5 rounded-2xl border border-amber-200 space-y-3">
+                            <div class="text-xs font-extrabold text-amber-900 uppercase flex items-center">
+                                <i class="fa-solid fa-circle-plus text-amber-600 mr-1.5 text-sm"></i> Depo Operasyon: Listeye Yeni Ürün / İkame Ekle
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                                <div class="sm:col-span-8">
+                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Katalogdan Ürün Seç</label>
+                                    <select id="depo-select-product" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white"></select>
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Adet</label>
+                                    <input type="number" id="depo-add-qty" value="1" min="1" class="w-full text-xs font-bold p-2.5 rounded-xl border border-slate-300 text-center bg-white">
+                                </div>
+                                <div class="sm:col-span-2 flex items-end">
+                                    <button type="button" onclick="addItemFromDepo()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition shadow">
+                                        <i class="fa-solid fa-plus mr-1"></i> Ekle
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-slate-100 gap-4">
                             <div class="text-xs text-slate-500 flex items-center"><i class="fa-solid fa-truck-ramp-box text-slate-400 mr-2"></i> Kolilendi ve araca yüklenmeye hazır.</div>
                             <div id="step2-action-buttons">
@@ -642,7 +614,7 @@
                     <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg"><i class="fa-solid fa-file-excel"></i></div>
                     <div>
                         <h3 class="text-base font-extrabold text-slate-900">Nebim / Excel'den Fiş İçe Aktar</h3>
-                        <p class="text-xs text-slate-500">Nebim sipariş formatına tam uyumludur.</p>
+                        <p class="text-xs text-slate-500">Nebim sipariş formatına (`ItemCode`, `ColorCode`, `Qty1`, `Price`) tam uyumludur.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeExcelImportModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
@@ -803,7 +775,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE ABCD.XLSX ENTEGRASYON MOTORU -->
+    <!-- JAVASCRIPT STATE VE NEBİM ABCD.XLSX ENTEGRASYON MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -850,7 +822,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v44");
+            const stored = localStorage.getItem("cinpa_orders_v45");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -862,7 +834,7 @@
         let activeStepTab = 1;
         let parsedExcelItems = [];
 
-        // --- INDEXEDDB: OTOMATİK ARTAN BENZERSİZ KİMLİK ---
+        // --- INDEXEDDB VERİTABANI BAĞLANTISI ---
         const DB_NAME = "CinpaCatalogDB_v2";
         const DB_VERSION = 1;
         const STORE_NAME = "products_store";
@@ -916,7 +888,7 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v44", JSON.stringify(orders));
+                localStorage.setItem("cinpa_orders_v45", JSON.stringify(orders));
             } catch(e) {}
         }
 
@@ -1085,7 +1057,7 @@
             showToast("Nebim V3 Excel şablonu başarıyla indirildi!");
         }
 
-        // --- ABCD.XLSX (ITEMCODE, COLORCODE, QTY1, PRICE) DOĞRUDAN OKUMA MOTORU ---
+        // --- ABCD.XLSX OKUMA MOTORU (KOD, RENK, ADET, FİYAT SIRALAMASI) ---
         function handleExcelFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1119,10 +1091,10 @@
             parsedExcelItems = [];
             if (!rows || rows.length === 0) return;
 
-            let itemCodeCol = 2; // Default ItemCode (C)
-            let colorCodeCol = 3; // Default ColorCode (D)
-            let qty1Col = 7; // Default Qty1 (H)
-            let priceCol = 12; // Default Price (M)
+            let itemCodeCol = 2; // ItemCode (C)
+            let colorCodeCol = 3; // ColorCode (D)
+            let qty1Col = 7; // Qty1 (H)
+            let priceCol = 12; // Price (M)
             let startRow = 0;
 
             for (let r = 0; r < Math.min(5, rows.length); r++) {
@@ -1177,7 +1149,7 @@
                     dispatchedQty: qty,
                     returnedQty: 0,
                     price: price,
-                    warehouseNote: "ABCD_2.xlsx Nebim Aktarımı",
+                    warehouseNote: "", // BOŞ BIRAKILDI
                     checked: true
                 });
             }
@@ -1209,7 +1181,7 @@
             document.getElementById("excel-preview-count").innerText = `${parsedExcelItems.length} Kalem Ürün`;
             document.getElementById("excel-preview-total").innerText = `Toplam: ${previewTotal.toLocaleString('tr-TR')} ₺`;
             updateExcelApplyButton();
-            showToast(`${parsedExcelItems.length} kalem ürün başarıyla çözümlendi!`);
+            showToast(`${parsedExcelItems.length} kalem ürün başarıyla okundu!`);
         }
 
         function updateExcelApplyButton() {
@@ -1237,7 +1209,7 @@
                 dispatchedQty: i.dispatchedQty,
                 returnedQty: 0,
                 price: i.price,
-                warehouseNote: i.warehouseNote,
+                warehouseNote: "", // BOŞ BIRAKILDI
                 checked: true
             }));
 
@@ -1588,7 +1560,7 @@
             if (!p) { showToast("Lütfen bir ürün seçin.", true); return; }
             const finalPrice = isNaN(customPrice) ? p.price : customPrice;
             activeOrder.items.push({
-                id: p.id, name: p.name + (p.color && p.color !== "-" ? " (" + p.color + ")" : ""), requestedQty: qty, dispatchedQty: qty, returnedQty: 0, price: finalPrice, warehouseNote: "Katalogdan seçildi.", checked: true
+                id: p.id, name: p.name + (p.color && p.color !== "-" ? " (" + p.color + ")" : ""), requestedQty: qty, dispatchedQty: qty, returnedQty: 0, price: finalPrice, warehouseNote: "", checked: true
             });
             saveToStorage(); renderStep1(); showToast(`${p.name} fişe eklendi!`);
         }
@@ -1601,7 +1573,7 @@
             const saveMaster = document.getElementById("chk-save-to-master").checked;
             if (!name) { showToast("Lütfen ürün adını yazınız.", true); return; }
             activeOrder.items.push({
-                id: code, name: name, requestedQty: qty, dispatchedQty: qty, returnedQty: 0, price: price, warehouseNote: "Özel ürün girişi.", checked: true
+                id: code, name: name, requestedQty: qty, dispatchedQty: qty, returnedQty: 0, price: price, warehouseNote: "", checked: true
             });
             if (saveMaster) {
                 masterProducts.unshift({ id: code, name: name, color: "-", price: price });
@@ -1632,6 +1604,7 @@
             showToast("Ürün fişten çıkarıldı.");
         }
 
+        // --- 2. ADIM: DEPO (KAMBER USTA) İÇİN CHECKLIST VE ÜRÜN EKLEME ---
         function renderStep2() {
             const tbody = document.getElementById("step2-items-tbody");
             if (!tbody) return;
@@ -1643,6 +1616,12 @@
 
             const actBtn = document.getElementById("step2-action-buttons");
             if (actBtn) actBtn.style.display = canEditWarehouse ? "block" : "none";
+
+            const addPnl = document.getElementById("depo-add-item-panel");
+            if (addPnl) addPnl.style.display = canEditWarehouse ? "block" : "none";
+
+            const thAct = document.getElementById("th-depo-action");
+            if (thAct) thAct.style.display = canEditWarehouse ? "table-cell" : "none";
 
             const lckAlert = document.getElementById("step2-lock-alert");
             if (lckAlert) lckAlert.style.display = (!canEditWarehouse && !isAdmin) ? "flex" : "none";
@@ -1659,11 +1638,55 @@
                         ${canEditWarehouse ? `<input type="number" min="0" value="${item.dispatchedQty}" onchange="updateStep2Dispatched(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold text-amber-900">${item.dispatchedQty} Adet</span>`}
                     </td>
                     <td class="p-3.5">
-                        ${canEditWarehouse ? `<input type="text" value="${item.warehouseNote || ""}" onchange="updateStep2Note(${index}, this.value)" placeholder="İkame ürün / not..." class="w-full text-xs p-1.5 border border-slate-300 rounded">` : `<span class="text-xs text-slate-600">${item.warehouseNote || "-"}</span>`}
+                        ${canEditWarehouse ? `<input type="text" value="${item.warehouseNote || ""}" onchange="updateStep2Note(${index}, this.value)" placeholder="İkame / Not..." class="w-full text-xs p-1.5 border border-slate-300 rounded bg-white">` : `<span class="text-xs text-slate-600">${item.warehouseNote || "-"}</span>`}
                     </td>
+                    ${canEditWarehouse ? `<td class="p-3.5 text-center"><button onclick="removeItemStep2(${index})" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>` : ''}
                 `;
                 tbody.appendChild(tr);
             });
+
+            // Depo arama select kutusunu doldur
+            populateDepoProductSelect();
+        }
+
+        function populateDepoProductSelect() {
+            const sel = document.getElementById("depo-select-product");
+            if (!sel || sel.options.length > 0) return;
+            sel.innerHTML = "";
+            masterProducts.slice(0, 100).forEach(p => {
+                const opt = document.createElement("option");
+                opt.value = p.id;
+                opt.innerText = `${p.id} - ${p.name} (${Number(p.price).toLocaleString('tr-TR')} ₺)`;
+                sel.appendChild(opt);
+            });
+        }
+
+        function addItemFromDepo() {
+            const prodId = document.getElementById("depo-select-product").value;
+            const qty = parseInt(document.getElementById("depo-add-qty").value) || 1;
+            const p = masterProducts.find(x => x.id === prodId);
+            if (!p) { showToast("Lütfen bir ürün seçin.", true); return; }
+
+            activeOrder.items.push({
+                id: p.id,
+                name: p.name + (p.color && p.color !== "-" ? ` (${p.color})` : "") + " [Depo İlavesi]",
+                requestedQty: qty,
+                dispatchedQty: qty,
+                returnedQty: 0,
+                price: p.price,
+                warehouseNote: "Depodan Eklendi",
+                checked: true
+            });
+            saveToStorage();
+            renderStep2();
+            showToast(`${p.name} depodan siparişe eklendi!`);
+        }
+
+        function removeItemStep2(index) {
+            activeOrder.items.splice(index, 1);
+            saveToStorage();
+            renderStep2();
+            showToast("Ürün depodan çıkarıldı.");
         }
 
         function toggleCheckStep2(index, chk) { activeOrder.items[index].checked = chk; saveToStorage(); }
