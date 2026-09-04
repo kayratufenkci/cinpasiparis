@@ -7,7 +7,7 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- SheetJS CDN (Excel okuma ve yazma kütüphanesi) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -29,8 +29,6 @@
     </script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        .font-logo-title { font-family: 'Cinzel', serif; letter-spacing: 0.12em; }
-        .font-logo-sub { font-family: 'Montserrat', sans-serif; letter-spacing: 0.28em; }
         .step-circle { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 9999px; font-weight: 800; font-size: 13px; }
         @media print { .no-print { display: none !important; } .print-only { display: block !important; } body { background: white; } }
         .print-only { display: none; }
@@ -49,17 +47,60 @@
         <div class="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl space-y-6">
             <div class="text-center space-y-3">
                 
-                <!-- TAM KURUMSAL ÇİNPA LOGOSU (AMBLEM + LOGOTYPE) -->
-                <div class="flex flex-col items-center justify-center pt-2">
-                    <svg class="w-20 h-20 text-cinpa-700 drop-shadow-md mb-2" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Çinpa Botanik Stilize Monogram & Yaprak Amblemi -->
-                        <path d="M50 8C48 24 34 38 18 40C34 42 48 56 50 72C52 56 66 42 82 40C66 38 52 24 50 8Z" fill="#15803d" />
-                        <circle cx="50" cy="40" r="7" fill="#22c55e" />
-                        <path d="M50 47C45 60 38 72 26 84C42 80 58 80 74 84C62 72 55 60 50 47Z" fill="#166534" opacity="0.9" />
-                        <path d="M49 84L49 94M51 84L51 94" stroke="#15803d" stroke-width="2.5" stroke-linecap="round" />
+                <!-- TAM GERÇEK ÇİNPA KURUMSAL LOGOSU (GÖRSELDEKİ BİREBİR VEKTÖREL ÇİZİM) -->
+                <div class="flex items-center justify-center pt-2 px-2">
+                    <svg class="w-full max-w-[310px] h-auto drop-shadow-sm" viewBox="0 0 650 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Sol Kısım: Botanik Dal & Kök Amblemi -->
+                        <g stroke="#1b4d2e" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M70 100 Q105 70 145 50" stroke-width="14" fill="none" />
+                            <path d="M65 100 Q110 95 155 90" stroke-width="13" fill="none" />
+                            <path d="M68 100 Q105 120 145 140" stroke-width="14" fill="none" />
+                            
+                            <path d="M100 85 Q130 55 160 32" stroke-width="9" fill="none" />
+                            <path d="M115 76 Q140 65 162 58" stroke-width="8" fill="none" />
+                            <path d="M125 93 Q150 82 170 80" stroke-width="7" fill="none" />
+                            <path d="M120 108 Q148 118 168 126" stroke-width="8" fill="none" />
+                            <path d="M100 115 Q130 145 155 165" stroke-width="9" fill="none" />
+
+                            <path d="M75 90 Q60 65 80 40 Q95 25 118 20" stroke-width="8" fill="none" />
+                            <path d="M75 110 Q60 135 75 160 Q95 178 120 182" stroke-width="8" fill="none" />
+                            <path d="M80 40 Q95 55 125 45" stroke-width="7" fill="none" />
+                            <path d="M75 160 Q95 145 125 155" stroke-width="7" fill="none" />
+                            
+                            <path d="M140 38 Q155 24 165 18" stroke-width="6" fill="none" />
+                            <path d="M140 162 Q158 178 168 185" stroke-width="6" fill="none" />
+                        </g>
+
+                        <!-- Dikey Ayırıcı İnce Çizgi -->
+                        <line x1="202" y1="28" x2="202" y2="172" stroke="#1b4d2e" stroke-width="2" stroke-opacity="0.6" />
+
+                        <!-- Sağ Kısım: 'C İ N P A' Tipografisi -->
+                        <g fill="#221f1f">
+                            <!-- C Harfi -->
+                            <path d="M312 60 C300 50 282 46 262 46 C225 46 195 72 195 110 C195 148 225 174 262 174 C282 174 300 170 312 160 L312 134 C300 142 284 146 265 146 C240 146 225 130 225 110 C225 90 240 74 265 74 C284 74 300 78 312 86 Z" />
+                            
+                            <!-- İ Harfi -->
+                            <rect x="338" y="74" width="23" height="96" rx="4" />
+                            <circle cx="349.5" cy="48" r="13" />
+
+                            <!-- N Harfi -->
+                            <path d="M392 74 L392 170 L413 170 L460 98 L460 170 L481 170 L481 74 L460 74 L413 146 L413 74 Z" />
+
+                            <!-- P Harfi -->
+                            <path d="M515 74 L515 170 L537 170 L537 132 L560 132 C582 132 598 119 598 103 C598 87 582 74 560 74 Z M537 94 L558 94 C568 94 576 98 576 103 C576 108 568 112 558 112 L537 112 Z" />
+
+                            <!-- A Harfi -->
+                            <path d="M652 170 L607 74 L627 74 L672 170 Z" />
+                            <path d="M692 170 L647 74 L667 74 L712 170 Z" transform="translate(1364, 0) scale(-1, 1)" />
+                        </g>
+
+                        <!-- C ve A Harflerinin İçindeki Yeşil Üçgen / Yaprak Detayları -->
+                        <polygon points="262,156 254,168 270,168" fill="#1b4d2e" />
+                        <polygon points="659.5,138 647,162 672,162" fill="#1b4d2e" />
+
+                        <!-- Alt Başlık: 'PLANTS & FLOWERS' -->
+                        <text x="465" y="196" font-family="'Montserrat', sans-serif" font-size="21" font-weight="500" fill="#221f1f" letter-spacing="7" text-anchor="middle">PLANTS &amp; FLOWERS</text>
                     </svg>
-                    <span class="font-logo-title text-3xl font-black text-slate-900 tracking-[0.18em]">CİNPA</span>
-                    <span class="font-logo-sub text-[8.5px] font-bold text-slate-400 tracking-[0.32em] uppercase mt-1">PLANTS & FLOWERS</span>
                 </div>
 
                 <p class="text-xs text-slate-500 font-medium">Nebim Entegreli Rol & Görev Bazlı Yetkili Giriş Portalı</p>
@@ -167,18 +208,37 @@
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center space-x-3 cursor-pointer" onclick="returnToDashboard()">
                         
-                        <!-- ÜST MENÜ TAM VEKTÖREL ÇİNPA LOGOSU -->
-                        <div class="flex items-center space-x-2.5">
-                            <svg class="w-9 h-9 text-cinpa-700 flex-shrink-0" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M50 8C48 24 34 38 18 40C34 42 48 56 50 72C52 56 66 42 82 40C66 38 52 24 50 8Z" fill="#15803d" />
-                                <circle cx="50" cy="40" r="7" fill="#22c55e" />
-                                <path d="M50 47C45 60 38 72 26 84C42 80 58 80 74 84C62 72 55 60 50 47Z" fill="#166534" opacity="0.9" />
-                                <path d="M49 84L49 94M51 84L51 94" stroke="#15803d" stroke-width="2.5" stroke-linecap="round" />
+                        <!-- ÜST MENÜ TAM GERÇEK ÇİNPA LOGOSU -->
+                        <div class="flex items-center">
+                            <svg class="h-10 w-auto" viewBox="0 0 650 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g stroke="#1b4d2e" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M70 100 Q105 70 145 50" stroke-width="14" fill="none" />
+                                    <path d="M65 100 Q110 95 155 90" stroke-width="13" fill="none" />
+                                    <path d="M68 100 Q105 120 145 140" stroke-width="14" fill="none" />
+                                    <path d="M100 85 Q130 55 160 32" stroke-width="9" fill="none" />
+                                    <path d="M115 76 Q140 65 162 58" stroke-width="8" fill="none" />
+                                    <path d="M125 93 Q150 82 170 80" stroke-width="7" fill="none" />
+                                    <path d="M120 108 Q148 118 168 126" stroke-width="8" fill="none" />
+                                    <path d="M100 115 Q130 145 155 165" stroke-width="9" fill="none" />
+                                    <path d="M75 90 Q60 65 80 40 Q95 25 118 20" stroke-width="8" fill="none" />
+                                    <path d="M75 110 Q60 135 75 160 Q95 178 120 182" stroke-width="8" fill="none" />
+                                    <path d="M80 40 Q95 55 125 45" stroke-width="7" fill="none" />
+                                    <path d="M75 160 Q95 145 125 155" stroke-width="7" fill="none" />
+                                </g>
+                                <line x1="202" y1="28" x2="202" y2="172" stroke="#1b4d2e" stroke-width="2" stroke-opacity="0.6" />
+                                <g fill="#221f1f">
+                                    <path d="M312 60 C300 50 282 46 262 46 C225 46 195 72 195 110 C195 148 225 174 262 174 C282 174 300 170 312 160 L312 134 C300 142 284 146 265 146 C240 146 225 130 225 110 C225 90 240 74 265 74 C284 74 300 78 312 86 Z" />
+                                    <rect x="338" y="74" width="23" height="96" rx="4" />
+                                    <circle cx="349.5" cy="48" r="13" />
+                                    <path d="M392 74 L392 170 L413 170 L460 98 L460 170 L481 170 L481 74 L460 74 L413 146 L413 74 Z" />
+                                    <path d="M515 74 L515 170 L537 170 L537 132 L560 132 C582 132 598 119 598 103 C598 87 582 74 560 74 Z M537 94 L558 94 C568 94 576 98 576 103 C576 108 568 112 558 112 L537 112 Z" />
+                                    <path d="M652 170 L607 74 L627 74 L672 170 Z" />
+                                    <path d="M692 170 L647 74 L667 74 L712 170 Z" transform="translate(1364, 0) scale(-1, 1)" />
+                                </g>
+                                <polygon points="262,156 254,168 270,168" fill="#1b4d2e" />
+                                <polygon points="659.5,138 647,162 672,162" fill="#1b4d2e" />
+                                <text x="465" y="196" font-family="'Montserrat', sans-serif" font-size="21" font-weight="500" fill="#221f1f" letter-spacing="7" text-anchor="middle">PLANTS &amp; FLOWERS</text>
                             </svg>
-                            <div class="flex flex-col justify-center">
-                                <span class="font-logo-title text-lg font-black text-slate-900 leading-none tracking-[0.16em]">CİNPA</span>
-                                <span class="font-logo-sub text-[6.5px] font-bold text-slate-400 tracking-[0.24em] uppercase mt-0.5">PLANTS & FLOWERS</span>
-                            </div>
                         </div>
 
                         <div class="border-l border-slate-200 pl-3">
@@ -812,7 +872,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v34");
+            const stored = localStorage.getItem("cinpa_orders_v35");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -878,7 +938,7 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v34", JSON.stringify(orders));
+                localStorage.setItem("cinpa_orders_v35", JSON.stringify(orders));
             } catch(e) {}
         }
 
