@@ -642,8 +642,8 @@
                         <i class="fa-solid fa-file-excel"></i>
                     </div>
                     <div>
-                        <div class="text-xs font-black text-slate-900">Excel'den Fiyatlı Katalog Yükle (Kalıcı)</div>
-                        <div class="text-[11px] text-slate-500">Sütun A: Kod | Sütun B: Ürün Adı | Sütun C: Renk | Sütun D: Toptan Fiyat (Kayıtlı: <span id="master-count-label" class="font-bold text-emerald-700">0</span>)</div>
+                        <div class="text-xs font-black text-slate-900">Excel'den Fiyatlı Katalog Yükle (IndexedDB Kalıcı Hafıza)</div>
+                        <div class="text-[11px] text-slate-500">A: Kod | B: Ürün Adı | C: Renk | D: Toptan Fiyat (Kayıtlı: <span id="master-count-label" class="font-bold text-emerald-700">0</span>)</div>
                     </div>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
@@ -737,7 +737,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE AKILLI EXCEL SÜTUN AYIRICI MOTORU -->
+    <!-- INDEXEDDB KALICI VERİTABANI MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -774,31 +774,11 @@
             }
         };
 
-        const DEFAULT_PRODUCTS = [
-            {"id":"0101007","name":"YUCCA BUSH X 36 W/WHITE FLOWERS","color":"-","price":350},
-            {"id":"0101018","name":"67 MİNG ARALİA (GREEN)","color":"-","price":330},
-            {"id":"0101024","name":"GUZMANIA KIRMIZI BÜYÜK","color":"-","price":130},
-            {"id":"0101025","name":"GUZMANIA SARI BÜYÜK","color":"SARI","price":0},
-            {"id":"0101026","name":"GUZMANIA MOR BÜYÜK","color":"PEMBE","price":160},
-            {"id":"0101050","name":"PEPEROMIA TOPIARY","color":"-","price":620}
-        ];
-
-        let masterProducts = [];
-        try {
-            const stored = localStorage.getItem("cinpa_permanent_catalog_v30");
-            masterProducts = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
-        } catch(e) {
-            masterProducts = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
-        }
-
         const INITIAL_ORDERS = [
             {
                 id: "CNP-2026-084", customer: "Hilton Bosphorus Projesi", salesRep: "Orhan Özen", date: "2026-08-25",
                 notes: "İlk sipariş kaydı.", currentStep: 1,
-                items: [
-                    { id: "0101007", name: "YUCCA BUSH X 36 W/WHITE FLOWERS", requestedQty: 4, dispatchedQty: 4, returnedQty: 0, price: 350, warehouseNote: "Hazırlandı.", checked: true }
-                ],
-                extras: [], isClosed: false
+                items: [], extras: [], isClosed: false
             }
         ];
 
@@ -810,15 +790,64 @@
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
         }
 
+        let masterProducts = [];
         let currentUser = null;
         let activeOrder = null;
         let activeStepTab = 1;
         let parsedExcelItems = [];
 
+        // --- INDEXEDDB KALICI DEPOLAMA (SINIRSIZ BOYUT) ---
+        const DB_NAME = "CinpaBotanikDB";
+        const DB_VERSION = 1;
+        const STORE_NAME = "products";
+
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME, { keyPath: "id" });
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function loadProductsFromDB() {
+            try {
+                const db = await openDB();
+                const tx = db.transaction(STORE_NAME, "readonly");
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.getAll();
+                req.onsuccess = () => {
+                    masterProducts = req.result || [];
+                    updateHeaderBadgeCounts();
+                    if (masterProducts.length > 0) {
+                        populateProductSelects();
+                    }
+                };
+            } catch(err) {
+                console.error("IndexedDB okuma hatası:", err);
+            }
+        }
+
+        async function saveProductsToDB(productsList) {
+            const db = await openDB();
+            const tx = db.transaction(STORE_NAME, "readwrite");
+            const store = tx.objectStore(STORE_NAME);
+            store.clear(); // Eskileri temizle
+            productsList.forEach(p => store.put(p));
+            return new Promise((resolve, reject) => {
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
         function saveToStorage() {
             try {
                 localStorage.setItem("cinpa_orders_v30", JSON.stringify(orders));
-                localStorage.setItem("cinpa_permanent_catalog_v30", JSON.stringify(masterProducts));
             } catch(e) {}
         }
 
@@ -835,48 +864,43 @@
             }, 3000);
         }
 
-        // --- TAM AKILLI BAŞLIK VE HÜCRE AYIRICI MOTOR ---
+        // --- EXCEL DOSYASINI OKUYUP INDEXEDDB'YE KALICI KAYDETME ---
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
+            showToast("Excel okunuyor ve kalıcı hafızaya aktarılıyor...");
+
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     
-                    // 2 Boyutlu Array olarak okuyoruz (Boşluklar atlanmaz)
+                    // 2 Boyutlu Dizi olarak okuma (A:0, B:1, C:2, D:3)
                     const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
                     if (rawData.length === 0) {
                         showToast("Excel boş görünüyor!", true);
                         return;
                     }
 
-                    // Başlık satırını bulup sütun numaralarını tespit edelim
-                    let headerIndex = -1;
+                    // Sütun indekslerini başlık satırından kesinleştir
                     let codeCol = 0, nameCol = 1, colorCol = 2, priceCol = 3;
+                    let startRow = 0;
 
-                    for (let r = 0; r < Math.min(10, rawData.length); r++) {
-                        let row = rawData[r].map(c => String(c || '').toLowerCase().trim());
-                        let hasCode = row.some(c => c.includes('kod') || c.includes('stok') || c.includes('sku'));
-                        let hasName = row.some(c => c.includes('ürün') || c.includes('ad') || c.includes('tanım'));
-                        if (hasCode || hasName) {
-                            headerIndex = r;
-                            row.forEach((h, colIdx) => {
-                                if (h.includes('kod') || h.includes('stok') || h.includes('sku')) codeCol = colIdx;
-                                else if (h.includes('toptan') || h.includes('satış fiyatı') || h.includes('fiyatı') || h.includes('fiyat')) priceCol = colIdx;
-                                else if (h.includes('renk')) colorCol = colIdx;
-                                else if (h.includes('ad') || h.includes('açıklama') || h.includes('tanım') || h.includes('ürün')) nameCol = colIdx;
-                            });
-                            break;
-                        }
+                    const firstRow = rawData[0].map(c => String(c || '').toLowerCase().trim());
+                    if (firstRow.some(c => c.includes('kod') || c.includes('ürün') || c.includes('fiyat') || c.includes('toptan'))) {
+                        startRow = 1;
+                        firstRow.forEach((h, colIdx) => {
+                            if (h.includes('kod') || h.includes('stok')) codeCol = colIdx;
+                            else if (h.includes('ad') || h.includes('ürün') || h.includes('tanım')) nameCol = colIdx;
+                            else if (h.includes('renk')) colorCol = colIdx;
+                            else if (h.includes('fiyat') || h.includes('toptan') || h.includes('satış')) priceCol = colIdx;
+                        });
                     }
 
                     let newProducts = [];
-                    let startRow = headerIndex >= 0 ? headerIndex + 1 : 0;
-
                     for (let i = startRow; i < rawData.length; i++) {
                         let row = rawData[i];
                         if (!row || row.length === 0) continue;
@@ -887,9 +911,8 @@
                         let rawPrice = row[priceCol] !== undefined ? row[priceCol] : 0;
 
                         if (!code && !name) continue;
-                        if (code.toLowerCase().includes('kod') || name.toLowerCase().includes('ürün adı')) continue;
 
-                        // Fiyatı temizleme ve sayıya çevirme
+                        // Fiyatı tam temizle ve sayıya çevir
                         let cleanPrice = String(rawPrice).replace(/[^0-9,.-]/g, '').replace(',', '.');
                         let price = parseFloat(cleanPrice);
                         if (isNaN(price)) price = 0;
@@ -904,12 +927,13 @@
 
                     if (newProducts.length > 0) {
                         masterProducts = newProducts;
-                        saveToStorage();
+                        await saveProductsToDB(masterProducts); // Kalıcı olarak diske yaz
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
-                        showToast(`Başarıyla ${newProducts.length} ürün ve gerçek toptan fiyatları yüklendi!`);
+                        populateProductSelects();
+                        showToast(`Başarıyla ${newProducts.length} ürün kalıcı olarak kaydedildi! Bir daha yüklemenize gerek kalmaz.`);
                     } else {
-                        showToast("Excel'den ürün okunamadı. Lütfen dosyanızı kontrol edin.", true);
+                        showToast("Excel'den ürün satırı okunamadı!", true);
                     }
                 } catch(err) {
                     showToast("Excel okunurken hata oluştu: " + err.message, true);
@@ -1263,7 +1287,10 @@
             });
             if (saveMaster) {
                 const exists = masterProducts.find(x => x.id === code);
-                if (!exists) masterProducts.unshift({ id: code, name: name, color: "-", price: price });
+                if (!exists) {
+                    masterProducts.unshift({ id: code, name: name, color: "-", price: price });
+                    saveProductsToDB(masterProducts);
+                }
             }
             saveToStorage(); populateProductSelects(); renderStep1();
             document.getElementById("manual-code").value = "";
@@ -1793,7 +1820,7 @@
             checkboxes.forEach(cb => cb.checked = checked);
         }
 
-        function deleteSelectedCatalogItems() {
+        async function deleteSelectedCatalogItems() {
             const checkboxes = document.querySelectorAll(".catalog-row-checkbox:checked");
             if (checkboxes.length === 0) {
                 showToast("Lütfen silmek için en az bir ürün seçiniz.", true);
@@ -1803,15 +1830,15 @@
 
             const selectedIds = Array.from(checkboxes).map(cb => cb.value);
             masterProducts = masterProducts.filter(p => !selectedIds.includes(p.id));
-            saveToStorage();
+            await saveProductsToDB(masterProducts);
             renderCatalogTable();
             showToast(`${selectedIds.length} ürün katalogdan silindi.`);
         }
 
-        function deleteAllCatalogItems() {
+        async function deleteAllCatalogItems() {
             if (!confirm("DİKKAT: Tüm katalog listesi kalıcı olarak silinecek! Emin misiniz?")) return;
             masterProducts = [];
-            saveToStorage();
+            await saveProductsToDB(masterProducts);
             renderCatalogTable();
             showToast("Tüm katalog tamamen temizlendi.");
         }
@@ -1826,7 +1853,7 @@
             renderCatalogTable(filtered);
         }
 
-        function saveProductToMasterCatalog() {
+        async function saveProductToMasterCatalog() {
             const code = document.getElementById("cat-new-code").value.trim() || `ÇNP-${Math.floor(100 + Math.random() * 900)}`;
             const name = document.getElementById("cat-new-name").value.trim();
             const color = document.getElementById("cat-new-color").value.trim() || "-";
@@ -1834,7 +1861,7 @@
 
             if (!name) { showToast("Lütfen ürün adını yazınız.", true); return; }
             masterProducts.unshift({ id: code, name: name, color: color, price: price });
-            saveToStorage();
+            await saveProductsToDB(masterProducts);
             renderCatalogTable();
             document.getElementById("cat-new-code").value = "";
             document.getElementById("cat-new-name").value = "";
@@ -1843,9 +1870,9 @@
             showToast(`${name} kataloğa eklendi!`);
         }
 
-        function removeProductFromMaster(productId) {
+        async function removeProductFromMaster(productId) {
             masterProducts = masterProducts.filter(p => p.id !== productId);
-            saveToStorage();
+            await saveProductsToDB(masterProducts);
             renderCatalogTable();
             showToast("Ürün katalogdan silindi.");
         }
@@ -1856,8 +1883,9 @@
             rows.forEach(r => { r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; });
         }
 
+        // Sayfa ilk yüklendiğinde kalıcı veritabanından ürünleri çek
         window.addEventListener('DOMContentLoaded', () => {
-            updateHeaderBadgeCounts();
+            loadProductsFromDB();
         });
     </script>
 </body>
