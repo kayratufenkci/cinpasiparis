@@ -152,13 +152,12 @@
 
     <!-- ================= 2. ANA PANEL ================= -->
     <div id="view-app" class="hidden flex-1 flex flex-col min-h-screen">
-        <!-- ÜST KISIM (HEADER) YEŞİL YAPILDI -->
         <header class="bg-emerald-900 text-white border-b border-emerald-800 sticky top-0 z-40 shadow-md no-print">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center space-x-3 cursor-pointer" onclick="returnToDashboard()">
                         
-                        <!-- Üst Menü Beyaz Logo -->
+                        <!-- Üst Menü Logo -->
                         <div class="flex flex-col justify-center">
                             <span class="text-xl font-black tracking-[0.18em] text-white leading-none font-serif">CİNPA</span>
                             <span class="text-[6px] font-bold tracking-[0.25em] text-emerald-300 uppercase mt-0.5">PLANTS &amp; FLOWERS</span>
@@ -229,6 +228,42 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ADMIN ÖZEL: SATIŞ TEMSİLCİSİ PERFORMANS ANALİZİ -->
+            <section id="admin-performance-section" class="hidden space-y-4">
+                <div class="bg-emerald-900 text-white p-6 rounded-3xl shadow-lg space-y-4">
+                    <div class="flex items-center justify-between border-b border-emerald-800 pb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-800 text-emerald-300 flex items-center justify-center font-bold text-base">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-extrabold text-white">Yönetici Paneli: Satış Temsilcisi Performans Analizi</h3>
+                                <p class="text-xs text-emerald-300">Temsilcilerin açtığı dosya sayıları ve toplam ciroları (Yalnızca Admin Görür)</p>
+                            </div>
+                        </div>
+                        <span class="bg-emerald-800 text-emerald-200 text-xs font-bold px-3 py-1 rounded-full border border-emerald-700">Canlı Rapor</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="admin-kpi-cards">
+                        <!-- JS ile doldurulacak -->
+                    </div>
+
+                    <div class="overflow-x-auto bg-white/10 rounded-2xl p-2 border border-emerald-800">
+                        <table class="w-full text-left text-sm text-white">
+                            <thead class="bg-emerald-950/60 text-emerald-300 text-xs font-bold uppercase border-b border-emerald-800">
+                                <tr>
+                                    <th class="p-3">Satış Uzmanı</th>
+                                    <th class="p-3 text-center">Toplam Dosya</th>
+                                    <th class="p-3 text-center">Kapatılan / Faturalanan</th>
+                                    <th class="p-3 text-right">Toplam Ciro (₺)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-performance-tbody" class="divide-y divide-emerald-800/50 text-emerald-50 text-xs font-medium"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
             <!-- DASHBOARD LİSTESİ -->
             <section id="section-dashboard" class="space-y-6">
@@ -826,8 +861,8 @@
         let activeStepTab = 1;
         let parsedExcelItems = [];
 
-        // --- INDEXEDDB VERİTABANI MOTORU ---
-        const DB_NAME = "CinpaMasterDB_v5";
+        // --- INDEXEDDB KALICI VERİTABANI MOTORU ---
+        const DB_NAME = "CinpaMasterDB_v6";
         const DB_VERSION = 1;
         const STORE_CATALOG = "catalog";
         const STORE_ORDERS = "orders";
@@ -1365,8 +1400,93 @@
                 repSelect.value = currentUser.name;
             }
 
+            // Admin ise Performans Analizini göster
+            const perfSec = document.getElementById("admin-performance-section");
+            if (perfSec) {
+                if (currentUser.roleId === 'admin') {
+                    perfSec.classList.remove("hidden");
+                    renderAdminPerformance();
+                } else {
+                    perfSec.classList.add("hidden");
+                }
+            }
+
             renderOrderList();
             showToast(`Hoş geldiniz, ${currentUser.name}!`);
+        }
+
+        // --- ADMIN PERFORMANS ANALİZİ RENDER ---
+        function renderAdminPerformance() {
+            const kpiContainer = document.getElementById("admin-kpi-cards");
+            const tbody = document.getElementById("admin-performance-tbody");
+            if (!kpiContainer || !tbody) return;
+
+            kpiContainer.innerHTML = "";
+            tbody.innerHTML = "";
+
+            let totalOrders = orders.length;
+            let totalRevenue = 0;
+            let closedOrdersCount = orders.filter(o => o.isClosed).length;
+
+            orders.forEach(ord => {
+                let sub = 0;
+                ord.items.forEach(i => {
+                    const netQty = Math.max(0, i.dispatchedQty - (i.returnedQty || 0));
+                    sub += netQty * i.price;
+                });
+                if (ord.extras) {
+                    ord.extras.forEach(ext => {
+                        if (ext.faikApproval) sub += ext.qty * ext.price;
+                    });
+                }
+                totalRevenue += sub * 1.20; // KDV dahil
+            });
+
+            kpiContainer.innerHTML = `
+                <div class="bg-white/10 p-4 rounded-2xl border border-emerald-800">
+                    <div class="text-[10px] font-bold text-emerald-300 uppercase">Toplam Sipariş Dosyası</div>
+                    <div class="text-2xl font-black text-white mt-1">${totalOrders} Adet</div>
+                </div>
+                <div class="bg-white/10 p-4 rounded-2xl border border-emerald-800">
+                    <div class="text-[10px] font-bold text-emerald-300 uppercase">Tamamlanan / Faturalanan</div>
+                    <div class="text-2xl font-black text-emerald-300 mt-1">${closedOrdersCount} Dosya</div>
+                </div>
+                <div class="bg-white/10 p-4 rounded-2xl border border-emerald-800">
+                    <div class="text-[10px] font-bold text-emerald-300 uppercase">Toplam Konsolide Ciro (KDV Dahil)</div>
+                    <div class="text-2xl font-black text-white mt-1">${totalRevenue.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</div>
+                </div>
+            `;
+
+            // Temsilci Bazlı Tablo
+            SALES_TEAM.forEach(repName => {
+                const repOrders = orders.filter(o => (o.salesRep || '').trim().toLowerCase() === repName.trim().toLowerCase());
+                let repCount = repOrders.length;
+                let repClosed = repOrders.filter(o => o.isClosed).length;
+                let repRev = 0;
+
+                repOrders.forEach(ord => {
+                    let sub = 0;
+                    ord.items.forEach(i => {
+                        const netQty = Math.max(0, i.dispatchedQty - (i.returnedQty || 0));
+                        sub += netQty * i.price;
+                    });
+                    if (ord.extras) {
+                        ord.extras.forEach(ext => {
+                            if (ext.faikApproval) sub += ext.qty * ext.price;
+                        });
+                    }
+                    repRev += sub * 1.20;
+                });
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-white">${repName}</td>
+                    <td class="p-3 text-center font-bold">${repCount} Dosya</td>
+                    <td class="p-3 text-center text-emerald-300 font-bold">${repClosed} Kapalı</td>
+                    <td class="p-3 text-right font-black text-white text-sm">${repRev.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
         function logout() {
