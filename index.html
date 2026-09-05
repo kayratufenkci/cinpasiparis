@@ -29,8 +29,8 @@
     </script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        .logo-text { font-family: 'Cinzel', serif; letter-spacing: 0.18em; font-weight: 800; color: #111827; }
-        .logo-sub { font-family: 'Montserrat', sans-serif; letter-spacing: 0.3em; font-weight: 600; color: #64748b; }
+        .logo-text { font-family: 'Cinzel', serif; letter-spacing: 0.18em; font-weight: 800; color: #14532d; }
+        .logo-sub { font-family: 'Montserrat', sans-serif; letter-spacing: 0.3em; font-weight: 600; color: #166534; }
         .step-circle { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 9999px; font-weight: 800; font-size: 13px; }
         @media print { .no-print { display: none !important; } .print-only { display: block !important; } body { background: white; } }
         .print-only { display: none; }
@@ -39,30 +39,30 @@
 <body class="text-slate-800 min-h-screen flex flex-col antialiased">
 
     <!-- Dinamik Bildirim -->
-    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs sm:text-sm font-bold px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-2.5 no-print">
+    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-950 text-white text-xs sm:text-sm font-bold px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-2.5 no-print border border-emerald-800">
         <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
         <span id="toast-msg"></span>
     </div>
 
     <!-- ================= 1. GİRİŞ EKRANI ================= -->
-    <section id="view-login" class="min-h-screen flex items-center justify-center p-4 bg-slate-950 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950">
-        <div class="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl space-y-6">
+    <section id="view-login" class="min-h-screen flex items-center justify-center p-4 bg-slate-950 bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950">
+        <div class="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl space-y-6 border border-emerald-100">
             <div class="text-center space-y-2">
                 <div class="flex flex-col items-center justify-center pt-2">
                     <h1 class="logo-text text-3xl m-0 leading-none">CİNPA</h1>
                     <span class="logo-sub text-[8.5px] uppercase mt-1">PLANTS &amp; FLOWERS</span>
                 </div>
-                <p class="text-xs text-slate-500 font-medium pt-1">Nebim Entegreli Rol & Görev Bazlı Yetkili Giriş Portalı</p>
+                <p class="text-xs text-slate-500 font-medium pt-1">Nebim Entegreli Yeşil & Beyaz Kurumsal Portal</p>
             </div>
 
             <div class="space-y-3 pt-2">
-                <label class="block text-xs font-extrabold text-slate-400 uppercase tracking-wider text-center">Giriş Yapmak İstediğiniz Profil</label>
+                <label class="block text-xs font-extrabold text-emerald-800 uppercase tracking-wider text-center">Giriş Yapmak İstediğiniz Profil</label>
                 <div class="grid grid-cols-1 gap-2.5">
                     
                     <!-- Satış Profili Seçimi -->
-                    <div class="p-3.5 rounded-2xl border border-slate-200 hover:border-blue-500 bg-blue-50/30 transition text-left space-y-2.5">
+                    <div class="p-3.5 rounded-2xl border border-emerald-100 hover:border-emerald-500 bg-emerald-50/30 transition text-left space-y-2.5">
                         <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-base">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-base">
                                 <i class="fa-solid fa-file-signature"></i>
                             </div>
                             <div>
@@ -71,20 +71,20 @@
                             </div>
                         </div>
                         <div class="flex items-center space-x-2 pt-1">
-                            <select id="login-sales-rep-select" class="w-full text-xs font-bold p-2.5 rounded-xl border border-blue-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="login-sales-rep-select" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-600">
                                 <option value="Orhan Özen">Orhan Özen</option>
                                 <option value="Uğur Morkoç">Uğur Morkoç</option>
                                 <option value="Tolga Keleş">Tolga Keleş</option>
                                 <option value="Salih Şahin">Salih Şahin</option>
                             </select>
-                            <button type="button" onclick="loginAsSalesSelected()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition whitespace-nowrap">
+                            <button type="button" onclick="loginAsSalesSelected()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md transition whitespace-nowrap">
                                 Giriş <i class="fa-solid fa-arrow-right ml-1"></i>
                             </button>
                         </div>
                     </div>
 
                     <!-- Depo Profili -->
-                    <button type="button" onclick="loginAs('depo')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-amber-500 hover:bg-amber-50/50 transition group text-left w-full">
+                    <button type="button" onclick="loginAs('depo')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
                                 <i class="fa-solid fa-boxes-packing"></i>
@@ -94,11 +94,11 @@
                                 <div class="text-[11px] text-slate-500 font-medium">Sadece Depo Hazırlık & İkame Değişikliği Görür</div>
                             </div>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-amber-600 transition text-xs"></i>
+                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs"></i>
                     </button>
 
                     <!-- Saha Profili -->
-                    <button type="button" onclick="loginAs('saha')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-purple-500 hover:bg-purple-50/50 transition group text-left w-full">
+                    <button type="button" onclick="loginAs('saha')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
                                 <i class="fa-solid fa-helmet-safety"></i>
@@ -108,13 +108,13 @@
                                 <div class="text-[11px] text-slate-500 font-medium">Sadece Mal Kabul, İade & İlave Ekranını Görür</div>
                             </div>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-purple-600 transition text-xs"></i>
+                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs"></i>
                     </button>
 
                     <!-- Muhasebe Profili (Şifreli: 1) -->
                     <button type="button" onclick="requestPasswordAndLogin('muhasebe')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full">
                         <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
                                 <i class="fa-solid fa-receipt"></i>
                             </div>
                             <div>
@@ -125,24 +125,24 @@
                                 <div class="text-[11px] text-slate-500 font-medium">Tüm Evrakları Görür (Şifre: 1)</div>
                             </div>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-600 transition text-xs"></i>
+                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs"></i>
                     </button>
 
                     <!-- Admin Profili (Şifreli: cinpasiparis) -->
-                    <button type="button" onclick="requestPasswordAndLogin('admin')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-800 bg-slate-900 text-white hover:bg-black transition group text-left w-full">
+                    <button type="button" onclick="requestPasswordAndLogin('admin')" class="flex items-center justify-between p-3.5 rounded-2xl border border-emerald-900 bg-emerald-900 text-white hover:bg-emerald-950 transition group text-left w-full shadow-lg">
                         <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-xl bg-slate-800 text-emerald-400 flex items-center justify-center font-bold text-base">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-800 text-emerald-300 flex items-center justify-center font-bold text-base">
                                 <i class="fa-solid fa-crown"></i>
                             </div>
                             <div>
                                 <div class="text-xs font-black text-white flex items-center space-x-1.5">
                                     <span>Sistem Yöneticisi (Admin)</span>
-                                    <i class="fa-solid fa-lock text-[10px] text-emerald-400"></i>
+                                    <i class="fa-solid fa-lock text-[10px] text-emerald-300"></i>
                                 </div>
-                                <div class="text-[11px] text-slate-400 font-medium">Tam Yetki & Sınırsız Düzenleme (Şifre Korumalı)</div>
+                                <div class="text-[11px] text-emerald-200 font-medium">Tam Yetki & Sınırsız Düzenleme (Şifre Korumalı)</div>
                             </div>
                         </div>
-                        <i class="fa-solid fa-arrow-right-to-bracket text-emerald-400 text-xs"></i>
+                        <i class="fa-solid fa-arrow-right-to-bracket text-emerald-300 text-xs"></i>
                     </button>
 
                 </div>
@@ -152,20 +152,20 @@
 
     <!-- ================= 2. ANA PANEL ================= -->
     <div id="view-app" class="hidden flex-1 flex flex-col min-h-screen">
-        <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm no-print">
+        <header class="bg-white border-b border-emerald-100 sticky top-0 z-40 shadow-sm no-print">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center space-x-3 cursor-pointer" onclick="returnToDashboard()">
                         
-                        <!-- Üst Menü Düz Yazı Logo -->
+                        <!-- Üst Menü Şık Yazı Logo -->
                         <div class="flex flex-col justify-center">
                             <span class="logo-text text-xl leading-none">CİNPA</span>
                             <span class="logo-sub text-[6px] tracking-[0.2em] uppercase mt-0.5">PLANTS &amp; FLOWERS</span>
                         </div>
 
-                        <div class="border-l border-slate-200 pl-3">
+                        <div class="border-l border-emerald-200 pl-3">
                             <div class="flex items-center space-x-2">
-                                <span class="bg-cinpa-100 text-cinpa-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-cinpa-200" id="header-role-badge">SATIŞ PANELİ</span>
+                                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200" id="header-role-badge">SATIŞ PANELİ</span>
                             </div>
                             <p class="text-[11px] text-slate-500 font-medium mt-0.5" id="header-user-desc">Kullanıcı: -</p>
                         </div>
@@ -178,17 +178,17 @@
                         </button>
 
                         <button onclick="openExcelImportModal()" id="btn-header-import-excel" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs sm:text-sm rounded-xl border border-emerald-200 transition flex items-center space-x-1.5 shadow-sm">
-                            <i class="fa-solid fa-file-excel text-emerald-600"></i>
+                            <i class="fa-solid fa-file-excel text-emerald-700"></i>
                             <span class="hidden sm:inline">Nebim / Excel Fişi Yükle</span>
                         </button>
 
-                        <button onclick="createNewOrderModal()" id="btn-header-new-order" class="px-4 py-2 bg-cinpa-700 hover:bg-cinpa-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center space-x-2">
+                        <button onclick="createNewOrderModal()" id="btn-header-new-order" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center space-x-2">
                             <i class="fa-solid fa-plus"></i>
                             <span>Yeni Sipariş</span>
                         </button>
 
                         <button onclick="openCatalogModal()" id="btn-header-catalog" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-200 transition flex items-center space-x-1.5">
-                            <i class="fa-solid fa-boxes-stacked text-cinpa-700"></i>
+                            <i class="fa-solid fa-boxes-stacked text-emerald-700"></i>
                             <span class="hidden md:inline">Katalog (<span id="cat-count-badge">0</span>)</span>
                         </button>
 
@@ -202,15 +202,15 @@
         </header>
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
-            <div id="role-welcome-banner" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div id="role-welcome-banner" class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="flex items-center space-x-3.5">
-                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold" id="role-avatar-box">
+                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold bg-emerald-100 text-emerald-800 shadow-sm" id="role-avatar-box">
                         <i class="fa-solid fa-user-tie" id="role-avatar-icon"></i>
                     </div>
                     <div>
                         <div class="flex items-center space-x-2">
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Yetkili Oturum</span>
-                            <button onclick="logout()" class="text-[11px] font-bold text-blue-600 hover:underline flex items-center space-x-1">
+                            <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Yetkili Oturum</span>
+                            <button onclick="logout()" class="text-[11px] font-bold text-emerald-600 hover:underline flex items-center space-x-1">
                                 <i class="fa-solid fa-repeat text-[10px]"></i>
                                 <span>(Profil Değiştir)</span>
                             </button>
@@ -231,21 +231,21 @@
 
             <!-- DASHBOARD LİSTESİ -->
             <section id="section-dashboard" class="space-y-6">
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="bg-white rounded-2xl border border-emerald-100 shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-emerald-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
                             <h2 class="text-base font-extrabold text-slate-900" id="dashboard-table-title">Sipariş Dosyaları</h2>
                             <p class="text-xs text-slate-500" id="dashboard-table-subtitle">İlgili siparişin üzerine tıklayarak işlem ekranına geçebilirsiniz.</p>
                         </div>
                         <div class="relative">
                             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                            <input type="text" id="search-input" onkeyup="filterOrders()" placeholder="Sipariş no veya müşteri ara..." class="text-xs pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-cinpa-600 w-full sm:w-72">
+                            <input type="text" id="search-input" onkeyup="filterOrders()" placeholder="Sipariş no veya müşteri ara..." class="text-xs pl-9 pr-4 py-2.5 rounded-xl border border-emerald-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 w-full sm:w-72">
                         </div>
                     </div>
 
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
-                            <thead class="bg-slate-50 text-slate-600 text-xs font-bold uppercase border-b border-slate-200">
+                            <thead class="bg-emerald-50/60 text-emerald-900 text-xs font-bold uppercase border-b border-emerald-100">
                                 <tr>
                                     <th class="p-4">İş No / Dosya</th>
                                     <th class="p-4">Müşteri / Proje</th>
@@ -263,7 +263,7 @@
 
             <!-- DETAYLI OPERASYON EKRANI -->
             <section id="section-order-detail" class="hidden space-y-6">
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="flex items-center space-x-4">
                         <button onclick="returnToDashboard()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center space-x-1.5 transition text-xs font-bold" title="Sipariş Listesine Geri Dön">
                             <i class="fa-solid fa-arrow-left"></i>
@@ -271,7 +271,7 @@
                         </button>
                         <div>
                             <div class="flex items-center space-x-2">
-                                <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-md bg-slate-900 text-white font-mono" id="detail-order-code">-</span>
+                                <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-md bg-emerald-900 text-white font-mono" id="detail-order-code">-</span>
                                 <span class="text-xs font-bold text-slate-500" id="detail-order-date">-</span>
                             </div>
                             <h2 class="text-lg font-black text-slate-900 mt-1" id="detail-customer-name">-</h2>
@@ -279,7 +279,7 @@
                     </div>
 
                     <div class="flex items-center space-x-2">
-                        <button onclick="sendWhatsAppNotification()" class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold flex items-center space-x-1.5 transition">
+                        <button onclick="sendWhatsAppNotification()" class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold flex items-center space-x-1.5 transition">
                             <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i>
                             <span>WhatsApp Durum Gönder</span>
                         </button>
@@ -290,16 +290,16 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto" id="stepper-nav-bar">
+                <div class="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm overflow-x-auto" id="stepper-nav-bar">
                     <div class="flex space-x-2 min-w-[600px]" id="stepper-buttons-container"></div>
                 </div>
 
                 <!-- 1. ADIM: SATIŞ FORMU -->
                 <div id="content-step-1" class="hidden space-y-6">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
+                    <div class="bg-white p-6 rounded-2xl border border-emerald-100 shadow-sm space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-emerald-100 pb-4 gap-2">
                             <div>
-                                <span class="bg-blue-100 text-blue-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">Evrak 1: Satış Sipariş Formu</span>
+                                <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">Evrak 1: Satış Sipariş Formu</span>
                                 <h3 class="text-lg font-black text-slate-900 mt-1">Müşteri Talebi ve Sipariş Kalemleri</h3>
                             </div>
                             <div class="text-xs text-slate-500 font-medium">
@@ -312,9 +312,9 @@
                             <div><strong>Fiş Kilitlendi:</strong> Bu sipariş depoya iletildiği için satış fişi üzerinde değişiklik yapılamaz (Salt Okunur).</div>
                         </div>
 
-                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                        <div class="overflow-x-auto border border-emerald-100 rounded-xl">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-slate-50 text-slate-600 text-xs font-bold uppercase border-b border-slate-200">
+                                <thead class="bg-emerald-50/60 text-emerald-900 text-xs font-bold uppercase border-b border-emerald-100">
                                     <tr>
                                         <th class="p-3.5">Ürün Kodu & Tanımı</th>
                                         <th class="p-3.5 text-center w-32">Talep Adedi</th>
@@ -327,10 +327,10 @@
                             </table>
                         </div>
 
-                        <div id="step1-add-product-panel" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+                        <div id="step1-add-product-panel" class="bg-emerald-50/40 p-5 rounded-2xl border border-emerald-200 space-y-4">
                             <div class="flex items-center justify-between">
-                                <div class="text-xs font-extrabold text-slate-800 uppercase flex items-center">
-                                    <i class="fa-solid fa-circle-plus text-cinpa-700 mr-1.5 text-sm"></i> Fişe Ürün Ekle
+                                <div class="text-xs font-extrabold text-emerald-900 uppercase flex items-center">
+                                    <i class="fa-solid fa-circle-plus text-emerald-700 mr-1.5 text-sm"></i> Fişe Ürün Ekle
                                 </div>
                                 <div class="flex bg-slate-200 p-0.5 rounded-lg text-xs font-bold">
                                     <button type="button" onclick="toggleAddMode('catalog')" id="btn-mode-catalog" class="px-3 py-1 rounded-md bg-white text-slate-900 shadow-sm">Katalogdan Seç</button>
@@ -343,19 +343,19 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
                                     <div class="sm:col-span-8">
                                         <label class="block text-[11px] font-bold text-slate-500 mb-1">Katalogda Ürün Ara (Kod veya İsim Yazın)</label>
-                                        <input type="text" id="step1-product-search" oninput="searchCatalogDropdown(this.value)" placeholder="Örn: 0101007 veya YUCCA..." class="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white mb-2">
-                                        <select id="step1-select-product" onchange="syncSelectedCatalogPrice()" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white"></select>
+                                        <input type="text" id="step1-product-search" oninput="searchCatalogDropdown(this.value)" placeholder="Örn: 0101007 veya YUCCA..." class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white mb-2">
+                                        <select id="step1-select-product" onchange="syncSelectedCatalogPrice()" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white"></select>
                                     </div>
                                     <div class="sm:col-span-2">
                                         <label class="block text-[11px] font-bold text-slate-500 mb-1">Birim Fiyat (TL)</label>
-                                        <input type="number" id="step1-catalog-price" min="0" step="any" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 bg-white text-right">
+                                        <input type="number" id="step1-catalog-price" min="0" step="any" class="w-full text-xs font-bold p-3 rounded-xl border border-emerald-300 bg-white text-right">
                                     </div>
                                     <div class="sm:col-span-2">
                                         <label class="block text-[11px] font-bold text-slate-500 mb-1">Adet</label>
-                                        <input type="number" id="step1-catalog-qty" value="1" min="1" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 text-center bg-white">
+                                        <input type="number" id="step1-catalog-qty" value="1" min="1" class="w-full text-xs font-bold p-3 rounded-xl border border-emerald-300 text-center bg-white">
                                     </div>
                                     <div class="sm:col-span-12 flex justify-end">
-                                        <button type="button" onclick="addItemFromCatalog()" class="px-5 py-2.5 bg-cinpa-700 hover:bg-cinpa-800 text-white text-xs font-bold rounded-xl transition flex items-center space-x-1.5 shadow-md">
+                                        <button type="button" onclick="addItemFromCatalog()" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition flex items-center space-x-1.5 shadow-md">
                                             <i class="fa-solid fa-plus"></i><span>Katalogdan Fişe Ekle</span>
                                         </button>
                                     </div>
@@ -365,23 +365,23 @@
                             <div id="add-mode-manual-box" class="hidden grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
                                 <div class="sm:col-span-3">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Ürün Kodu</label>
-                                    <input type="text" id="manual-code" placeholder="Örn: 0101007" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 bg-white">
+                                    <input type="text" id="manual-code" placeholder="Örn: 0101007" class="w-full text-xs font-bold p-3 rounded-xl border border-emerald-300 bg-white">
                                 </div>
                                 <div class="sm:col-span-5">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Ürün Adı & Renk</label>
-                                    <input type="text" id="manual-name" placeholder="Örn: YUCCA BUSH (BEYAZ)" class="w-full text-xs font-semibold p-3 rounded-xl border border-slate-300 bg-white">
+                                    <input type="text" id="manual-name" placeholder="Örn: YUCCA BUSH (BEYAZ)" class="w-full text-xs font-semibold p-3 rounded-xl border border-emerald-300 bg-white">
                                 </div>
                                 <div class="sm:col-span-2">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Fiyat (TL)</label>
-                                    <input type="number" id="manual-price" placeholder="0" min="0" step="any" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 bg-white text-right">
+                                    <input type="number" id="manual-price" placeholder="0" min="0" step="any" class="w-full text-xs font-bold p-3 rounded-xl border border-emerald-300 bg-white text-right">
                                 </div>
                                 <div class="sm:col-span-2">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Adet</label>
-                                    <input type="number" id="manual-qty" value="1" min="1" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 text-center bg-white">
+                                    <input type="number" id="manual-qty" value="1" min="1" class="w-full text-xs font-bold p-3 rounded-xl border border-emerald-300 text-center bg-white">
                                 </div>
                                 <div class="sm:col-span-12 flex justify-between items-center pt-2">
                                     <label class="flex items-center space-x-2 text-xs text-slate-600 font-semibold cursor-pointer">
-                                        <input type="checkbox" id="chk-save-to-master" checked class="w-4 h-4 text-cinpa-700 rounded">
+                                        <input type="checkbox" id="chk-save-to-master" checked class="w-4 h-4 text-emerald-700 rounded">
                                         <span>Kalıcı kataloğa da ekle</span>
                                     </label>
                                     <button type="button" onclick="addItemManual()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition shadow-md">Özel Ürünü Ekle</button>
@@ -389,13 +389,13 @@
                             </div>
                         </div>
 
-                        <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-slate-100 gap-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
                             <div>
                                 <span class="text-xs text-slate-500 font-bold uppercase">Sipariş Taslak Toplamı:</span>
                                 <div class="text-2xl font-black text-slate-900" id="step1-total-amount">0,00 ₺</div>
                             </div>
                             <div id="step1-action-buttons">
-                                <button type="button" onclick="forwardToWarehouse()" class="px-6 py-3.5 bg-cinpa-700 hover:bg-cinpa-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2">
+                                <button type="button" onclick="forwardToWarehouse()" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2">
                                     <i class="fa-solid fa-box-archive"></i>
                                     <span>Siparişi Onayla & Depocu Kamber'e İlet (Fişi Kilitle)</span>
                                 </button>
@@ -406,8 +406,8 @@
 
                 <!-- 2. ADIM: DEPO (KAMBER USTA) -->
                 <div id="content-step-2" class="hidden space-y-6">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
+                    <div class="bg-white p-6 rounded-2xl border border-emerald-100 shadow-sm space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-emerald-100 pb-4 gap-2">
                             <div>
                                 <span class="bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">Evrak 2: Sevk İrsaliyesi</span>
                                 <h3 class="text-lg font-black text-slate-900 mt-1">Depo Stok & Toplama (Checklist)</h3>
@@ -418,9 +418,9 @@
                             <i class="fa-solid fa-lock text-slate-500 text-sm"></i>
                             <div><strong>İrsaliye Kesildi:</strong> Ürünler sevk edildiği için liste kilitlidir (Salt Okunur).</div>
                         </div>
-                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                        <div class="overflow-x-auto border border-emerald-100 rounded-xl">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-slate-50 text-slate-600 text-xs font-bold uppercase border-b border-slate-200">
+                                <thead class="bg-emerald-50/60 text-emerald-900 text-xs font-bold uppercase border-b border-emerald-100">
                                     <tr>
                                         <th class="p-3.5 w-12 text-center">Toplandı</th>
                                         <th class="p-3.5">Talep Edilen Ürün</th>
@@ -435,32 +435,32 @@
                         </div>
 
                         <!-- KAMBER USTA İÇİN CANLI KATALOG ARAMALI ÜRÜN EKLEME PANELİ -->
-                        <div id="depo-add-item-panel" class="bg-amber-50/60 p-5 rounded-2xl border border-amber-200 space-y-4">
-                            <div class="text-xs font-extrabold text-amber-900 uppercase flex items-center">
-                                <i class="fa-solid fa-magnifying-glass text-amber-600 mr-1.5 text-sm"></i> Depo Operasyon: Katalogdan Ürün / İkame Bul ve Ekle
+                        <div id="depo-add-item-panel" class="bg-emerald-50/40 p-5 rounded-2xl border border-emerald-200 space-y-4">
+                            <div class="text-xs font-extrabold text-emerald-900 uppercase flex items-center">
+                                <i class="fa-solid fa-magnifying-glass text-emerald-700 mr-1.5 text-sm"></i> Depo Operasyon: Katalogdan Ürün / İkame Bul ve Ekle
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
                                 <div class="sm:col-span-8">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Katalogda Ürün Ara (Kod veya Ad Yazın)</label>
-                                    <input type="text" id="depo-product-search" oninput="searchDepoCatalogDropdown(this.value)" placeholder="Örn: 101123 veya POTHOS..." class="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white mb-2">
-                                    <select id="depo-select-product" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white"></select>
+                                    <input type="text" id="depo-product-search" oninput="searchDepoCatalogDropdown(this.value)" placeholder="Örn: 101123 veya POTHOS..." class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white mb-2">
+                                    <select id="depo-select-product" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white"></select>
                                 </div>
                                 <div class="sm:col-span-2">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Adet</label>
-                                    <input type="number" id="depo-add-qty" value="1" min="1" class="w-full text-xs font-bold p-2.5 rounded-xl border border-slate-300 text-center bg-white">
+                                    <input type="number" id="depo-add-qty" value="1" min="1" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-300 text-center bg-white">
                                 </div>
                                 <div class="sm:col-span-2 flex items-end">
-                                    <button type="button" onclick="addItemFromDepo()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition shadow">
+                                    <button type="button" onclick="addItemFromDepo()" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition shadow">
                                         <i class="fa-solid fa-plus mr-1"></i> Fişe Ekle
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-slate-100 gap-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
                             <div class="text-xs text-slate-500 flex items-center"><i class="fa-solid fa-truck-ramp-box text-slate-400 mr-2"></i> Kolilendi ve araca yüklenmeye hazır.</div>
                             <div id="step2-action-buttons">
-                                <button type="button" onclick="forwardToField()" class="px-6 py-3.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2">
+                                <button type="button" onclick="forwardToField()" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2">
                                     <i class="fa-solid fa-truck-fast"></i><span>Sevk İrsaliyesini Kes & Sahaya İlet</span>
                                 </button>
                             </div>
@@ -470,8 +470,8 @@
 
                 <!-- 3. ADIM: SAHA -->
                 <div id="content-step-3" class="hidden space-y-6">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
+                    <div class="bg-white p-6 rounded-2xl border border-emerald-100 shadow-sm space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-emerald-100 pb-4 gap-2">
                             <div>
                                 <span class="bg-purple-100 text-purple-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">Evrak 3 & 4: Saha Uygulama</span>
                                 <h3 class="text-lg font-black text-slate-900 mt-1">Saha Mal Kabul, İade ve Ek Talep</h3>
@@ -487,32 +487,32 @@
                             <div><strong>Saha Tamamlandı:</strong> Evraklar muhasebeye devredildiği için kilitlidir (Salt Okunur).</div>
                         </div>
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50/70 space-y-3">
-                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                            <div class="border border-emerald-100 rounded-2xl p-4 bg-emerald-50/40 space-y-3">
+                                <div class="flex items-center justify-between border-b border-emerald-200 pb-2">
                                     <h4 class="text-xs font-extrabold text-red-800 uppercase flex items-center"><i class="fa-solid fa-rotate-left mr-1.5 text-red-600"></i> Evrak 3: İade İrsaliyesi</h4>
                                     <span class="text-[11px] text-slate-500">Artan Ürünler</span>
                                 </div>
                                 <div id="step3-returns-container" class="space-y-2"></div>
                             </div>
-                            <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50/70 space-y-3">
-                                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                            <div class="border border-emerald-100 rounded-2xl p-4 bg-emerald-50/40 space-y-3">
+                                <div class="flex items-center justify-between border-b border-emerald-200 pb-2">
                                     <h4 class="text-xs font-extrabold text-emerald-800 uppercase flex items-center"><i class="fa-solid fa-cart-plus mr-1.5 text-emerald-600"></i> Evrak 4: İlave Ürün İrsaliyesi</h4>
                                     <span class="text-[11px] text-slate-500">Müşteri Ek Talebi</span>
                                 </div>
                                 <div id="step3-extras-container" class="space-y-2"></div>
-                                <div id="step3-add-extra-panel" class="pt-3 border-t border-slate-200 space-y-2">
+                                <div id="step3-add-extra-panel" class="pt-3 border-t border-emerald-200 space-y-2">
                                     <div class="grid grid-cols-12 gap-2">
-                                        <select id="step3-extra-select" class="col-span-8 text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white"></select>
-                                        <input type="number" id="step3-extra-qty" value="1" min="1" class="col-span-4 text-xs p-2.5 rounded-xl border border-slate-300 font-bold text-center" placeholder="Adet">
+                                        <select id="step3-extra-select" class="col-span-8 text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white"></select>
+                                        <input type="number" id="step3-extra-qty" value="1" min="1" class="col-span-4 text-xs p-2.5 rounded-xl border border-emerald-300 font-bold text-center" placeholder="Adet">
                                     </div>
                                     <button type="button" onclick="addExtraItemStep3()" class="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition">İlave Talebi Aç</button>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-slate-100 gap-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
                             <div class="text-xs text-slate-500"><i class="fa-solid fa-clipboard-check mr-1 text-slate-400"></i> Montaj tamamlandıktan sonra tüm evraklar birleşir.</div>
                             <div id="step3-action-buttons">
-                                <button type="button" onclick="forwardToAccounting()" class="px-6 py-3.5 bg-purple-700 hover:bg-purple-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2">
+                                <button type="button" onclick="forwardToAccounting()" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2">
                                     <i class="fa-solid fa-file-invoice-dollar"></i><span>Montajı Bitir & Muhasebeye (Gökhan) Gönder</span>
                                 </button>
                             </div>
@@ -522,8 +522,8 @@
 
                 <!-- 4. ADIM: MUHASEBE -->
                 <div id="content-step-4" class="hidden space-y-6">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
+                    <div class="bg-white p-6 rounded-2xl border border-emerald-100 shadow-sm space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-emerald-100 pb-4 gap-2">
                             <div>
                                 <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">Nihai Evrak & Fiş Girişi</span>
                                 <h3 class="text-lg font-black text-slate-900 mt-1">4 Evrakın Konsolide Analizi & Fatura Hesabı</h3>
@@ -531,8 +531,8 @@
                             <div class="text-xs text-slate-500 font-medium">Muhasebe Sorumlusu: <strong class="text-slate-800">Gökhan</strong></div>
                         </div>
                         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-                                <div class="text-[10px] font-bold text-slate-400 uppercase">1. Sipariş Formu</div>
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-emerald-200">
+                                <div class="text-[10px] font-bold text-emerald-800 uppercase">1. Sipariş Formu</div>
                                 <div class="text-sm font-extrabold text-slate-900 mt-0.5" id="sum-evrak1-text">-</div>
                                 <div class="text-[11px] text-slate-500">Satış Çıkışı</div>
                             </div>
@@ -552,16 +552,16 @@
                                 <div class="text-[11px] text-emerald-700">Faik Bey Onaylı</div>
                             </div>
                         </div>
-                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                        <div class="overflow-x-auto border border-emerald-100 rounded-xl">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-slate-900 text-white text-xs font-bold uppercase tracking-wider">
+                                <thead class="bg-emerald-900 text-white text-xs font-bold uppercase tracking-wider">
                                     <tr>
                                         <th class="p-3.5">Ürün / Kalem Açıklaması</th>
                                         <th class="p-3.5 text-center">İlk Sipariş</th>
                                         <th class="p-3.5 text-center">Sevk Edilen</th>
                                         <th class="p-3.5 text-center">İade</th>
                                         <th class="p-3.5 text-center">İlave</th>
-                                        <th class="p-3.5 text-center bg-slate-800 font-extrabold">Net Faturalanacak</th>
+                                        <th class="p-3.5 text-center bg-emerald-800 font-extrabold">Net Faturalanacak</th>
                                         <th class="p-3.5 text-right">Birim Fiyat</th>
                                         <th class="p-3.5 text-right">Toplam Tutar</th>
                                     </tr>
@@ -583,7 +583,7 @@
                                 </tfoot>
                             </table>
                         </div>
-                        <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-slate-100 gap-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
                             <div class="flex flex-wrap items-center gap-2">
                                 <button type="button" onclick="exportToNebimExcel()" class="px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center space-x-2 shadow transition">
                                     <i class="fa-solid fa-file-excel text-sm"></i><span>Nebim V3 Excel Şablonu İndir (.xlsx)</span>
@@ -618,11 +618,11 @@
                 <button type="button" onclick="closeExcelImportModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-700 uppercase">1. Yöntem: Excel Dosyası Seçin</label>
+                <label class="block text-xs font-bold text-slate-700 uppercase">1. Yöntem: ABCD.xlsx Dosyası Seçin</label>
                 <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/40 rounded-2xl p-5 text-center cursor-pointer hover:bg-emerald-50 transition" onclick="document.getElementById('excel-file-input').click()">
                     <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-600 mb-1.5"></i>
                     <div class="text-xs font-extrabold text-slate-800">Bilgisayardan Excel Fişini Seçmek İçin Tıklayın</div>
-                    <div class="text-[11px] text-slate-500">Ürün kodu, renk, adet ve fiyatlar kalıcı hafızadan eşleşir.</div>
+                    <div class="text-[11px] text-slate-500">Ürün kodu, renk, adet ve fiyatlar otomatik işlenir.</div>
                     <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleExcelFileUpload(event)">
                 </div>
             </div>
@@ -634,7 +634,7 @@
                 <textarea id="excel-paste-input" rows="3" placeholder="Nebim tablosunu buraya yapıştırabilirsiniz..." class="w-full text-xs font-mono p-3 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white"></textarea>
                 <button type="button" onclick="parsePastedExcelText()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Yapıştırılan Metni Çözümle</button>
             </div>
-            <div id="excel-preview-box" class="hidden flex-1 overflow-y-auto border border-slate-200 rounded-2xl p-3 bg-slate-50 space-y-2">
+            <div id="excel-preview-box" class="hidden flex-1 overflow-y-auto border border-emerald-100 rounded-2xl p-3 bg-slate-50 space-y-2">
                 <div class="text-xs font-bold text-slate-700 flex items-center justify-between">
                     <span>Okunan Ürünler: <strong id="excel-preview-count" class="text-emerald-700">0 Kalem</strong></span>
                     <span id="excel-preview-total" class="font-extrabold text-slate-900">0 ₺</span>
@@ -666,13 +666,13 @@
     <!-- KATALOG VE YENİ SİPARİŞ MODALLARI -->
     <div id="modal-catalog" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-3xl max-w-5xl w-full p-6 shadow-2xl space-y-5 max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="text-base font-extrabold text-slate-900 flex items-center"><i class="fa-solid fa-boxes-stacked text-cinpa-700 mr-2"></i> ÇİNPA Ürün Kataloğu & Fiyat Listesi</h3>
+            <div class="flex items-center justify-between border-b border-emerald-100 pb-3">
+                <h3 class="text-base font-extrabold text-slate-900 flex items-center"><i class="fa-solid fa-boxes-stacked text-emerald-700 mr-2"></i> ÇİNPA Ürün Kataloğu & Fiyat Listesi</h3>
                 <button type="button" onclick="closeCatalogModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
             <!-- Excel'den Toplu Katalog Yükleme ve Toplu Silme Araçları -->
-            <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex flex-col lg:flex-row items-center justify-between gap-3">
+            <div class="bg-emerald-50/40 border border-emerald-200 p-4 rounded-2xl flex flex-col lg:flex-row items-center justify-between gap-3">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
                         <i class="fa-solid fa-file-excel"></i>
@@ -704,23 +704,23 @@
             <div class="flex items-center space-x-3">
                 <div class="relative flex-1">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                    <input type="text" id="cat-search-input" onkeyup="filterCatalogTable()" placeholder="Katalogda ürün kodu, adı veya renk ara..." class="w-full text-xs pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white">
+                    <input type="text" id="cat-search-input" onkeyup="filterCatalogTable()" placeholder="Katalogda ürün kodu, adı veya renk ara..." class="w-full text-xs pl-9 pr-3 py-2.5 rounded-xl border border-emerald-200 bg-slate-50 focus:bg-white">
                 </div>
             </div>
 
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
+            <div class="bg-slate-50 p-4 rounded-2xl border border-emerald-100 grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
                 <input type="text" id="cat-new-code" placeholder="Kod (Örn: 0101007)" class="sm:col-span-3 p-2.5 rounded-xl border border-slate-300 font-bold bg-white">
                 <input type="text" id="cat-new-name" placeholder="Ürün Tanımı (Örn: YUCCA BUSH)" class="sm:col-span-4 p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
                 <input type="text" id="cat-new-color" placeholder="Renk (Örn: BEYAZ)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
                 <input type="number" id="cat-new-price" placeholder="Fiyat (TL)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 font-bold bg-white text-right">
-                <button type="button" onclick="saveProductToMasterCatalog()" class="sm:col-span-1 py-2.5 bg-cinpa-700 hover:bg-cinpa-800 text-white font-bold rounded-xl transition">+ Ekle</button>
+                <button type="button" onclick="saveProductToMasterCatalog()" class="sm:col-span-1 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl transition">+ Ekle</button>
             </div>
             
-            <div class="overflow-y-auto flex-1 border border-slate-200 rounded-2xl">
+            <div class="overflow-y-auto flex-1 border border-emerald-100 rounded-2xl">
                 <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-100 text-slate-700 font-bold uppercase sticky top-0 border-b border-slate-200">
+                    <thead class="bg-slate-100 text-slate-700 font-bold uppercase sticky top-0 border-b border-emerald-100">
                         <tr>
-                            <th class="p-3 w-10 text-center"><input type="checkbox" id="select-all-catalog" onchange="toggleSelectAllCatalog(this.checked)" class="w-4 h-4 text-cinpa-700 rounded"></th>
+                            <th class="p-3 w-10 text-center"><input type="checkbox" id="select-all-catalog" onchange="toggleSelectAllCatalog(this.checked)" class="w-4 h-4 text-emerald-700 rounded"></th>
                             <th class="p-3">Ürün Kodu</th>
                             <th class="p-3">Ürün Adı</th>
                             <th class="p-3">Renk</th>
@@ -731,25 +731,25 @@
                     <tbody id="catalog-table-body" class="divide-y divide-slate-100 text-slate-800"></tbody>
                 </table>
             </div>
-            <div class="flex justify-end pt-2 border-t border-slate-100"><button type="button" onclick="closeCatalogModal()" class="px-5 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-xs">Kapat</button></div>
+            <div class="flex justify-end pt-2 border-t border-emerald-100"><button type="button" onclick="closeCatalogModal()" class="px-5 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-xs">Kapat</button></div>
         </div>
     </div>
 
     <div id="modal-new-order" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="text-base font-extrabold text-slate-900 flex items-center"><i class="fa-solid fa-file-circle-plus text-cinpa-700 mr-2"></i> Yeni Sipariş Formu Başlat</h3>
+            <div class="flex items-center justify-between border-b border-emerald-100 pb-3">
+                <h3 class="text-base font-extrabold text-slate-900 flex items-center"><i class="fa-solid fa-file-circle-plus text-emerald-700 mr-2"></i> Yeni Sipariş Formu Başlat</h3>
                 <button type="button" onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="space-y-4 text-xs">
                 <div>
                     <label class="block font-bold text-slate-700 uppercase mb-1">Müşteri / Proje Adı <span class="text-red-500">*</span></label>
-                    <input type="text" id="new-cust-name" placeholder="Örn: Swissotel Balo Salonu" class="w-full text-xs font-semibold p-3 rounded-xl border border-slate-300 bg-slate-50">
+                    <input type="text" id="new-cust-name" placeholder="Örn: Swissotel Balo Salonu" class="w-full text-xs font-semibold p-3 rounded-xl border border-emerald-200 bg-slate-50">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block font-bold text-slate-700 uppercase mb-1">Satış Uzmanı</label>
-                        <select id="new-sales-rep" class="w-full text-xs font-semibold p-3 rounded-xl border border-slate-300 bg-slate-50">
+                        <select id="new-sales-rep" class="w-full text-xs font-semibold p-3 rounded-xl border border-emerald-200 bg-slate-50">
                             <option value="Orhan Özen">Orhan Özen</option>
                             <option value="Uğur Morkoç">Uğur Morkoç</option>
                             <option value="Tolga Keleş">Tolga Keleş</option>
@@ -758,22 +758,22 @@
                     </div>
                     <div>
                         <label class="block font-bold text-slate-700 uppercase mb-1">Tarih</label>
-                        <input type="date" id="new-date" class="w-full text-xs font-semibold p-3 rounded-xl border border-slate-300 bg-slate-50">
+                        <input type="date" id="new-date" class="w-full text-xs font-semibold p-3 rounded-xl border border-emerald-200 bg-slate-50">
                     </div>
                 </div>
                 <div>
                     <label class="block font-bold text-slate-700 uppercase mb-1">Notlar</label>
-                    <textarea id="new-notes" rows="2" placeholder="Özel talepler..." class="w-full text-xs p-3 rounded-xl border border-slate-300 bg-slate-50"></textarea>
+                    <textarea id="new-notes" rows="2" placeholder="Özel talepler..." class="w-full text-xs p-3 rounded-xl border border-emerald-200 bg-slate-50"></textarea>
                 </div>
             </div>
             <div class="flex items-center justify-end space-x-3 pt-2">
                 <button type="button" onclick="closeModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs">İptal</button>
-                <button type="button" onclick="saveNewOrder()" class="px-5 py-2.5 rounded-xl bg-cinpa-700 hover:bg-cinpa-800 text-white font-bold text-xs shadow-md">Siparişi Başlat</button>
+                <button type="button" onclick="saveNewOrder()" class="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md">Siparişi Başlat</button>
             </div>
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE INDEXEDDB SİPARİŞ / KATALOG KAYIT MOTORU -->
+    <!-- JAVASCRIPT STATE VE SİPARİŞ / KATALOG KAYIT MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -781,7 +781,7 @@
             satis: {
                 roleId: 'satis', name: 'Orhan Özen', title: 'Satış Uzmanı', badgeText: 'SATIŞ PANELİ',
                 dutyText: 'Sadece KENDİ siparişlerinizi görürsünüz. Fiş depoya iletildikten sonra değişiklik yapamazsınız.',
-                colorClass: 'bg-blue-50 text-blue-700 border-blue-200', avatarBg: 'bg-blue-100 text-blue-700', avatarIcon: 'fa-file-signature',
+                colorClass: 'bg-blue-50 text-blue-700 border-blue-200', avatarBg: 'bg-emerald-100 text-emerald-800', avatarIcon: 'fa-file-signature',
                 visibleSteps: [1], canCreateOrder: true, canManageCatalog: true
             },
             depo: {
@@ -805,7 +805,7 @@
             admin: {
                 roleId: 'admin', name: 'Sistem Yöneticisi', title: 'Admin (Tam Yetki)', badgeText: 'TAM YETKİLİ ADMIN',
                 dutyText: 'Tüm aşamaları görür ve her aşamada sınırsız düzenleme / değiştirme yetkisine sahiptir.',
-                colorClass: 'bg-slate-900 text-white border-slate-800', avatarBg: 'bg-slate-800 text-emerald-400', avatarIcon: 'fa-crown',
+                colorClass: 'bg-emerald-950 text-white border-emerald-900', avatarBg: 'bg-emerald-900 text-emerald-200', avatarIcon: 'fa-crown',
                 visibleSteps: [1, 2, 3, 4], canCreateOrder: true, canManageCatalog: true
             }
         };
@@ -825,8 +825,8 @@
         let activeStepTab = 1;
         let parsedExcelItems = [];
 
-        // --- INDEXEDDB VERİTABANI MOTORU (SİPARİŞLER VE KATALOG İÇİN KALICI DİSK KAYDI) ---
-        const DB_NAME = "CinpaMasterDB_v4";
+        // --- INDEXEDDB KALICI VERİTABANI MOTORU ---
+        const DB_NAME = "CinpaMasterDB_v5";
         const DB_VERSION = 1;
         const STORE_CATALOG = "catalog";
         const STORE_ORDERS = "orders";
@@ -862,7 +862,7 @@
                     if (masterProducts.length > 0) populateProductSelects();
                 };
 
-                // Siparişleri yükle
+                // Siparişleri yükle (Kalıcı Disk Kaydı)
                 const txOrd = db.transaction(STORE_ORDERS, "readonly");
                 const storeOrd = txOrd.objectStore(STORE_ORDERS);
                 const reqOrd = storeOrd.getAll();
@@ -1428,7 +1428,7 @@
                     <td class="p-4 text-xs font-medium text-slate-500">${ord.date || "-"}</td>
                     <td class="p-4">${badge}</td>
                     <td class="p-4 text-right">
-                        <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-cinpa-700 hover:text-white transition">Aç <i class="fa-solid fa-chevron-right ml-1"></i></button>
+                        <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-emerald-700 hover:text-white transition">Aç <i class="fa-solid fa-chevron-right ml-1"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -1501,8 +1501,8 @@
             const activeBtn = document.getElementById(`tab-btn-${step}`);
             const activeNum = document.getElementById(`step-num-${step}`);
             if (activeBtn && activeNum) {
-                activeBtn.className = "flex-1 flex items-center space-x-3 p-3 rounded-xl border border-cinpa-700 bg-cinpa-50/50 shadow-sm transition text-left";
-                activeNum.className = "step-circle bg-cinpa-700 text-white";
+                activeBtn.className = "flex-1 flex items-center space-x-3 p-3 rounded-xl border border-emerald-600 bg-emerald-50/50 shadow-sm transition text-left";
+                activeNum.className = "step-circle bg-emerald-700 text-white";
             }
             renderStep1(); renderStep2(); renderStep3(); renderStep4();
         }
@@ -1682,7 +1682,7 @@
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td class="p-3.5 text-center">
-                        <input type="checkbox" ${item.checked ? "checked" : ""} ${!canEditWarehouse ? "disabled" : ""} onchange="toggleCheckStep2(${index}, this.checked)" class="w-4 h-4 text-cinpa-700 rounded">
+                        <input type="checkbox" ${item.checked ? "checked" : ""} ${!canEditWarehouse ? "disabled" : ""} onchange="toggleCheckStep2(${index}, this.checked)" class="w-4 h-4 text-emerald-700 rounded">
                     </td>
                     <td class="p-3.5 font-bold text-slate-900">${item.name}</td>
                     <td class="p-3.5 text-center font-bold text-slate-500">${item.requestedQty} Adet</td>
@@ -2070,7 +2070,7 @@
             list.slice(0, 200).forEach((p, idx) => {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-                    <td class="p-3 text-center"><input type="checkbox" value="${idx}" class="catalog-row-checkbox w-4 h-4 text-cinpa-700 rounded"></td>
+                    <td class="p-3 text-center"><input type="checkbox" value="${idx}" class="catalog-row-checkbox w-4 h-4 text-emerald-700 rounded"></td>
                     <td class="p-3 font-mono font-bold text-slate-900">${p.id}</td>
                     <td class="p-3 font-medium">${p.name}</td>
                     <td class="p-3 text-slate-500 font-semibold">${p.color || '-'}</td>
