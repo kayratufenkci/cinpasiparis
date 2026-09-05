@@ -407,7 +407,7 @@
                     </div>
                 </div>
 
-                <!-- 2. ADIM: DEPO (KAMBER BEY İÇİN ÜRÜN EKLEME ALANI İLE) -->
+                <!-- 2. ADIM: DEPO (KAMBER BEY İÇİN CANLI KATALOG ARAMALI ÜRÜN EKLEME) -->
                 <div id="content-step-2" class="hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
@@ -437,14 +437,15 @@
                             </table>
                         </div>
 
-                        <!-- KAMBER USTA İÇİN KATALOGDAN YENİ ÜRÜN / İKAME EKLEME PANELİ -->
-                        <div id="depo-add-item-panel" class="bg-amber-50/50 p-5 rounded-2xl border border-amber-200 space-y-3">
+                        <!-- KAMBER USTA İÇİN CANLI KATALOG ARAMALI ÜRÜN EKLEME PANELİ -->
+                        <div id="depo-add-item-panel" class="bg-amber-50/60 p-5 rounded-2xl border border-amber-200 space-y-4">
                             <div class="text-xs font-extrabold text-amber-900 uppercase flex items-center">
-                                <i class="fa-solid fa-circle-plus text-amber-600 mr-1.5 text-sm"></i> Depo Operasyon: Listeye Yeni Ürün / İkame Ekle
+                                <i class="fa-solid fa-magnifying-glass text-amber-600 mr-1.5 text-sm"></i> Depo Operasyon: Katalogdan Ürün / İkame Bul ve Ekle
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
                                 <div class="sm:col-span-8">
-                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Katalogdan Ürün Seç</label>
+                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Katalogda Ürün Ara (Kod veya Ad Yazın)</label>
+                                    <input type="text" id="depo-product-search" oninput="searchDepoCatalogDropdown(this.value)" placeholder="Örn: 101123 veya POTHOS..." class="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white mb-2">
                                     <select id="depo-select-product" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white"></select>
                                 </div>
                                 <div class="sm:col-span-2">
@@ -453,7 +454,7 @@
                                 </div>
                                 <div class="sm:col-span-2 flex items-end">
                                     <button type="button" onclick="addItemFromDepo()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition shadow">
-                                        <i class="fa-solid fa-plus mr-1"></i> Ekle
+                                        <i class="fa-solid fa-plus mr-1"></i> Fişe Ekle
                                     </button>
                                 </div>
                             </div>
@@ -614,7 +615,7 @@
                     <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg"><i class="fa-solid fa-file-excel"></i></div>
                     <div>
                         <h3 class="text-base font-extrabold text-slate-900">Nebim / Excel'den Fiş İçe Aktar</h3>
-                        <p class="text-xs text-slate-500">Nebim sipariş formatına (`ItemCode`, `ColorCode`, `Qty1`, `Price`) tam uyumludur.</p>
+                        <p class="text-xs text-slate-500">Nebim sipariş formatına tam uyumludur.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeExcelImportModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
@@ -775,7 +776,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE NEBİM ABCD.XLSX ENTEGRASYON MOTORU -->
+    <!-- JAVASCRIPT STATE VE DEPO ÜRÜN EKLEME MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -822,7 +823,7 @@
 
         let orders = [];
         try {
-            const stored = localStorage.getItem("cinpa_orders_v45");
+            const stored = localStorage.getItem("cinpa_orders_v46");
             orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
         } catch(e) {
             orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
@@ -834,7 +835,7 @@
         let activeStepTab = 1;
         let parsedExcelItems = [];
 
-        // --- INDEXEDDB VERİTABANI BAĞLANTISI ---
+        // --- INDEXEDDB: OTOMATİK ARTAN BENZERSİZ KİMLİK ---
         const DB_NAME = "CinpaCatalogDB_v2";
         const DB_VERSION = 1;
         const STORE_NAME = "products_store";
@@ -888,7 +889,7 @@
 
         function saveToStorage() {
             try {
-                localStorage.setItem("cinpa_orders_v45", JSON.stringify(orders));
+                localStorage.setItem("cinpa_orders_v46", JSON.stringify(orders));
             } catch(e) {}
         }
 
@@ -1057,7 +1058,7 @@
             showToast("Nebim V3 Excel şablonu başarıyla indirildi!");
         }
 
-        // --- ABCD.XLSX OKUMA MOTORU (KOD, RENK, ADET, FİYAT SIRALAMASI) ---
+        // --- ABCD.XLSX OKUMA MOTORU ---
         function handleExcelFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1218,7 +1219,7 @@
                 customer: custName,
                 salesRep: currentUser ? currentUser.name : "Orhan Özen",
                 date: new Date().toISOString().split("T")[0],
-                notes: "ABCD_2.xlsx Nebim dosyasından otomatik aktarıldı.",
+                notes: "Nebim Excel dosyasından otomatik aktarıldı.",
                 currentStep: 1,
                 items: formattedItems,
                 extras: [],
@@ -1230,6 +1231,41 @@
             closeExcelImportModal();
             showToast(`Sipariş #${newId} başarıyla oluşturuldu!`);
             openOrderDetail(newId);
+        }
+
+        // --- KAMBER USTA İÇİN DEPO EKRANI ARAMA MOTORU ---
+        function searchDepoCatalogDropdown(query) {
+            const sel = document.getElementById("depo-select-product");
+            if (!sel) return;
+            sel.innerHTML = "";
+            const q = (query || "").trim().toLowerCase();
+            
+            let matched = [];
+            if (!q) {
+                matched = masterProducts.slice(0, 50);
+            } else {
+                matched = masterProducts.filter(p => 
+                    p.id.toLowerCase().includes(q) || 
+                    p.name.toLowerCase().includes(q) || 
+                    (p.color && p.color.toLowerCase().includes(q))
+                ).slice(0, 50);
+            }
+
+            if (matched.length === 0) {
+                const opt = document.createElement("option");
+                opt.value = "";
+                opt.innerText = "Eşleşen ürün bulunamadı";
+                sel.appendChild(opt);
+                return;
+            }
+
+            matched.forEach(p => {
+                const opt = document.createElement("option");
+                opt.value = p.id;
+                const colorTxt = (p.color && p.color !== "-") ? ` [${p.color}]` : "";
+                opt.innerText = `${p.id} - ${p.name}${colorTxt} (${Number(p.price).toLocaleString('tr-TR')} ₺)`;
+                sel.appendChild(opt);
+            });
         }
 
         function updateHeaderBadgeCounts() {
@@ -1604,7 +1640,7 @@
             showToast("Ürün fişten çıkarıldı.");
         }
 
-        // --- 2. ADIM: DEPO (KAMBER USTA) İÇİN CHECKLIST VE ÜRÜN EKLEME ---
+        // --- 2. ADIM: DEPO (KAMBER USTA) ---
         function renderStep2() {
             const tbody = document.getElementById("step2-items-tbody");
             if (!tbody) return;
@@ -1645,18 +1681,39 @@
                 tbody.appendChild(tr);
             });
 
-            // Depo arama select kutusunu doldur
-            populateDepoProductSelect();
+            searchDepoCatalogDropdown("");
         }
 
-        function populateDepoProductSelect() {
+        function searchDepoCatalogDropdown(query) {
             const sel = document.getElementById("depo-select-product");
-            if (!sel || sel.options.length > 0) return;
+            if (!sel) return;
             sel.innerHTML = "";
-            masterProducts.slice(0, 100).forEach(p => {
+            const q = (query || "").trim().toLowerCase();
+            
+            let matched = [];
+            if (!q) {
+                matched = masterProducts.slice(0, 50);
+            } else {
+                matched = masterProducts.filter(p => 
+                    p.id.toLowerCase().includes(q) || 
+                    p.name.toLowerCase().includes(q) || 
+                    (p.color && p.color.toLowerCase().includes(q))
+                ).slice(0, 50);
+            }
+
+            if (matched.length === 0) {
+                const opt = document.createElement("option");
+                opt.value = "";
+                opt.innerText = "Eşleşen ürün bulunamadı";
+                sel.appendChild(opt);
+                return;
+            }
+
+            matched.forEach(p => {
                 const opt = document.createElement("option");
                 opt.value = p.id;
-                opt.innerText = `${p.id} - ${p.name} (${Number(p.price).toLocaleString('tr-TR')} ₺)`;
+                const colorTxt = (p.color && p.color !== "-") ? ` [${p.color}]` : "";
+                opt.innerText = `${p.id} - ${p.name}${colorTxt} (${Number(p.price).toLocaleString('tr-TR')} ₺)`;
                 sel.appendChild(opt);
             });
         }
