@@ -48,13 +48,10 @@
     <section id="view-login" class="min-h-screen flex items-center justify-center p-4 bg-slate-950 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950">
         <div class="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl space-y-6">
             <div class="text-center space-y-2">
-                
-                <!-- DÜZ YAZI TİPOGRAFİK ÇİNPA LOGOSU -->
                 <div class="flex flex-col items-center justify-center pt-2">
                     <h1 class="logo-text text-3xl m-0 leading-none">CİNPA</h1>
                     <span class="logo-sub text-[8.5px] uppercase mt-1">PLANTS &amp; FLOWERS</span>
                 </div>
-
                 <p class="text-xs text-slate-500 font-medium pt-1">Nebim Entegreli Rol & Görev Bazlı Yetkili Giriş Portalı</p>
             </div>
 
@@ -407,7 +404,7 @@
                     </div>
                 </div>
 
-                <!-- 2. ADIM: DEPO (KAMBER BEY İÇİN CANLI KATALOG ARAMALI ÜRÜN EKLEME) -->
+                <!-- 2. ADIM: DEPO (KAMBER USTA) -->
                 <div id="content-step-2" class="hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
@@ -621,11 +618,11 @@
                 <button type="button" onclick="closeExcelImportModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-700 uppercase">1. Yöntem: ABCD.xlsx Dosyası Seçin</label>
+                <label class="block text-xs font-bold text-slate-700 uppercase">1. Yöntem: Excel Dosyası Seçin</label>
                 <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/40 rounded-2xl p-5 text-center cursor-pointer hover:bg-emerald-50 transition" onclick="document.getElementById('excel-file-input').click()">
                     <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-600 mb-1.5"></i>
                     <div class="text-xs font-extrabold text-slate-800">Bilgisayardan Excel Fişini Seçmek İçin Tıklayın</div>
-                    <div class="text-[11px] text-slate-500">Ürün kodu, renk, adet ve fiyatlar otomatik işlenir.</div>
+                    <div class="text-[11px] text-slate-500">Ürün kodu, renk, adet ve fiyatlar kalıcı hafızadan eşleşir.</div>
                     <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleExcelFileUpload(event)">
                 </div>
             </div>
@@ -776,7 +773,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE DEPO ÜRÜN EKLEME MOTORU -->
+    <!-- JAVASCRIPT STATE VE INDEXEDDB SİPARİŞ / KATALOG KAYIT MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -822,31 +819,28 @@
         ];
 
         let orders = [];
-        try {
-            const stored = localStorage.getItem("cinpa_orders_v46");
-            orders = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(INITIAL_ORDERS));
-        } catch(e) {
-            orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
-        }
-
         let masterProducts = [];
         let currentUser = null;
         let activeOrder = null;
         let activeStepTab = 1;
         let parsedExcelItems = [];
 
-        // --- INDEXEDDB: OTOMATİK ARTAN BENZERSİZ KİMLİK ---
-        const DB_NAME = "CinpaCatalogDB_v2";
+        // --- INDEXEDDB VERİTABANI MOTORU (SİPARİŞLER VE KATALOG İÇİN KALICI DİSK KAYDI) ---
+        const DB_NAME = "CinpaMasterDB_v4";
         const DB_VERSION = 1;
-        const STORE_NAME = "products_store";
+        const STORE_CATALOG = "catalog";
+        const STORE_ORDERS = "orders";
 
         function openDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open(DB_NAME, DB_VERSION);
                 request.onupgradeneeded = (e) => {
                     const db = e.target.result;
-                    if (!db.objectStoreNames.contains(STORE_NAME)) {
-                        db.createObjectStore(STORE_NAME, { keyPath: "uid", autoIncrement: true });
+                    if (!db.objectStoreNames.contains(STORE_CATALOG)) {
+                        db.createObjectStore(STORE_CATALOG, { keyPath: "uid", autoIncrement: true });
+                    }
+                    if (!db.objectStoreNames.contains(STORE_ORDERS)) {
+                        db.createObjectStore(STORE_ORDERS, { keyPath: "id" });
                     }
                 };
                 request.onsuccess = () => resolve(request.result);
@@ -854,28 +848,44 @@
             });
         }
 
-        async function loadProductsFromDB() {
+        async function loadDataFromDB() {
             try {
                 const db = await openDB();
-                const tx = db.transaction(STORE_NAME, "readonly");
-                const store = tx.objectStore(STORE_NAME);
-                const req = store.getAll();
-                req.onsuccess = () => {
-                    masterProducts = req.result || [];
+                
+                // Katalog yükle
+                const txCat = db.transaction(STORE_CATALOG, "readonly");
+                const storeCat = txCat.objectStore(STORE_CATALOG);
+                const reqCat = storeCat.getAll();
+                reqCat.onsuccess = () => {
+                    masterProducts = reqCat.result || [];
                     updateHeaderBadgeCounts();
-                    if (masterProducts.length > 0) {
-                        populateProductSelects();
+                    if (masterProducts.length > 0) populateProductSelects();
+                };
+
+                // Siparişleri yükle
+                const txOrd = db.transaction(STORE_ORDERS, "readonly");
+                const storeOrd = txOrd.objectStore(STORE_ORDERS);
+                const reqOrd = storeOrd.getAll();
+                reqOrd.onsuccess = () => {
+                    const loadedOrders = reqOrd.result || [];
+                    if (loadedOrders.length > 0) {
+                        orders = loadedOrders;
+                    } else {
+                        orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
+                        saveOrdersToDB();
                     }
+                    if (currentUser) renderOrderList();
                 };
             } catch(err) {
-                console.error("IndexedDB okuma hatası:", err);
+                console.error("IndexedDB yükleme hatası:", err);
+                orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
             }
         }
 
-        async function saveProductsToDB(productsList) {
+        async function saveCatalogToDB(productsList) {
             const db = await openDB();
-            const tx = db.transaction(STORE_NAME, "readwrite");
-            const store = tx.objectStore(STORE_NAME);
+            const tx = db.transaction(STORE_CATALOG, "readwrite");
+            const store = tx.objectStore(STORE_CATALOG);
             store.clear();
             productsList.forEach(p => {
                 delete p.uid;
@@ -887,10 +897,16 @@
             });
         }
 
-        function saveToStorage() {
+        async function saveOrdersToDB() {
             try {
-                localStorage.setItem("cinpa_orders_v46", JSON.stringify(orders));
-            } catch(e) {}
+                const db = await openDB();
+                const tx = db.transaction(STORE_ORDERS, "readwrite");
+                const store = tx.objectStore(STORE_ORDERS);
+                store.clear();
+                orders.forEach(ord => store.put(ord));
+            } catch(e) {
+                console.error("Siparişleri kaydetme hatası:", e);
+            }
         }
 
         function showToast(message, isError = false) {
@@ -910,7 +926,7 @@
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Excel okunuyor ve ürünler kaydediliyor...");
+            showToast("Excel okunuyor ve kalıcı diske kaydediliyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -966,12 +982,12 @@
 
                     if (newProducts.length > 0) {
                         masterProducts = newProducts;
-                        await saveProductsToDB(masterProducts);
-                        await loadProductsFromDB();
+                        await saveCatalogToDB(masterProducts);
+                        await loadDataFromDB();
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
                         populateProductSelects();
-                        showToast(`Başarıyla ${newProducts.length} ürün kaydedildi!`);
+                        showToast(`Başarıyla ${newProducts.length} ürün kalıcı olarak kaydedildi!`);
                     } else {
                         showToast("Excel'den ürün okunamadı!", true);
                     }
@@ -1227,13 +1243,13 @@
             };
 
             orders.unshift(newOrd);
-            saveToStorage();
+            saveOrdersToDB();
             closeExcelImportModal();
             showToast(`Sipariş #${newId} başarıyla oluşturuldu!`);
             openOrderDetail(newId);
         }
 
-        // --- KAMBER USTA İÇİN DEPO EKRANI ARAMA MOTORU ---
+        // --- KAMBER USTA İÇİN DEPO ARAMA MOTORU ---
         function searchDepoCatalogDropdown(query) {
             const sel = document.getElementById("depo-select-product");
             if (!sel) return;
@@ -1547,7 +1563,7 @@
                 return;
             }
             activeOrder.currentStep = 2;
-            saveToStorage();
+            saveOrdersToDB();
             showToast("Sipariş depoya iletildi ve satış fişi kilitlendi!");
             returnToDashboard();
         }
@@ -1598,7 +1614,7 @@
             activeOrder.items.push({
                 id: p.id, name: p.name + (p.color && p.color !== "-" ? " (" + p.color + ")" : ""), requestedQty: qty, dispatchedQty: qty, returnedQty: 0, price: finalPrice, warehouseNote: "", checked: true
             });
-            saveToStorage(); renderStep1(); showToast(`${p.name} fişe eklendi!`);
+            saveOrdersToDB(); renderStep1(); showToast(`${p.name} fişe eklendi!`);
         }
 
         function addItemManual() {
@@ -1613,9 +1629,9 @@
             });
             if (saveMaster) {
                 masterProducts.unshift({ id: code, name: name, color: "-", price: price });
-                saveProductsToDB(masterProducts);
+                saveCatalogToDB(masterProducts);
             }
-            saveToStorage(); populateProductSelects(); renderStep1();
+            saveOrdersToDB(); populateProductSelects(); renderStep1();
             document.getElementById("manual-code").value = "";
             document.getElementById("manual-name").value = "";
             document.getElementById("manual-price").value = "";
@@ -1626,17 +1642,17 @@
         function updateStep1Qty(index, val) {
             activeOrder.items[index].requestedQty = parseInt(val) || 1;
             activeOrder.items[index].dispatchedQty = parseInt(val) || 1;
-            saveToStorage(); renderStep1();
+            saveOrdersToDB(); renderStep1();
         }
 
         function updateStep1Price(index, val) {
             activeOrder.items[index].price = parseFloat(val) || 0;
-            saveToStorage(); renderStep1();
+            saveOrdersToDB(); renderStep1();
         }
 
         function removeItemStep1(index) {
             activeOrder.items.splice(index, 1);
-            saveToStorage(); renderStep1();
+            saveOrdersToDB(); renderStep1();
             showToast("Ürün fişten çıkarıldı.");
         }
 
@@ -1734,25 +1750,25 @@
                 warehouseNote: "Depodan Eklendi",
                 checked: true
             });
-            saveToStorage();
+            saveOrdersToDB();
             renderStep2();
             showToast(`${p.name} depodan siparişe eklendi!`);
         }
 
         function removeItemStep2(index) {
             activeOrder.items.splice(index, 1);
-            saveToStorage();
+            saveOrdersToDB();
             renderStep2();
             showToast("Ürün depodan çıkarıldı.");
         }
 
-        function toggleCheckStep2(index, chk) { activeOrder.items[index].checked = chk; saveToStorage(); }
-        function updateStep2Dispatched(index, val) { activeOrder.items[index].dispatchedQty = parseInt(val) || 0; saveToStorage(); }
-        function updateStep2Note(index, val) { activeOrder.items[index].warehouseNote = val; saveToStorage(); }
+        function toggleCheckStep2(index, chk) { activeOrder.items[index].checked = chk; saveOrdersToDB(); }
+        function updateStep2Dispatched(index, val) { activeOrder.items[index].dispatchedQty = parseInt(val) || 0; saveOrdersToDB(); }
+        function updateStep2Note(index, val) { activeOrder.items[index].warehouseNote = val; saveOrdersToDB(); }
 
         function forwardToField() {
             activeOrder.currentStep = 3;
-            saveToStorage();
+            saveOrdersToDB();
             showToast("Sevk İrsaliyesi kesildi ve Saha Ekibine teslim edildi!");
             returnToDashboard();
         }
@@ -1813,7 +1829,7 @@
             }
         }
 
-        function updateStep3Return(index, val) { activeOrder.items[index].returnedQty = parseInt(val) || 0; saveToStorage(); }
+        function updateStep3Return(index, val) { activeOrder.items[index].returnedQty = parseInt(val) || 0; saveOrdersToDB(); }
 
         function addExtraItemStep3() {
             const prodId = document.getElementById("step3-extra-select").value;
@@ -1824,7 +1840,7 @@
                 id: p ? p.id : "ÇNP-EK", name: p ? (p.name + " (Saha İlavesi)") : "Saha Ekstra Ürün",
                 qty: qty, price: p ? p.price : 0, faikApproval: false, approvalTime: null
             });
-            saveToStorage(); renderStep3(); showToast("İlave ürün talebi açıldı. Faik Bey onayı bekleniyor.");
+            saveOrdersToDB(); renderStep3(); showToast("İlave ürün talebi açıldı. Faik Bey onayı bekleniyor.");
         }
 
         function approveFaikExtra(index) {
@@ -1832,7 +1848,7 @@
             const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
             activeOrder.extras[index].faikApproval = true;
             activeOrder.extras[index].approvalTime = timeStr;
-            saveToStorage(); showToast("Faik Bey dijital onayı verildi!"); renderStep3();
+            saveOrdersToDB(); showToast("Faik Bey dijital onayı verildi!"); renderStep3();
         }
 
         function forwardToAccounting() {
@@ -1841,7 +1857,7 @@
                 return;
             }
             activeOrder.currentStep = 4;
-            saveToStorage();
+            saveOrdersToDB();
             showToast("Saha tamamlandı! Dosya Muhasebeye (Gökhan) iletildi.");
             returnToDashboard();
         }
@@ -1922,7 +1938,7 @@
         function finalizeAndCloseOrder() {
             activeOrder.isClosed = true;
             activeOrder.currentStep = 5;
-            saveToStorage();
+            saveOrdersToDB();
             showToast("Tebrikler! Fatura kesildi ve dosya kapatıldı.");
             renderOrderList();
             returnToDashboard();
@@ -2023,7 +2039,7 @@
                 date: document.getElementById("new-date").value, notes: document.getElementById("new-notes").value,
                 currentStep: 1, items: [], extras: [], isClosed: false
             };
-            orders.unshift(newOrd); saveToStorage(); closeModal();
+            orders.unshift(newOrd); saveOrdersToDB(); closeModal();
             showToast(`Yeni sipariş açıldı: ${newId}`); openOrderDetail(newId);
         }
 
@@ -2083,7 +2099,7 @@
                 masterProducts.splice(idx, 1);
             });
 
-            await saveProductsToDB(masterProducts);
+            await saveCatalogToDB(masterProducts);
             renderCatalogTable();
             showToast(`${selectedIndices.length} ürün katalogdan silindi.`);
         }
@@ -2091,7 +2107,7 @@
         async function deleteAllCatalogItems() {
             if (!confirm("DİKKAT: Tüm katalog listesi kalıcı olarak silinecek! Emin misiniz?")) return;
             masterProducts = [];
-            await saveProductsToDB(masterProducts);
+            await saveCatalogToDB(masterProducts);
             renderCatalogTable();
             showToast("Tüm katalog tamamen temizlendi.");
         }
@@ -2114,7 +2130,7 @@
 
             if (!name) { showToast("Lütfen ürün adını yazınız.", true); return; }
             masterProducts.unshift({ id: code, name: name, color: color, price: price });
-            await saveProductsToDB(masterProducts);
+            await saveCatalogToDB(masterProducts);
             renderCatalogTable();
             document.getElementById("cat-new-code").value = "";
             document.getElementById("cat-new-name").value = "";
@@ -2125,7 +2141,7 @@
 
         async function removeProductByIndex(idx) {
             masterProducts.splice(idx, 1);
-            await saveProductsToDB(masterProducts);
+            await saveCatalogToDB(masterProducts);
             renderCatalogTable();
             showToast("Ürün katalogdan silindi.");
         }
@@ -2137,7 +2153,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            loadProductsFromDB();
+            loadDataFromDB();
         });
     </script>
 </body>
