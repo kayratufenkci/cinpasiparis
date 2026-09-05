@@ -229,20 +229,20 @@
                 </div>
             </div>
 
-            <!-- ADMIN ÖZEL: SATIŞ TEMSİLCİSİ PERFORMANS ANALİZİ -->
+            <!-- ADMIN ÖZEL: YÖNETİCİ ÖZET PANELİ & PERFORMANS ANALİZİ -->
             <section id="admin-performance-section" class="hidden space-y-4">
-                <div class="bg-emerald-900 text-white p-6 rounded-3xl shadow-lg space-y-4">
+                <div class="bg-emerald-900 text-white p-6 rounded-3xl shadow-lg space-y-4 border border-emerald-800">
                     <div class="flex items-center justify-between border-b border-emerald-800 pb-3">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-emerald-800 text-emerald-300 flex items-center justify-center font-bold text-base">
                                 <i class="fa-solid fa-chart-line"></i>
                             </div>
                             <div>
-                                <h3 class="text-base font-extrabold text-white">Yönetici Paneli: Satış Temsilcisi Performans Analizi</h3>
-                                <p class="text-xs text-emerald-300">Temsilcilerin açtığı dosya sayıları ve toplam ciroları (Yalnızca Admin Görür)</p>
+                                <h3 class="text-base font-extrabold text-white">Yönetici Özet Paneli & Satış Performansı</h3>
+                                <p class="text-xs text-emerald-300">Şirket genel cirosu ve temsilci bazlı ciro dökümü (Yalnızca Admin Görür)</p>
                             </div>
                         </div>
-                        <span class="bg-emerald-800 text-emerald-200 text-xs font-bold px-3 py-1 rounded-full border border-emerald-700">Canlı Rapor</span>
+                        <span class="bg-emerald-800 text-emerald-200 text-xs font-bold px-3 py-1 rounded-full border border-emerald-700">Yönetim Modu</span>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="admin-kpi-cards">
@@ -1400,7 +1400,7 @@
                 repSelect.value = currentUser.name;
             }
 
-            // Admin ise Performans Analizini göster
+            // Admin ise Yönetici Özet Panelini göster
             const perfSec = document.getElementById("admin-performance-section");
             if (perfSec) {
                 if (currentUser.roleId === 'admin') {
@@ -1415,7 +1415,7 @@
             showToast(`Hoş geldiniz, ${currentUser.name}!`);
         }
 
-        // --- ADMIN PERFORMANS ANALİZİ RENDER ---
+        // --- ADMIN ÖZET PANELİ RENDER ---
         function renderAdminPerformance() {
             const kpiContainer = document.getElementById("admin-kpi-cards");
             const tbody = document.getElementById("admin-performance-tbody");
@@ -1439,7 +1439,7 @@
                         if (ext.faikApproval) sub += ext.qty * ext.price;
                     });
                 }
-                totalRevenue += sub * 1.20; // KDV dahil
+                totalRevenue += sub * 1.20; // KDV Dahil
             });
 
             kpiContainer.innerHTML = `
@@ -1457,7 +1457,6 @@
                 </div>
             `;
 
-            // Temsilci Bazlı Tablo
             SALES_TEAM.forEach(repName => {
                 const repOrders = orders.filter(o => (o.salesRep || '').trim().toLowerCase() === repName.trim().toLowerCase());
                 let repCount = repOrders.length;
