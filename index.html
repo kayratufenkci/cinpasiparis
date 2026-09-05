@@ -152,47 +152,48 @@
 
     <!-- ================= 2. ANA PANEL ================= -->
     <div id="view-app" class="hidden flex-1 flex flex-col min-h-screen">
-        <header class="bg-white border-b border-emerald-100 sticky top-0 z-40 shadow-sm no-print">
+        <!-- ÜST KISIM (HEADER) YEŞİL YAPILDI -->
+        <header class="bg-emerald-900 text-white border-b border-emerald-800 sticky top-0 z-40 shadow-md no-print">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center space-x-3 cursor-pointer" onclick="returnToDashboard()">
                         
-                        <!-- Üst Menü Şık Yazı Logo -->
+                        <!-- Üst Menü Beyaz Logo -->
                         <div class="flex flex-col justify-center">
-                            <span class="logo-text text-xl leading-none">CİNPA</span>
-                            <span class="logo-sub text-[6px] tracking-[0.2em] uppercase mt-0.5">PLANTS &amp; FLOWERS</span>
+                            <span class="text-xl font-black tracking-[0.18em] text-white leading-none font-serif">CİNPA</span>
+                            <span class="text-[6px] font-bold tracking-[0.25em] text-emerald-300 uppercase mt-0.5">PLANTS &amp; FLOWERS</span>
                         </div>
 
-                        <div class="border-l border-emerald-200 pl-3">
+                        <div class="border-l border-emerald-700 pl-3">
                             <div class="flex items-center space-x-2">
-                                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200" id="header-role-badge">SATIŞ PANELİ</span>
+                                <span class="bg-emerald-800 text-emerald-200 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-700" id="header-role-badge">SATIŞ PANELİ</span>
                             </div>
-                            <p class="text-[11px] text-slate-500 font-medium mt-0.5" id="header-user-desc">Kullanıcı: -</p>
+                            <p class="text-[11px] text-emerald-200 font-medium mt-0.5" id="header-user-desc">Kullanıcı: -</p>
                         </div>
                     </div>
 
                     <div class="flex items-center space-x-2 sm:space-x-3">
-                        <button onclick="logout()" title="Giriş Ekranına Dön ve Kullanıcı Değiştir" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-300 transition flex items-center space-x-1.5 shadow-sm">
+                        <button onclick="logout()" title="Giriş Ekranına Dön ve Kullanıcı Değiştir" class="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl border border-emerald-700 transition flex items-center space-x-1.5 shadow-sm">
                             <i class="fa-solid fa-arrow-left"></i>
                             <span class="hidden sm:inline">Kullanıcı Değiştir</span>
                         </button>
 
-                        <button onclick="openExcelImportModal()" id="btn-header-import-excel" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs sm:text-sm rounded-xl border border-emerald-200 transition flex items-center space-x-1.5 shadow-sm">
-                            <i class="fa-solid fa-file-excel text-emerald-700"></i>
+                        <button onclick="openExcelImportModal()" id="btn-header-import-excel" class="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl border border-emerald-700 transition flex items-center space-x-1.5 shadow-sm">
+                            <i class="fa-solid fa-file-excel text-emerald-300"></i>
                             <span class="hidden sm:inline">Nebim / Excel Fişi Yükle</span>
                         </button>
 
-                        <button onclick="createNewOrderModal()" id="btn-header-new-order" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center space-x-2">
+                        <button onclick="createNewOrderModal()" id="btn-header-new-order" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center space-x-2">
                             <i class="fa-solid fa-plus"></i>
                             <span>Yeni Sipariş</span>
                         </button>
 
-                        <button onclick="openCatalogModal()" id="btn-header-catalog" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-200 transition flex items-center space-x-1.5">
-                            <i class="fa-solid fa-boxes-stacked text-emerald-700"></i>
+                        <button onclick="openCatalogModal()" id="btn-header-catalog" class="px-3 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl border border-emerald-700 transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-boxes-stacked text-emerald-300"></i>
                             <span class="hidden md:inline">Katalog (<span id="cat-count-badge">0</span>)</span>
                         </button>
 
-                        <button onclick="logout()" title="Oturumu Kapat" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs rounded-xl border border-red-200 transition flex items-center space-x-1.5">
+                        <button onclick="logout()" title="Oturumu Kapat" class="px-3 py-2 bg-red-800 hover:bg-red-700 text-white font-bold text-xs rounded-xl border border-red-700 transition flex items-center space-x-1.5">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
                             <span class="hidden md:inline">Çıkış</span>
                         </button>
@@ -607,7 +608,7 @@
     <!-- NEBİM / EXCEL'DEN FİŞ İÇE AKTAR MODAL -->
     <div id="modal-excel-import" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center justify-between border-b border-emerald-100 pb-3">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg"><i class="fa-solid fa-file-excel"></i></div>
                     <div>
@@ -773,7 +774,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE SİPARİŞ / KATALOG KAYIT MOTORU -->
+    <!-- JAVASCRIPT STATE VE SİPARİŞ / KATALOG KALICI KAYIT MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -825,7 +826,7 @@
         let activeStepTab = 1;
         let parsedExcelItems = [];
 
-        // --- INDEXEDDB KALICI VERİTABANI MOTORU ---
+        // --- INDEXEDDB VERİTABANI MOTORU ---
         const DB_NAME = "CinpaMasterDB_v5";
         const DB_VERSION = 1;
         const STORE_CATALOG = "catalog";
@@ -862,7 +863,7 @@
                     if (masterProducts.length > 0) populateProductSelects();
                 };
 
-                // Siparişleri yükle (Kalıcı Disk Kaydı)
+                // Siparişleri yükle
                 const txOrd = db.transaction(STORE_ORDERS, "readonly");
                 const storeOrd = txOrd.objectStore(STORE_ORDERS);
                 const reqOrd = storeOrd.getAll();
