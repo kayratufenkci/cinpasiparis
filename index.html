@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÇİNPA - Özel Yetkilendirilmiş Operasyon & Sipariş Paneli</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Cinzel:wght@700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
     
-    <!-- SheetJS CDN -->
+    <!-- SheetJS CDN (Excel okuma/yazma) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <!-- Firebase SDK (v9 Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
     <script>
         tailwind.config = {
@@ -37,6 +42,7 @@
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased">
 
+    <!-- Dinamik Bildirim -->
     <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-950 text-white text-xs sm:text-sm font-bold px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-2.5 no-print border border-emerald-800">
         <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
         <span id="toast-msg"></span>
@@ -50,7 +56,10 @@
                     <h1 class="logo-text text-3xl m-0 leading-none">CİNPA</h1>
                     <span class="logo-sub text-[8.5px] uppercase mt-1">PLANTS &amp; FLOWERS</span>
                 </div>
-                <p class="text-xs text-slate-500 font-medium pt-1">Nebim Entegreli Güvenli Kurumsal Portal</p>
+                <div class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Bulut Veritabanı Canlı Bağlantılı</span>
+                </div>
             </div>
 
             <div class="space-y-3 pt-2">
@@ -237,7 +246,7 @@
                             </div>
                             <div>
                                 <h3 class="text-base font-extrabold text-white">Yönetici Özet Paneli & Satış Performansı</h3>
-                                <p class="text-xs text-emerald-300">Şirket genel cirosu ve temsilci bazlı ciro dökümü (Yalnızca Admin Görür)</p>
+                                <p class="text-xs text-emerald-300">Şirket genel cirosu ve temsilci bazlı ciro dökümü (Canlı Bulut Senkronize)</p>
                             </div>
                         </div>
                         <span class="bg-emerald-800 text-emerald-200 text-xs font-bold px-3 py-1 rounded-full border border-emerald-700">Yönetim Modu</span>
@@ -803,8 +812,22 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE ŞİFRE / YETKİ İZOLASYON MOTORU -->
+    <!-- ================= JAVASCRIPT MOTORU & BULUT SENKRONİZASYONU ================= -->
     <script>
+        // --- 1. FIREBASE BAĞLANTISI (GOOGLE CLOUD FIRESTORE) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2VBj_BKmDPPwXbFPV3Pd9Hz4SHiF1saI",
+            authDomain: "cinpasiparis.firebaseapp.com",
+            projectId: "cinpasiparis",
+            storageBucket: "cinpasiparis.firebasestorage.app",
+            messagingSenderId: "389463884768",
+            appId: "1:389463884768:web:7c44469ee13259710aa185",
+            measurementId: "G-WEKPCN8C5Q"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
         const USER_ROLES = {
@@ -840,14 +863,6 @@
             }
         };
 
-        const INITIAL_ORDERS = [
-            {
-                id: "CNP-2026-084", customer: "Hilton Bosphorus Projesi", salesRep: "Orhan Özen", date: "2026-08-25",
-                notes: "İlk sipariş kaydı.", currentStep: 1,
-                items: [], extras: [], isClosed: false
-            }
-        ];
-
         let orders = [];
         let masterProducts = [];
         let currentUser = null;
@@ -855,22 +870,53 @@
         let activeStepTab = 1;
         let parsedExcelItems = [];
 
-        // --- INDEXEDDB KALICI VERİTABANI MOTORU ---
-        const DB_NAME = "CinpaMasterDB_v10";
-        const DB_VERSION = 1;
-        const STORE_CATALOG = "catalog";
-        const STORE_ORDERS = "orders";
-
-        function openDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, DB_VERSION);
-                request.onupgradeneeded = (e) => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains(STORE_CATALOG)) {
-                        db.createObjectStore(STORE_CATALOG, { keyPath: "uid", autoIncrement: true });
+        // --- 2. CANLI BULUT SENKRONİZASYONU (FIRESTORE ON-SNAPSHOT) ---
+        function listenToOrdersCloud() {
+            db.collection("orders").onSnapshot((snapshot) => {
+                const cloudOrders = [];
+                snapshot.forEach((doc) => {
+                    cloudOrders.push(doc.data());
+                });
+                // Tarihe göre sırala
+                cloudOrders.sort((a, b) => (b.id > a.id ? 1 : -1));
+                orders = cloudOrders;
+                if (currentUser) {
+                    renderOrderList();
+                    if (currentUser.roleId === 'admin') renderAdminPerformance();
+                }
+                if (activeOrder) {
+                    const refreshed = orders.find(o => o.id === activeOrder.id);
+                    if (refreshed) {
+                        activeOrder = refreshed;
+                        switchStepTab(activeStepTab);
                     }
-                    if (!db.objectStoreNames.contains(STORE_ORDERS)) {
-                        db.createObjectStore(STORE_ORDERS, { keyPath: "id" });
+                }
+            }, (error) => {
+                console.error("Bulut veri dinleme hatası:", error);
+                showToast("Bulut senkronizasyonunda bir hata oluştu.", true);
+            });
+        }
+
+        async function syncOrderToCloud(orderObj) {
+            try {
+                await db.collection("orders").doc(orderObj.id).set(orderObj);
+            } catch(e) {
+                console.error("Buluta kaydetme hatası:", e);
+                showToast("Buluta kaydedilemedi!", true);
+            }
+        }
+
+        // --- INDEXEDDB YEREL KATALOG MOTORU (18.000 ÜRÜN İÇİN HIZLI DİSK HAFIZASI) ---
+        const DB_NAME = "CinpaCatalogDB_v11";
+        const STORE_CATALOG = "catalog";
+
+        function openCatalogDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, 1);
+                request.onupgradeneeded = (e) => {
+                    const idb = e.target.result;
+                    if (!idb.objectStoreNames.contains(STORE_CATALOG)) {
+                        idb.createObjectStore(STORE_CATALOG, { keyPath: "uid", autoIncrement: true });
                     }
                 };
                 request.onsuccess = () => resolve(request.result);
@@ -878,11 +924,10 @@
             });
         }
 
-        async function loadDataFromDB() {
+        async function loadCatalogFromDB() {
             try {
-                const db = await openDB();
-                
-                const txCat = db.transaction(STORE_CATALOG, "readonly");
+                const idb = await openCatalogDB();
+                const txCat = idb.transaction(STORE_CATALOG, "readonly");
                 const storeCat = txCat.objectStore(STORE_CATALOG);
                 const reqCat = storeCat.getAll();
                 reqCat.onsuccess = () => {
@@ -890,29 +935,14 @@
                     updateHeaderBadgeCounts();
                     if (masterProducts.length > 0) populateProductSelects();
                 };
-
-                const txOrd = db.transaction(STORE_ORDERS, "readonly");
-                const storeOrd = txOrd.objectStore(STORE_ORDERS);
-                const reqOrd = storeOrd.getAll();
-                reqOrd.onsuccess = () => {
-                    const loadedOrders = reqOrd.result || [];
-                    if (loadedOrders.length > 0) {
-                        orders = loadedOrders;
-                    } else {
-                        orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
-                        saveOrdersToDB();
-                    }
-                    if (currentUser) renderOrderList();
-                };
             } catch(err) {
-                console.error("IndexedDB yükleme hatası:", err);
-                orders = JSON.parse(JSON.stringify(INITIAL_ORDERS));
+                console.error("Katalog yükleme hatası:", err);
             }
         }
 
         async function saveCatalogToDB(productsList) {
-            const db = await openDB();
-            const tx = db.transaction(STORE_CATALOG, "readwrite");
+            const idb = await openCatalogDB();
+            const tx = idb.transaction(STORE_CATALOG, "readwrite");
             const store = tx.objectStore(STORE_CATALOG);
             store.clear();
             productsList.forEach(p => {
@@ -923,18 +953,6 @@
                 tx.oncomplete = () => resolve();
                 tx.onerror = () => reject(tx.error);
             });
-        }
-
-        async function saveOrdersToDB() {
-            try {
-                const db = await openDB();
-                const tx = db.transaction(STORE_ORDERS, "readwrite");
-                const store = tx.objectStore(STORE_ORDERS);
-                store.clear();
-                orders.forEach(ord => store.put(ord));
-            } catch(e) {
-                console.error("Siparişleri kaydetme hatası:", e);
-            }
         }
 
         function showToast(message, isError = false) {
@@ -950,10 +968,11 @@
             }, 3000);
         }
 
+        // --- EXCEL KATALOG YÜKLEME ---
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Excel okunuyor ve kalıcı diske kaydediliyor...");
+            showToast("Katalog okunuyor ve kaydediliyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -962,12 +981,7 @@
                     const workbook = XLSX.read(data, { type: 'array' });
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
-                    
                     const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
-                    if (rawData.length === 0) {
-                        showToast("Excel boş görünüyor!", true);
-                        return;
-                    }
 
                     let codeCol = 0, nameCol = 1, colorCol = 2, priceCol = 3;
                     let startRow = 0;
@@ -996,8 +1010,7 @@
                         if (!code && !name) continue;
 
                         let cleanPrice = String(rawPrice).replace(/[^0-9,.-]/g, '').replace(',', '.');
-                        let price = parseFloat(cleanPrice);
-                        if (isNaN(price)) price = 0;
+                        let price = parseFloat(cleanPrice) || 0;
 
                         newProducts.push({
                             id: code,
@@ -1010,13 +1023,11 @@
                     if (newProducts.length > 0) {
                         masterProducts = newProducts;
                         await saveCatalogToDB(masterProducts);
-                        await loadDataFromDB();
+                        await loadCatalogFromDB();
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
                         populateProductSelects();
-                        showToast(`Başarıyla ${newProducts.length} ürün kalıcı olarak kaydedildi!`);
-                    } else {
-                        showToast("Excel'den ürün okunamadı!", true);
+                        showToast(`Başarıyla ${newProducts.length} ürün kaydedildi!`);
                     }
                 } catch(err) {
                     showToast("Excel okunurken hata oluştu: " + err.message, true);
@@ -1025,9 +1036,9 @@
             reader.readAsArrayBuffer(file);
         }
 
+        // --- MUHASEBE İÇİN NEBİM V3 EXCEL (.XLSX) ---
         function exportToNebimExcel() {
             if (!activeOrder) return;
-            
             const nebimRows = [];
             
             activeOrder.items.forEach(item => {
@@ -1095,11 +1106,11 @@
                 { wch: 22 }, { wch: 20 }
             ];
 
-            const fileName = `NEBIM_V3_FATURA_${activeOrder.id}_${activeOrder.date}.xlsx`;
-            XLSX.writeFile(workbook, fileName);
+            XLSX.writeFile(workbook, `NEBIM_V3_FATURA_${activeOrder.id}_${activeOrder.date}.xlsx`);
             showToast("Nebim V3 Excel şablonu başarıyla indirildi!");
         }
 
+        // --- ABCD.XLSX OKUMA MOTORU ---
         function handleExcelFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1122,7 +1133,7 @@
         function parsePastedExcelText() {
             const text = document.getElementById("excel-paste-input").value.trim();
             if (!text) {
-                showToast("Lütfen önce Excel'den kopyaladığınız veriyi yapıştırınız.", true);
+                showToast("Lütfen önce veriyi yapıştırınız.", true);
                 return;
             }
             const rows = text.split(/\r?\n/).map(row => row.split('\t'));
@@ -1197,7 +1208,7 @@
             }
 
             if (parsedExcelItems.length === 0) {
-                showToast("Excel verisinden geçerli ürün satırı okunamadı.", true);
+                showToast("Geçerli ürün satırı okunamadı.", true);
                 return;
             }
 
@@ -1237,9 +1248,9 @@
             }
         }
 
-        function applyExcelImportToOrder() {
+        async function applyExcelImportToOrder() {
             if (parsedExcelItems.length === 0) return;
-            const custName = prompt("Nebim'den aktarılan bu sipariş için Müşteri / Proje Adı giriniz:", "Nebim Fişi - Yeni Proje");
+            const custName = prompt("Müşteri / Proje Adı giriniz:", "Nebim Fişi - Yeni Proje");
             if (!custName) return;
 
             const newId = "CNP-2026-" + String(Math.floor(100 + Math.random() * 900));
@@ -1260,21 +1271,20 @@
                 customer: custName,
                 salesRep: currentUser ? currentUser.name : "Orhan Özen",
                 date: new Date().toISOString().split("T")[0],
-                notes: "Nebim Excel dosyasından otomatik aktarıldı.",
+                notes: "Nebim Excel dosyasından aktarıldı.",
                 currentStep: 1,
                 items: formattedItems,
                 extras: [],
                 isClosed: false
             };
 
-            orders.unshift(newOrd);
-            saveOrdersToDB();
+            await syncOrderToCloud(newOrd);
             closeExcelImportModal();
-            showToast(`Sipariş #${newId} başarıyla oluşturuldu!`);
+            showToast(`Sipariş #${newId} buluta kaydedildi!`);
             openOrderDetail(newId);
         }
 
-        // --- ŞİFRE DOĞRULAMA MOTORU ---
+        // --- ŞİFRE KONTROLLÜ GİRİŞ İŞLEMLERİ ---
         function requestPasswordAndLogin(roleKey) {
             if (roleKey === 'muhasebe') {
                 const pass = prompt("Muhasebe (Gökhan) Giriş Şifresi:");
@@ -1405,7 +1415,6 @@
             const avatarIcon = document.getElementById("role-avatar-icon");
             if (avatarIcon) avatarIcon.className = `fa-solid ${currentUser.avatarIcon}`;
 
-            // Buton görünürlük izinleri
             const btnNewOrder = document.getElementById("btn-header-new-order");
             if (btnNewOrder) btnNewOrder.style.display = currentUser.canCreateOrder ? "flex" : "none";
 
@@ -1422,7 +1431,6 @@
                 repSelect.value = currentUser.name;
             }
 
-            // Sadece Admin görebilir: Yönetici Özet Paneli
             const perfSec = document.getElementById("admin-performance-section");
             if (perfSec) {
                 if (currentUser.roleId === 'admin') {
@@ -1527,7 +1535,7 @@
             renderOrderList();
         }
 
-        // --- HERKESİN SADECE KENDİYLE ALAKALI DOSYAYI GÖRDÜĞÜ LİSTELEME ---
+        // --- KULLANICI ROLLERİNE GÖRE FİLTRELİ LİSTELEME ---
         function renderOrderList() {
             const tbody = document.getElementById("orders-table-body");
             if (!tbody) return;
@@ -1536,27 +1544,22 @@
             let visibleOrders = [];
 
             if (currentUser.roleId === 'satis') {
-                // Sadece Satış Temsilcisinin Kendi Siparişleri
                 visibleOrders = orders.filter(ord => (ord.salesRep || '').trim().toLowerCase() === currentUser.name.trim().toLowerCase());
                 document.getElementById("dashboard-table-title").innerText = `Sipariş Dosyalarım (${currentUser.name})`;
                 document.getElementById("dashboard-table-subtitle").innerText = `Yalnızca sizin tarafınızdan açılmış siparişler listelenmektedir.`;
             } else if (currentUser.roleId === 'depo') {
-                // Depocu Kamber: Satıştan onaylanmış ve depoda hazırlık bekleyen veya sevk edilmiş siparişler (currentStep >= 2)
                 visibleOrders = orders.filter(ord => ord.currentStep >= 2);
                 document.getElementById("dashboard-table-title").innerText = `Depo Sevkiyat & Hazırlık Masası`;
                 document.getElementById("dashboard-table-subtitle").innerText = `Satış ekibinden gelen ve araç yüklemesi yapılacak aktif siparişler.`;
             } else if (currentUser.roleId === 'saha') {
-                // Saha Sefa Usta: Depodan sevk edilmiş ve montaj bekleyen siparişler (currentStep >= 3)
                 visibleOrders = orders.filter(ord => ord.currentStep >= 3);
                 document.getElementById("dashboard-table-title").innerText = `Saha Montaj & İade/İlave Masası`;
                 document.getElementById("dashboard-table-subtitle").innerText = `Depodan araca yüklenip sahaya gelen ve montajı yapılacak işler.`;
             } else if (currentUser.roleId === 'muhasebe') {
-                // Muhasebe Gökhan: Depo ve Saha onayı tamamlanmış ve faturası kesilecek fişler (currentStep >= 2 ve 3)
                 visibleOrders = orders.filter(ord => ord.currentStep >= 2);
                 document.getElementById("dashboard-table-title").innerText = `Muhasebe Fatura Onay Kuyruğu`;
                 document.getElementById("dashboard-table-subtitle").innerText = `Depo veya Saha onayı tamamlanmış, faturalandırılmayı bekleyen fişler.`;
             } else {
-                // Admin: Tüm siparişleri görür
                 visibleOrders = orders;
                 document.getElementById("dashboard-table-title").innerText = `Tüm Sipariş Dosyaları (Admin)`;
                 document.getElementById("dashboard-table-subtitle").innerText = `Sistemde kayıtlı olan tüm birimlere ait aktif dosyalar.`;
@@ -1597,7 +1600,6 @@
             activeOrder = orders.find(o => o.id === orderId);
             if (!activeOrder) return;
 
-            // Satış yetki kontrolü
             if (currentUser.roleId === 'satis' && (activeOrder.salesRep || '').trim().toLowerCase() !== currentUser.name.trim().toLowerCase()) {
                 showToast("YETKİSİZ ERİŞİM: Yalnızca kendi siparişlerinizi açabilirsiniz.", true);
                 return;
@@ -1612,13 +1614,11 @@
 
             buildDynamicStepperTabs();
             
-            // Kullanıcıyı doğrudan YALNIZCA kendi yetkili olduğu adıma yönlendir
             const defaultStep = currentUser.visibleSteps[0] || 1;
             switchStepTab(defaultStep);
             populateProductSelects();
         }
 
-        // --- SADECE YETKİLİ OLUNAN ADIMLARIN BUTONLARINI GÖSTER (KAMBER USTA MUHASEBEYİ GÖREMEZ) ---
         function buildDynamicStepperTabs() {
             const container = document.getElementById("stepper-buttons-container");
             if (!container) return;
@@ -1630,7 +1630,6 @@
                 4: { num: 4, title: "4. Muhasebe Fatura & Kapanış" }
             };
 
-            // Kullanıcının visibleSteps dizisinde olmayan hiçbir adım DOM'a dahi eklenmez!
             currentUser.visibleSteps.forEach(stepIdx => {
                 const info = stepNames[stepIdx];
                 const btn = document.createElement("button");
@@ -1649,7 +1648,6 @@
         }
 
         function switchStepTab(step) {
-            // Güvenlik: Kullanıcının bu adıma yetkisi yoksa çalıştırma!
             if (!currentUser.visibleSteps.includes(step) && currentUser.roleId !== 'admin') {
                 showToast("YETKİSİZ ERİŞİM: Bu adımı görüntüleme izniniz yok!", true);
                 return;
@@ -1727,14 +1725,14 @@
             if (totEl) totEl.innerText = total.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + " ₺ + KDV";
         }
 
-        function forwardToWarehouse() {
+        async function forwardToWarehouse() {
             if (activeOrder.items.length === 0) {
                 showToast("Lütfen önce fişe en az bir ürün ekleyiniz.", true);
                 return;
             }
             activeOrder.currentStep = 2;
-            saveOrdersToDB();
-            showToast("Sipariş depoya iletildi ve satış fişi kilitlendi!");
+            await syncOrderToCloud(activeOrder);
+            showToast("Sipariş depoya iletildi ve canlı buluta kaydedildi!");
             returnToDashboard();
         }
 
@@ -1774,7 +1772,7 @@
             syncSelectedCatalogPrice();
         }
 
-        function addItemFromCatalog() {
+        async function addItemFromCatalog() {
             const prodId = document.getElementById("step1-select-product").value;
             const customPrice = parseFloat(document.getElementById("step1-catalog-price").value);
             const qty = parseInt(document.getElementById("step1-catalog-qty").value) || 1;
@@ -1784,10 +1782,12 @@
             activeOrder.items.push({
                 id: p.id, name: p.name + (p.color && p.color !== "-" ? " (" + p.color + ")" : ""), requestedQty: qty, dispatchedQty: qty, returnedQty: 0, price: finalPrice, warehouseNote: "", checked: true
             });
-            saveOrdersToDB(); renderStep1(); showToast(`${p.name} fişe eklendi!`);
+            await syncOrderToCloud(activeOrder);
+            renderStep1();
+            showToast(`${p.name} fişe eklendi!`);
         }
 
-        function addItemManual() {
+        async function addItemManual() {
             const code = document.getElementById("manual-code").value.trim() || `ÇNP-${Math.floor(100 + Math.random() * 900)}`;
             const name = document.getElementById("manual-name").value.trim();
             const price = parseFloat(document.getElementById("manual-price").value) || 0;
@@ -1801,7 +1801,9 @@
                 masterProducts.unshift({ id: code, name: name, color: "-", price: price });
                 saveCatalogToDB(masterProducts);
             }
-            saveOrdersToDB(); populateProductSelects(); renderStep1();
+            await syncOrderToCloud(activeOrder);
+            populateProductSelects();
+            renderStep1();
             document.getElementById("manual-code").value = "";
             document.getElementById("manual-name").value = "";
             document.getElementById("manual-price").value = "";
@@ -1809,20 +1811,23 @@
             showToast(`${name} fişe eklendi!`);
         }
 
-        function updateStep1Qty(index, val) {
+        async function updateStep1Qty(index, val) {
             activeOrder.items[index].requestedQty = parseInt(val) || 1;
             activeOrder.items[index].dispatchedQty = parseInt(val) || 1;
-            saveOrdersToDB(); renderStep1();
+            await syncOrderToCloud(activeOrder);
+            renderStep1();
         }
 
-        function updateStep1Price(index, val) {
+        async function updateStep1Price(index, val) {
             activeOrder.items[index].price = parseFloat(val) || 0;
-            saveOrdersToDB(); renderStep1();
+            await syncOrderToCloud(activeOrder);
+            renderStep1();
         }
 
-        function removeItemStep1(index) {
+        async function removeItemStep1(index) {
             activeOrder.items.splice(index, 1);
-            saveOrdersToDB(); renderStep1();
+            await syncOrderToCloud(activeOrder);
+            renderStep1();
             showToast("Ürün fişten çıkarıldı.");
         }
 
@@ -1870,7 +1875,7 @@
             searchDepoCatalogDropdown("");
         }
 
-        function addItemFromDepo() {
+        async function addItemFromDepo() {
             const prodId = document.getElementById("depo-select-product").value;
             const qty = parseInt(document.getElementById("depo-add-qty").value) || 1;
             const p = masterProducts.find(x => x.id === prodId);
@@ -1886,26 +1891,26 @@
                 warehouseNote: "Depodan Eklendi",
                 checked: true
             });
-            saveOrdersToDB();
+            await syncOrderToCloud(activeOrder);
             renderStep2();
-            showToast(`${p.name} depodan siparişe eklendi!`);
+            showToast(`${p.name} depodan eklendi!`);
         }
 
-        function removeItemStep2(index) {
+        async function removeItemStep2(index) {
             activeOrder.items.splice(index, 1);
-            saveOrdersToDB();
+            await syncOrderToCloud(activeOrder);
             renderStep2();
-            showToast("Ürün depodan çıkarıldı.");
+            showToast("Ürün çıkarıldı.");
         }
 
-        function toggleCheckStep2(index, chk) { activeOrder.items[index].checked = chk; saveOrdersToDB(); }
-        function updateStep2Dispatched(index, val) { activeOrder.items[index].dispatchedQty = parseInt(val) || 0; saveOrdersToDB(); }
-        function updateStep2Note(index, val) { activeOrder.items[index].warehouseNote = val; saveOrdersToDB(); }
+        async function toggleCheckStep2(index, chk) { activeOrder.items[index].checked = chk; await syncOrderToCloud(activeOrder); }
+        async function updateStep2Dispatched(index, val) { activeOrder.items[index].dispatchedQty = parseInt(val) || 0; await syncOrderToCloud(activeOrder); }
+        async function updateStep2Note(index, val) { activeOrder.items[index].warehouseNote = val; await syncOrderToCloud(activeOrder); }
 
-        function forwardToField() {
+        async function forwardToField() {
             activeOrder.currentStep = 3;
-            saveOrdersToDB();
-            showToast("Sevk İrsaliyesi kesildi ve Saha Ekibine teslim edildi!");
+            await syncOrderToCloud(activeOrder);
+            showToast("Sevk İrsaliyesi kesildi ve Sahaya iletildi!");
             returnToDashboard();
         }
 
@@ -1966,9 +1971,9 @@
             }
         }
 
-        function updateStep3Return(index, val) { activeOrder.items[index].returnedQty = parseInt(val) || 0; saveOrdersToDB(); }
+        async function updateStep3Return(index, val) { activeOrder.items[index].returnedQty = parseInt(val) || 0; await syncOrderToCloud(activeOrder); }
 
-        function addExtraItemStep3() {
+        async function addExtraItemStep3() {
             const prodId = document.getElementById("step3-extra-select").value;
             const qty = parseInt(document.getElementById("step3-extra-qty").value) || 1;
             const p = masterProducts.find(x => x.id === prodId);
@@ -1977,24 +1982,28 @@
                 id: p ? p.id : "ÇNP-EK", name: p ? (p.name + " (Saha İlavesi)") : "Saha Ekstra Ürün",
                 qty: qty, price: p ? p.price : 0, faikApproval: false, approvalTime: null
             });
-            saveOrdersToDB(); renderStep3(); showToast("İlave ürün talebi açıldı. Faik Bey onayı bekleniyor.");
+            await syncOrderToCloud(activeOrder);
+            renderStep3();
+            showToast("İlave ürün talebi açıldı.");
         }
 
-        function approveFaikExtra(index) {
+        async function approveFaikExtra(index) {
             const now = new Date();
             const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
             activeOrder.extras[index].faikApproval = true;
             activeOrder.extras[index].approvalTime = timeStr;
-            saveOrdersToDB(); showToast("Faik Bey dijital onayı verildi!"); renderStep3();
+            await syncOrderToCloud(activeOrder);
+            showToast("Faik Bey onayı verildi!");
+            renderStep3();
         }
 
-        function forwardToAccounting() {
+        async function forwardToAccounting() {
             if (activeOrder.extras && activeOrder.extras.some(e => !e.faikApproval)) {
                 showToast("UYARI: Faik Bey onayı alınmamış ilave ürünler var!", true);
                 return;
             }
             activeOrder.currentStep = 4;
-            saveOrdersToDB();
+            await syncOrderToCloud(activeOrder);
             showToast("Saha tamamlandı! Dosya Muhasebeye (Gökhan) iletildi.");
             returnToDashboard();
         }
@@ -2073,10 +2082,10 @@
             if (s4Btn) s4Btn.style.display = (canFinalize && !activeOrder.isClosed) ? "block" : "none";
         }
 
-        function finalizeAndCloseOrder() {
+        async function finalizeAndCloseOrder() {
             activeOrder.isClosed = true;
             activeOrder.currentStep = 5;
-            saveOrdersToDB();
+            await syncOrderToCloud(activeOrder);
             showToast("Tebrikler! Fatura kesildi ve dosya kapatıldı.");
             renderOrderList();
             returnToDashboard();
@@ -2167,9 +2176,9 @@
 
         function closeModal() { document.getElementById("modal-new-order").classList.add("hidden"); }
 
-        function saveNewOrder() {
+        async function saveNewOrder() {
             const cust = document.getElementById("new-cust-name").value.trim();
-            if (!cust) { showToast("Lütfen müşteri veya proje adını giriniz.", true); return; }
+            if (!cust) { showToast("Lütfen müşteri adını giriniz.", true); return; }
             const newId = "CNP-2026-" + String(Math.floor(100 + Math.random() * 900));
             const rep = (currentUser && currentUser.roleId === 'satis') ? currentUser.name : (document.getElementById("new-sales-rep").value || "Orhan Özen");
             const newOrd = {
@@ -2177,8 +2186,10 @@
                 date: document.getElementById("new-date").value, notes: document.getElementById("new-notes").value,
                 currentStep: 1, items: [], extras: [], isClosed: false
             };
-            orders.unshift(newOrd); saveOrdersToDB(); closeModal();
-            showToast(`Yeni sipariş açıldı: ${newId}`); openOrderDetail(newId);
+            await syncOrderToCloud(newOrd);
+            closeModal();
+            showToast(`Yeni sipariş açıldı: ${newId}`);
+            openOrderDetail(newId);
         }
 
         function openCatalogModal() {
@@ -2227,7 +2238,7 @@
         async function deleteSelectedCatalogItems() {
             const checkboxes = document.querySelectorAll(".catalog-row-checkbox:checked");
             if (checkboxes.length === 0) {
-                showToast("Lütfen silmek için en az bir ürün seçiniz.", true);
+                showToast("Silmek için ürün seçiniz.", true);
                 return;
             }
             if (!confirm(`Seçilen ${checkboxes.length} ürünü silmek istediğinize emin misiniz?`)) return;
@@ -2239,15 +2250,15 @@
 
             await saveCatalogToDB(masterProducts);
             renderCatalogTable();
-            showToast(`${selectedIndices.length} ürün katalogdan silindi.`);
+            showToast(`${selectedIndices.length} ürün silindi.`);
         }
 
         async function deleteAllCatalogItems() {
-            if (!confirm("DİKKAT: Tüm katalog listesi kalıcı olarak silinecek! Emin misiniz?")) return;
+            if (!confirm("Tüm katalog listesi kalıcı olarak silinecek! Emin misiniz?")) return;
             masterProducts = [];
             await saveCatalogToDB(masterProducts);
             renderCatalogTable();
-            showToast("Tüm katalog tamamen temizlendi.");
+            showToast("Tüm katalog temizlendi.");
         }
 
         function filterCatalogTable() {
@@ -2281,7 +2292,7 @@
             masterProducts.splice(idx, 1);
             await saveCatalogToDB(masterProducts);
             renderCatalogTable();
-            showToast("Ürün katalogdan silindi.");
+            showToast("Ürün silindi.");
         }
 
         function filterOrders() {
@@ -2290,8 +2301,10 @@
             rows.forEach(r => { r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; });
         }
 
+        // Sayfa açıldığında yerel kataloğu ve canlı bulut siparişlerini yükle
         window.addEventListener('DOMContentLoaded', () => {
-            loadDataFromDB();
+            loadCatalogFromDB();
+            listenToOrdersCloud();
         });
     </script>
 </body>
