@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÇİNPA - Özel Yetkilendirilmiş Operasyon & Sipariş Paneli</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Cinzel:wght@700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
     
-    <!-- SheetJS CDN (Excel okuma/yazma) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <!-- Firebase SDK (v9 Compat) -->
@@ -42,7 +40,6 @@
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased">
 
-    <!-- Dinamik Bildirim -->
     <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-950 text-white text-xs sm:text-sm font-bold px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-2.5 no-print border border-emerald-800">
         <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
         <span id="toast-msg"></span>
@@ -57,8 +54,8 @@
                     <span class="logo-sub text-[8.5px] uppercase mt-1">PLANTS &amp; FLOWERS</span>
                 </div>
                 <div class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>Bulut Veritabanı Canlı Bağlantılı</span>
+                    <i class="fa-solid fa-shield-halved text-emerald-600"></i>
+                    <span>Güvenli Bulut Veritabanı Aktif</span>
                 </div>
             </div>
 
@@ -179,7 +176,7 @@
                     </div>
 
                     <div class="flex items-center space-x-2 sm:space-x-3">
-                        <button onclick="logout()" title="Giriş Ekranına Dön ve Kullanıcı Değiştir" class="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl border border-emerald-700 transition flex items-center space-x-1.5 shadow-sm">
+                        <button onclick="logout()" title="Giriş Ekranına Dön" class="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl border border-emerald-700 transition flex items-center space-x-1.5 shadow-sm">
                             <i class="fa-solid fa-arrow-left"></i>
                             <span class="hidden sm:inline">Kullanıcı Değiştir</span>
                         </button>
@@ -246,7 +243,7 @@
                             </div>
                             <div>
                                 <h3 class="text-base font-extrabold text-white">Yönetici Özet Paneli & Satış Performansı</h3>
-                                <p class="text-xs text-emerald-300">Şirket genel cirosu ve temsilci bazlı ciro dökümü (Canlı Bulut Senkronize)</p>
+                                <p class="text-xs text-emerald-300">Şirket genel cirosu ve temsilci bazlı ciro dökümü</p>
                             </div>
                         </div>
                         <span class="bg-emerald-800 text-emerald-200 text-xs font-bold px-3 py-1 rounded-full border border-emerald-700">Yönetim Modu</span>
@@ -474,7 +471,7 @@
                             </table>
                         </div>
 
-                        <!-- KAMBER USTA İÇİN CANLI KATALOG ARAMALI ÜRÜN EKLEME PANELİ -->
+                        <!-- CANLI ARAMALI ÜRÜN EKLEME -->
                         <div id="depo-add-item-panel" class="bg-emerald-50/40 p-5 rounded-2xl border border-emerald-200 space-y-4">
                             <div class="text-xs font-extrabold text-emerald-900 uppercase flex items-center">
                                 <i class="fa-solid fa-magnifying-glass text-emerald-700 mr-1.5 text-sm"></i> Depo Operasyon: Katalogdan Ürün / İkame Bul ve Ekle
@@ -812,9 +809,10 @@
         </div>
     </div>
 
-    <!-- ================= JAVASCRIPT MOTORU & BULUT SENKRONİZASYONU ================= -->
+    <!-- ================= JAVASCRIPT GÜVENLİ SENKRONİZASYON MOTORU ================= -->
     <script>
-        // --- 1. FIREBASE BAĞLANTISI (GOOGLE CLOUD FIRESTORE) ---
+        const CLOUD_ACCESS_KEY = "CinpaSecure_2026_Key!";
+
         const firebaseConfig = {
             apiKey: "AIzaSyB2VBj_BKmDPPwXbFPV3Pd9Hz4SHiF1saI",
             authDomain: "cinpasiparis.firebaseapp.com",
@@ -870,14 +868,16 @@
         let activeStepTab = 1;
         let parsedExcelItems = [];
 
-        // --- 2. CANLI BULUT SENKRONİZASYONU (FIRESTORE ON-SNAPSHOT) ---
+        // Güvenli Canlı Bulut Dinleyicisi
         function listenToOrdersCloud() {
             db.collection("orders").onSnapshot((snapshot) => {
                 const cloudOrders = [];
                 snapshot.forEach((doc) => {
-                    cloudOrders.push(doc.data());
+                    const data = doc.data();
+                    if (data.accessKey === CLOUD_ACCESS_KEY) {
+                        cloudOrders.push(data);
+                    }
                 });
-                // Tarihe göre sırala
                 cloudOrders.sort((a, b) => (b.id > a.id ? 1 : -1));
                 orders = cloudOrders;
                 if (currentUser) {
@@ -892,22 +892,27 @@
                     }
                 }
             }, (error) => {
-                console.error("Bulut veri dinleme hatası:", error);
-                showToast("Bulut senkronizasyonunda bir hata oluştu.", true);
+                console.error("Bulut erişim hatası:", error);
             });
         }
 
+        // Güvenli Anahtar ile Buluta Kaydetme
         async function syncOrderToCloud(orderObj) {
             try {
-                await db.collection("orders").doc(orderObj.id).set(orderObj);
+                const payload = {
+                    ...orderObj,
+                    accessKey: CLOUD_ACCESS_KEY,
+                    updatedAt: new Date().toISOString()
+                };
+                await db.collection("orders").doc(orderObj.id).set(payload);
             } catch(e) {
-                console.error("Buluta kaydetme hatası:", e);
-                showToast("Buluta kaydedilemedi!", true);
+                console.error("Bulut yazma hatası:", e);
+                showToast("Güvenlik doğrulaması başarısız!", true);
             }
         }
 
-        // --- INDEXEDDB YEREL KATALOG MOTORU (18.000 ÜRÜN İÇİN HIZLI DİSK HAFIZASI) ---
-        const DB_NAME = "CinpaCatalogDB_v11";
+        // --- INDEXEDDB KATALOG MOTORU ---
+        const DB_NAME = "CinpaCatalogDB_v12";
         const STORE_CATALOG = "catalog";
 
         function openCatalogDB() {
@@ -968,7 +973,6 @@
             }, 3000);
         }
 
-        // --- EXCEL KATALOG YÜKLEME ---
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1036,7 +1040,6 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // --- MUHASEBE İÇİN NEBİM V3 EXCEL (.XLSX) ---
         function exportToNebimExcel() {
             if (!activeOrder) return;
             const nebimRows = [];
@@ -1110,7 +1113,6 @@
             showToast("Nebim V3 Excel şablonu başarıyla indirildi!");
         }
 
-        // --- ABCD.XLSX OKUMA MOTORU ---
         function handleExcelFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1284,7 +1286,7 @@
             openOrderDetail(newId);
         }
 
-        // --- ŞİFRE KONTROLLÜ GİRİŞ İŞLEMLERİ ---
+        // --- ŞİFRE KONTROLLERİ ---
         function requestPasswordAndLogin(roleKey) {
             if (roleKey === 'muhasebe') {
                 const pass = prompt("Muhasebe (Gökhan) Giriş Şifresi:");
@@ -1535,7 +1537,6 @@
             renderOrderList();
         }
 
-        // --- KULLANICI ROLLERİNE GÖRE FİLTRELİ LİSTELEME ---
         function renderOrderList() {
             const tbody = document.getElementById("orders-table-body");
             if (!tbody) return;
@@ -1595,7 +1596,6 @@
             });
         }
 
-        // --- DETAY EKRANINDA KESİN ROL İZOLASYONU ---
         function openOrderDetail(orderId) {
             activeOrder = orders.find(o => o.id === orderId);
             if (!activeOrder) return;
@@ -2301,7 +2301,6 @@
             rows.forEach(r => { r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; });
         }
 
-        // Sayfa açıldığında yerel kataloğu ve canlı bulut siparişlerini yükle
         window.addEventListener('DOMContentLoaded', () => {
             loadCatalogFromDB();
             listenToOrdersCloud();
