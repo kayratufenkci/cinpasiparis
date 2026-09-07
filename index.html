@@ -9,7 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Cinzel:wght@700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
     
-    <!-- SheetJS CDN -->
+    <!-- SheetJS CDN (Excel okuma & yazma motoru) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <!-- Firebase SDK (v9 Compat) -->
@@ -688,172 +688,214 @@
         </div>
     </div>
 
-    <!-- ================= JAVASCRIPT BAŞLANGIÇ ÇALIŞTIRICISI ================= -->
+    <!-- ================= JAVASCRIPT BAŞLANGIÇ & BULUT KATALOG MOTORU ================= -->
     <script>
-        function toggleAddMode(mode) {
-            const catBox = document.getElementById("add-mode-catalog-box");
-            const manBox = document.getElementById("add-mode-manual-box");
-            const btnCat = document.getElementById("btn-mode-catalog");
-            const btnMan = document.getElementById("btn-mode-manual");
-            if (mode === "catalog") {
-                catBox.classList.remove("hidden"); manBox.classList.add("hidden");
-                btnCat.className = "px-3 py-1 rounded-md bg-white text-slate-900 shadow-sm";
-                btnMan.className = "px-3 py-1 rounded-md text-slate-600";
-            } else {
-                catBox.classList.add("hidden"); manBox.classList.remove("hidden");
-                btnMan.className = "px-3 py-1 rounded-md bg-white text-slate-900 shadow-sm";
-                btnCat.className = "px-3 py-1 rounded-md text-slate-600";
+        // ================= CANLI BULUT KATALOG SENKRONİZASYONU =================
+        function listenToCatalogCloud() {
+            db.collection("catalog").doc("master").onSnapshot((doc) => {
+                if (doc.exists && doc.data().products) {
+                    masterProducts = doc.data().products;
+                    updateHeaderBadgeCounts();
+                    if (masterProducts.length > 0) populateProductSelects();
+                    renderCatalogTable();
+                    // Yerel IndexedDB'ye de hızlı önbellek yap
+                    saveCatalogToDB(masterProducts, false);
+                }
+            }, (err) => {
+                console.warn("Bulut katalog dinleme:", err);
+            });
+        }
+
+        async function syncCatalogToCloud(productsList) {
+            try {
+                showToast("Katalog buluta yükleniyor, lütfen bekleyin...");
+                // Firestore tek doküman limiti 1MB olduğu için büyük katalogları parçalı veya optimize kaydet
+                const optimized = productsList.map(p => ({
+                    id: String(p.id).trim(),
+                    name: String(p.name || '').trim(),
+                    color: String(p.color || '-').trim(),
+                    price: parseFloat(p.price) || 0
+                }));
+
+                await db.collection("catalog").doc("master").set({
+                    products: optimized,
+                    updatedAt: new Date().toISOString()
+                });
+                showToast(`Katalog tüm cihazlar için buluta kaydedildi (${optimized.length} ürün)!`);
+            } catch(err) {
+                console.error("Buluta katalog kaydetme hatası:", err);
+                showToast("Buluta kaydedilemedi (Yerel kaydedildi): " + err.message, true);
             }
         }
 
-        function createNewOrderModal() {
-            document.getElementById("modal-new-order").classList.remove("hidden");
-            document.getElementById("new-cust-name").value = "";
-            document.getElementById("new-notes").value = "";
-            document.getElementById("new-date").value = new Date().toISOString().split("T")[0];
-            if (currentUser && currentUser.roleId === 'satis') {
-                document.getElementById("new-sales-rep").value = currentUser.name;
+        // ================= INDEXEDDB KATALOG KURTARMA & KAYDETME MOTORU =================
+        const PRIMARY_CATALOG_DB = "CinpaCatalogMasterDB";
+        const STORE_CATALOG = "catalog";
+
+        function openCatalogDB(dbName = PRIMARY_CATALOG_DB) {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(dbName, 1);
+                request.onupgradeneeded = (e) => {
+                    const idb = e.target.result;
+                    if (!idb.objectStoreNames.contains(STORE_CATALOG)) {
+                        idb.createObjectStore(STORE_CATALOG, { keyPath: "id" });
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function loadCatalogFromDB() {
+            try {
+                const idb = await openCatalogDB();
+                const txCat = idb.transaction(STORE_CATALOG, "readonly");
+                const storeCat = txCat.objectStore(STORE_CATALOG);
+                const reqCat = storeCat.getAll();
+                
+                reqCat.onsuccess = async () => {
+                    let items = reqCat.result || [];
+                    
+                    // Eğer ana DB boşsa, eski olası versiyonlardan kurtarmayı dene
+                    if (items.length === 0) {
+                        const oldDbs = ["CinpaMasterDB_v6", "CinpaMasterDB_v7", "CinpaMasterDB_v8", "CinpaCatalogDB_v11", "CinpaCatalogDB_v12", "CinpaCatalogDB_v15", "CinpaCatalogDB_v20"];
+                        for (const oldName of oldDbs) {
+                            try {
+                                const oldIdb = await openCatalogDB(oldName);
+                                const oldTx = oldIdb.transaction(STORE_CATALOG, "readonly");
+                                const oldReq = oldTx.objectStore(STORE_CATALOG).getAll();
+                                const oldItems = await new Promise(res => { oldReq.onsuccess = () => res(oldReq.result || []); oldReq.onerror = () => res([]); });
+                                if (oldItems.length > 0) {
+                                    items = oldItems;
+                                    await saveCatalogToDB(items, true); // Hem ana DB'ye hem buluta aktar!
+                                    break;
+                                }
+                            } catch(ignore) {}
+                        }
+                    }
+
+                    masterProducts = items;
+                    updateHeaderBadgeCounts();
+                    if (masterProducts.length > 0) populateProductSelects();
+                    renderCatalogTable();
+                };
+            } catch(err) {
+                console.error("Katalog yükleme hatası:", err);
             }
-            document.getElementById("new-cust-name").focus();
         }
 
-        function closeModal() { document.getElementById("modal-new-order").classList.add("hidden"); }
-
-        async function saveNewOrder() {
-            const cust = document.getElementById("new-cust-name").value.trim();
-            if (!cust) { showToast("Lütfen müşteri adını giriniz.", true); return; }
-            const newId = "CNP-2026-" + String(Math.floor(100 + Math.random() * 900));
-            const rep = (currentUser && currentUser.roleId === 'satis') ? currentUser.name : (document.getElementById("new-sales-rep").value || "Orhan Özen");
-            const newOrd = {
-                id: newId, customer: cust, salesRep: rep,
-                date: document.getElementById("new-date").value, notes: document.getElementById("new-notes").value,
-                currentStep: 1, items: [], extras: [], isClosed: false
-            };
-            await syncOrderToCloud(newOrd);
-            closeModal();
-            showToast(`Yeni sipariş açıldı: ${newId}`);
-            openOrderDetail(newId);
+        async function saveCatalogToDB(productsList, pushToCloud = true) {
+            try {
+                const idb = await openCatalogDB();
+                const tx = idb.transaction(STORE_CATALOG, "readwrite");
+                const store = tx.objectStore(STORE_CATALOG);
+                store.clear();
+                productsList.forEach(p => {
+                    store.put({
+                        id: String(p.id).trim(),
+                        name: String(p.name || '').trim(),
+                        color: String(p.color || '-').trim(),
+                        price: parseFloat(p.price) || 0
+                    });
+                });
+                if (pushToCloud) {
+                    syncCatalogToCloud(productsList);
+                }
+            } catch(e) {
+                console.error("Yerel kaydetme hatası:", e);
+            }
         }
 
-        function openCatalogModal() {
-            document.getElementById("modal-catalog").classList.remove("hidden");
+        async function saveProductToMasterCatalog() {
+            const code = document.getElementById("cat-new-code").value.trim() || `ÇNP-${Math.floor(100 + Math.random() * 900)}`;
+            const name = document.getElementById("cat-new-name").value.trim();
+            const color = document.getElementById("cat-new-color").value.trim() || "-";
+            const price = parseFloat(document.getElementById("cat-new-price").value) || 0;
+
+            if (!name) { showToast("Lütfen ürün adını yazınız.", true); return; }
+
+            const newProd = { id: code, name: name, color: color, price: price };
+            masterProducts.unshift(newProd);
+            await saveCatalogToDB(masterProducts, true);
             renderCatalogTable();
-            updateHeaderBadgeCounts();
-        }
-
-        function closeCatalogModal() {
-            document.getElementById("modal-catalog").classList.add("hidden");
             populateProductSelects();
+
+            document.getElementById("cat-new-code").value = "";
+            document.getElementById("cat-new-name").value = "";
+            document.getElementById("cat-new-color").value = "";
+            document.getElementById("cat-new-price").value = "";
+            showToast(`${name} tüm cihazlar için kaydedildi!`);
         }
 
-        function renderCatalogTable(filteredList = null) {
-            const tbody = document.getElementById("catalog-table-body");
-            if (!tbody) return;
-            tbody.innerHTML = "";
-            const list = filteredList || masterProducts;
+        function handleCatalogExcelUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            showToast("Katalog okunuyor ve buluta yükleniyor...");
 
-            updateHeaderBadgeCounts();
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    let data = new Uint8Array(e.target.result);
+                    let workbook = XLSX.read(data, { type: 'array' });
+                    let worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    let rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
 
-            if (list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 italic">Katalogda kayıtlı ürün bulunmuyor.</td></tr>`;
-                return;
-            }
+                    let codeCol = 0, nameCol = 1, colorCol = 2, priceCol = 3;
+                    let startRow = 0;
 
-            list.slice(0, 200).forEach((p, idx) => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td class="p-3 text-center"><input type="checkbox" value="${idx}" class="catalog-row-checkbox w-4 h-4 text-emerald-700 rounded"></td>
-                    <td class="p-3 font-mono font-bold text-slate-900">${p.id}</td>
-                    <td class="p-3 font-medium">${p.name}</td>
-                    <td class="p-3 text-slate-500 font-semibold">${p.color || '-'}</td>
-                    <td class="p-3 text-right font-bold text-emerald-800">${Number(p.price).toLocaleString('tr-TR')} ₺</td>
-                    <td class="p-3 text-center"><button type="button" onclick="removeProductByIndex(${idx})" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
-                `;
-                tbody.appendChild(tr);
-            });
+                    const firstRow = rawData[0].map(c => String(c || '').toLowerCase().trim());
+                    if (firstRow.some(c => c.includes('kod') || c.includes('ürün') || c.includes('fiyat') || c.includes('toptan') || c.includes('stok'))) {
+                        startRow = 1;
+                        firstRow.forEach((h, colIdx) => {
+                            if (h.includes('kod') || h.includes('stok')) codeCol = colIdx;
+                            else if (h.includes('ad') || h.includes('ürün') || h.includes('tanım')) nameCol = colIdx;
+                            else if (h.includes('renk')) colorCol = colIdx;
+                            else if (h.includes('fiyat') || h.includes('toptan') || h.includes('satış')) priceCol = colIdx;
+                        });
+                    }
+
+                    let newProducts = [];
+                    for (let i = startRow; i < rawData.length; i++) {
+                        let row = rawData[i];
+                        if (!row || row.length === 0) continue;
+
+                        let code = String(row[codeCol] !== undefined ? row[codeCol] : '').trim();
+                        let name = String(row[nameCol] !== undefined ? row[nameCol] : '').trim();
+                        let color = String(row[colorCol] !== undefined ? row[colorCol] : '').trim();
+                        let rawPrice = row[priceCol] !== undefined ? row[priceCol] : 0;
+
+                        if (!code && !name) continue;
+
+                        let cleanPrice = String(rawPrice).replace(/[^0-9,.-]/g, '').replace(',', '.');
+                        let price = parseFloat(cleanPrice) || 0;
+
+                        newProducts.push({
+                            id: code,
+                            name: name,
+                            color: (color && color !== "" && color !== "0") ? color : "-",
+                            price: price
+                        });
+                    }
+
+                    if (newProducts.length > 0) {
+                        masterProducts = newProducts;
+                        await saveCatalogToDB(masterProducts, true); // Hem diske hem Firestore'a kaydet!
+                        renderCatalogTable();
+                        updateHeaderBadgeCounts();
+                        populateProductSelects();
+                        showToast(`Başarıyla ${newProducts.length} ürün buluta yüklendi!`);
+                    } else {
+                        showToast("Excel'den ürün okunamadı!", true);
+                    }
+                } catch(err) {
+                    showToast("Excel okunurken hata oluştu: " + err.message, true);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            event.target.value = ""; // Inputu sıfırla
         }
 
-        function toggleSelectAllCatalog(checked) {
-            const checkboxes = document.querySelectorAll(".catalog-row-checkbox");
-            checkboxes.forEach(cb => cb.checked = checked);
-        }
-
-        async function deleteSelectedCatalogItems() {
-            const checkboxes = document.querySelectorAll(".catalog-row-checkbox:checked");
-            if (checkboxes.length === 0) {
-                showToast("Silmek için ürün seçiniz.", true);
-                return;
-            }
-            if (!confirm(`Seçilen ${checkboxes.length} ürünü silmek istediğinize emin misiniz?`)) return;
-
-            const selectedIndices = Array.from(checkboxes).map(cb => parseInt(cb.value)).sort((a, b) => b - a);
-            selectedIndices.forEach(idx => {
-                masterProducts.splice(idx, 1);
-            });
-
-            await saveCatalogToDB(masterProducts);
-            renderCatalogTable();
-            showToast(`${selectedIndices.length} ürün silindi.`);
-        }
-
-        async function deleteAllCatalogItems() {
-            if (!confirm("Tüm katalog listesi kalıcı olarak silinecek! Emin misiniz?")) return;
-            masterProducts = [];
-            await saveCatalogToDB(masterProducts);
-            renderCatalogTable();
-            showToast("Tüm katalog temizlendi.");
-        }
-
-        function filterCatalogTable() {
-            const q = document.getElementById("cat-search-input").value.toLowerCase();
-            const filtered = masterProducts.filter(p => 
-                p.id.toLowerCase().includes(q) || 
-                p.name.toLowerCase().includes(q) || 
-                (p.color && p.color.toLowerCase().includes(q))
-            );
-            renderCatalogTable(filtered);
-        }
-
-        async function removeProductByIndex(idx) {
-            masterProducts.splice(idx, 1);
-            await saveCatalogToDB(masterProducts);
-            renderCatalogTable();
-            showToast("Ürün silindi.");
-        }
-
-        function filterOrders() {
-            const q = document.getElementById("search-input").value.toLowerCase();
-            const rows = document.querySelectorAll("#orders-table-body tr");
-            rows.forEach(r => { r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; });
-        }
-
-        function sendWhatsAppNotification() {
-            if (!activeOrder) return;
-            const text = `Sayın İlgili, ${activeOrder.customer} projesine ait ${activeOrder.id} kodlu sipariş işlemi güncellenmiştir. Durum: ${activeOrder.currentStep}. Aşama.`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-        }
-
-        function populateProductSelects() {
-            searchCatalogDropdown("");
-            const s3 = document.getElementById("step3-extra-select");
-            if (!s3) return;
-            s3.innerHTML = "";
-            masterProducts.slice(0, 50).forEach(p => {
-                const opt3 = document.createElement("option");
-                opt3.value = p.id;
-                opt3.innerText = `${p.id} - ${p.name} (${Number(p.price).toLocaleString('tr-TR')} ₺)`;
-                s3.appendChild(opt3);
-            });
-        }
-
-        function syncSelectedCatalogPrice() {
-            const s1 = document.getElementById("step1-select-product");
-            if (!s1 || s1.options.length === 0) return;
-            const p = masterProducts.find(x => x.id === s1.value);
-            if (p) document.getElementById("step1-catalog-price").value = p.price;
-        }
-
-        // ================= BAŞLANGIÇ ÇALIŞTIRICISI =================
+        // ================= BAŞLANGIÇ YÜKLEMESİ =================
         window.addEventListener('DOMContentLoaded', () => {
             loadCatalogFromDB();
 
@@ -862,10 +904,12 @@
                     const st = document.getElementById("cloud-status-text");
                     if (st) st.innerText = "Bulut Canlı Senkronize";
                     listenToOrdersCloud();
+                    listenToCatalogCloud(); // Kataloğu da canlı buluttan dinle!
                 })
                 .catch((err) => {
                     console.warn("Anonim Auth pas geçildi:", err);
                     listenToOrdersCloud();
+                    listenToCatalogCloud();
                 });
         });
     </script>
