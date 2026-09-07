@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÇİNPA - Özel Yetkilendirilmiş Operasyon & Sipariş Paneli</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Cinzel:wght@700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
     
-    <!-- SheetJS CDN (Excel okuma ve yazma kütüphanesi) -->
+    <!-- SheetJS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <script>
@@ -38,7 +37,6 @@
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased">
 
-    <!-- Dinamik Bildirim -->
     <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-950 text-white text-xs sm:text-sm font-bold px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-2.5 no-print border border-emerald-800">
         <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
         <span id="toast-msg"></span>
@@ -59,7 +57,7 @@
                 <label class="block text-xs font-extrabold text-emerald-800 uppercase tracking-wider text-center">Giriş Yapmak İstediğiniz Profil</label>
                 <div class="grid grid-cols-1 gap-2.5">
                     
-                    <!-- Satış Profili Seçimi (Şifreli - Gizli) -->
+                    <!-- Satış Profili -->
                     <div class="p-3.5 rounded-2xl border border-emerald-100 hover:border-emerald-500 bg-emerald-50/30 transition text-left space-y-2.5">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-base">
@@ -94,7 +92,7 @@
                             </div>
                             <div>
                                 <div class="text-xs font-black text-slate-900">Depocu (Kamber Usta)</div>
-                                <div class="text-[11px] text-slate-500 font-medium">Sadece Depo Hazırlık & İkame Değişikliği Görür</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Sadece Depo Hazırlık & İkame Masasını Görür</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs"></i>
@@ -108,13 +106,13 @@
                             </div>
                             <div>
                                 <div class="text-xs font-black text-slate-900">Saha Ekibi (Sefa Usta)</div>
-                                <div class="text-[11px] text-slate-500 font-medium">Sadece Mal Kabul, İade & İlave Ekranını Görür</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Sadece Mal Kabul, İade & İlave Masasını Görür</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs"></i>
                     </button>
 
-                    <!-- Muhasebe Profili (Şifreli - Gizli) -->
+                    <!-- Muhasebe Profili -->
                     <button type="button" onclick="requestPasswordAndLogin('muhasebe')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
@@ -125,13 +123,13 @@
                                     <span>Muhasebe (Gökhan)</span>
                                     <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
                                 </div>
-                                <div class="text-[11px] text-slate-500 font-medium">Onay Kuyruğu & Fatura İşlemleri</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Sadece Depo/Saha Onaylı Fişleri Görür & Faturalandırır</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs"></i>
                     </button>
 
-                    <!-- Admin Profili (Şifreli - Gizli) -->
+                    <!-- Admin Profili -->
                     <button type="button" onclick="requestPasswordAndLogin('admin')" class="flex items-center justify-between p-3.5 rounded-2xl border border-emerald-900 bg-emerald-900 text-white hover:bg-emerald-950 transition group text-left w-full shadow-lg">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-emerald-800 text-emerald-300 flex items-center justify-center font-bold text-base">
@@ -159,15 +157,13 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center space-x-3 cursor-pointer" onclick="returnToDashboard()">
-                        
                         <div class="flex flex-col justify-center">
                             <span class="text-xl font-black tracking-[0.18em] text-white leading-none font-serif">CİNPA</span>
                             <span class="text-[6px] font-bold tracking-[0.25em] text-emerald-300 uppercase mt-0.5">PLANTS &amp; FLOWERS</span>
                         </div>
-
                         <div class="border-l border-emerald-700 pl-3">
                             <div class="flex items-center space-x-2">
-                                <span class="bg-emerald-800 text-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-700" id="header-role-badge">SATIŞ PANELİ</span>
+                                <span class="bg-emerald-800 text-emerald-200 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-700" id="header-role-badge">PANEL</span>
                             </div>
                             <p class="text-[11px] text-emerald-200 font-medium mt-0.5" id="header-user-desc">Kullanıcı: -</p>
                         </div>
@@ -231,7 +227,7 @@
                 </div>
             </div>
 
-            <!-- ADMIN ÖZEL: YÖNETİCİ ÖZET PANELİ -->
+            <!-- ADMIN ÖZEL PANELİ -->
             <section id="admin-performance-section" class="hidden space-y-4">
                 <div class="bg-emerald-900 text-white p-6 rounded-3xl shadow-lg space-y-4 border border-emerald-800">
                     <div class="flex items-center justify-between border-b border-emerald-800 pb-3">
@@ -265,17 +261,17 @@
                 </div>
             </section>
 
-            <!-- DASHBOARD LİSTESİ -->
+            <!-- ROLE ÖZEL DOSYA LİSTESİ -->
             <section id="section-dashboard" class="space-y-6">
                 <div class="bg-white rounded-2xl border border-emerald-100 shadow-sm overflow-hidden">
                     <div class="p-5 border-b border-emerald-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
-                            <h2 class="text-base font-extrabold text-slate-900" id="dashboard-table-title">Sipariş Dosyaları</h2>
-                            <p class="text-xs text-slate-500" id="dashboard-table-subtitle">İlgili siparişin üzerine tıklayarak işlem ekranına geçebilirsiniz.</p>
+                            <h2 class="text-base font-extrabold text-slate-900" id="dashboard-table-title">Dosyalar</h2>
+                            <p class="text-xs text-slate-500" id="dashboard-table-subtitle">İlgili dosyanın üzerine tıklayarak işlem ekranına geçebilirsiniz.</p>
                         </div>
                         <div class="relative">
                             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                            <input type="text" id="search-input" onkeyup="filterOrders()" placeholder="Sipariş no veya müşteri ara..." class="text-xs pl-9 pr-4 py-2.5 rounded-xl border border-emerald-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 w-full sm:w-72">
+                            <input type="text" id="search-input" onkeyup="filterOrders()" placeholder="Dosya veya müşteri ara..." class="text-xs pl-9 pr-4 py-2.5 rounded-xl border border-emerald-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 w-full sm:w-72">
                         </div>
                     </div>
 
@@ -287,7 +283,7 @@
                                     <th class="p-4">Müşteri / Proje</th>
                                     <th class="p-4">Satış Uzmanı</th>
                                     <th class="p-4">Tarih</th>
-                                    <th class="p-4">Aşama</th>
+                                    <th class="p-4">Aşama / Durum</th>
                                     <th class="p-4 text-right">İşlem</th>
                                 </tr>
                             </thead>
@@ -301,7 +297,7 @@
             <section id="section-order-detail" class="hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="flex items-center space-x-4">
-                        <button onclick="returnToDashboard()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center space-x-1.5 transition text-xs font-bold" title="Sipariş Listesine Geri Dön">
+                        <button onclick="returnToDashboard()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center space-x-1.5 transition text-xs font-bold" title="Listeye Geri Dön">
                             <i class="fa-solid fa-arrow-left"></i>
                             <span>Listeye Dön</span>
                         </button>
@@ -820,19 +816,19 @@
             },
             depo: {
                 roleId: 'depo', name: 'Kamber Usta', title: 'Depo Sorumlusu', badgeText: 'DEPO PANELİ',
-                dutyText: 'Sadece 2. Adım Depo Hazırlık ekranını görür. Sevk irsaliyesi kesilene kadar fişi değiştirebilir.',
+                dutyText: 'Sadece Depo Hazırlık & Sevkiyat Bekleyen siparişleri görür ve düzenlersiniz.',
                 colorClass: 'bg-amber-50 text-amber-800 border-amber-200', avatarBg: 'bg-amber-100 text-amber-700', avatarIcon: 'fa-boxes-packing',
                 visibleSteps: [2], canCreateOrder: false, canManageCatalog: false
             },
             saha: {
                 roleId: 'saha', name: 'Sefa Usta', title: 'Saha & Uygulama Ekibi', badgeText: 'SAHA MOBİL PANELİ',
-                dutyText: 'Sadece 3. Adım Saha Mal Kabul, İade ve İlave Ürün ekranını görür.',
+                dutyText: 'Sadece sevk edilen ve montaj bekleyen siparişleri görür, mal kabul/iade/ilave işlersiniz.',
                 colorClass: 'bg-purple-50 text-purple-700 border-purple-200', avatarBg: 'bg-purple-100 text-purple-700', avatarIcon: 'fa-helmet-safety',
                 visibleSteps: [3], canCreateOrder: false, canManageCatalog: false
             },
             muhasebe: {
                 roleId: 'muhasebe', name: 'Gökhan', title: 'Muhasebe Uzmanı', badgeText: 'MUHASEBE PANELİ',
-                dutyText: 'Saha onaylı (3. aşamayı tamamlamış) ve tamamlanmak üzere olan fişleri faturalandırıp kapatır.',
+                dutyText: 'Depo veya Saha onayı tamamlanmış fişleri inceler, faturalandırır ve kapatırsınız.',
                 colorClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', avatarBg: 'bg-emerald-100 text-emerald-700', avatarIcon: 'fa-receipt',
                 visibleSteps: [4], canCreateOrder: false, canManageCatalog: false
             },
@@ -860,7 +856,7 @@
         let parsedExcelItems = [];
 
         // --- INDEXEDDB KALICI VERİTABANI MOTORU ---
-        const DB_NAME = "CinpaMasterDB_v9";
+        const DB_NAME = "CinpaMasterDB_v10";
         const DB_VERSION = 1;
         const STORE_CATALOG = "catalog";
         const STORE_ORDERS = "orders";
@@ -954,7 +950,6 @@
             }, 3000);
         }
 
-        // --- EXCEL KATALOG YÜKLEME ---
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1030,7 +1025,6 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // --- MUHASEBE İÇİN NEBİM V3 UYUMLU EXCEL ÇIKTISI (.XLSX) ---
         function exportToNebimExcel() {
             if (!activeOrder) return;
             
@@ -1106,7 +1100,6 @@
             showToast("Nebim V3 Excel şablonu başarıyla indirildi!");
         }
 
-        // --- ABCD.XLSX OKUMA MOTORU ---
         function handleExcelFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1140,10 +1133,10 @@
             parsedExcelItems = [];
             if (!rows || rows.length === 0) return;
 
-            let itemCodeCol = 2; // ItemCode (C)
-            let colorCodeCol = 3; // ColorCode (D)
-            let qty1Col = 7; // Qty1 (H)
-            let priceCol = 12; // Price (M)
+            let itemCodeCol = 2; 
+            let colorCodeCol = 3; 
+            let qty1Col = 7; 
+            let priceCol = 12; 
             let startRow = 0;
 
             for (let r = 0; r < Math.min(5, rows.length); r++) {
@@ -1281,7 +1274,7 @@
             openOrderDetail(newId);
         }
 
-        // --- ŞİFRE KONTROLLÜ GİRİŞ İŞLEMLERİ (YENİ ŞİFRELER İLE) ---
+        // --- ŞİFRE DOĞRULAMA MOTORU ---
         function requestPasswordAndLogin(roleKey) {
             if (roleKey === 'muhasebe') {
                 const pass = prompt("Muhasebe (Gökhan) Giriş Şifresi:");
@@ -1340,7 +1333,6 @@
             loginAs('satis');
         }
 
-        // --- KAMBER USTA İÇİN DEPO ARAMA MOTORU ---
         function searchDepoCatalogDropdown(query) {
             const sel = document.getElementById("depo-select-product");
             if (!sel) return;
@@ -1382,6 +1374,7 @@
             if (lbl) lbl.innerText = masterProducts.length;
         }
 
+        // --- ROL VE GÖREV BAZLI ERİŞİM VE İZOLASYON ---
         function loginAs(roleKey) {
             currentUser = USER_ROLES[roleKey];
             if (!currentUser) return;
@@ -1412,6 +1405,7 @@
             const avatarIcon = document.getElementById("role-avatar-icon");
             if (avatarIcon) avatarIcon.className = `fa-solid ${currentUser.avatarIcon}`;
 
+            // Buton görünürlük izinleri
             const btnNewOrder = document.getElementById("btn-header-new-order");
             if (btnNewOrder) btnNewOrder.style.display = currentUser.canCreateOrder ? "flex" : "none";
 
@@ -1428,7 +1422,7 @@
                 repSelect.value = currentUser.name;
             }
 
-            // Admin ise Yönetici Özet Panelini göster
+            // Sadece Admin görebilir: Yönetici Özet Paneli
             const perfSec = document.getElementById("admin-performance-section");
             if (perfSec) {
                 if (currentUser.roleId === 'admin') {
@@ -1443,7 +1437,6 @@
             showToast(`Hoş geldiniz, ${currentUser.name}!`);
         }
 
-        // --- ADMIN ÖZET PANELİ RENDER ---
         function renderAdminPerformance() {
             const kpiContainer = document.getElementById("admin-kpi-cards");
             const tbody = document.getElementById("admin-performance-tbody");
@@ -1534,35 +1527,43 @@
             renderOrderList();
         }
 
+        // --- HERKESİN SADECE KENDİYLE ALAKALI DOSYAYI GÖRDÜĞÜ LİSTELEME ---
         function renderOrderList() {
             const tbody = document.getElementById("orders-table-body");
             if (!tbody) return;
             tbody.innerHTML = "";
 
-            let visibleOrders = orders;
-            
-            // MUHASEBE (GÖKHAN) İÇİN ÖZEL FİLTRE: Sadece depo veya saha onayından geçmiş (currentStep >= 2 veya 3) dosyaları göster
-            if (currentUser && currentUser.roleId === 'muhasebe') {
-                visibleOrders = orders.filter(ord => ord.currentStep >= 2);
-                const tTitle = document.getElementById("dashboard-table-title");
-                if (tTitle) tTitle.innerText = `Muhasebe Fatura Onay Kuyruğu (Depo & Saha Onaylı)`;
-                const tSub = document.getElementById("dashboard-table-subtitle");
-                if (tSub) tSub.innerText = `Depo veya saha sürecinden geçerek muhasebeye düşen aktif dosyalar.`;
-            } else if (currentUser && currentUser.roleId === 'satis') {
+            let visibleOrders = [];
+
+            if (currentUser.roleId === 'satis') {
+                // Sadece Satış Temsilcisinin Kendi Siparişleri
                 visibleOrders = orders.filter(ord => (ord.salesRep || '').trim().toLowerCase() === currentUser.name.trim().toLowerCase());
-                const tTitle = document.getElementById("dashboard-table-title");
-                if (tTitle) tTitle.innerText = `Siparişlerim (${currentUser.name})`;
-                const tSub = document.getElementById("dashboard-table-subtitle");
-                if (tSub) tSub.innerText = `Yalnızca sizin tarafınızdan açılmış sipariş dosyaları listelenmektedir.`;
+                document.getElementById("dashboard-table-title").innerText = `Sipariş Dosyalarım (${currentUser.name})`;
+                document.getElementById("dashboard-table-subtitle").innerText = `Yalnızca sizin tarafınızdan açılmış siparişler listelenmektedir.`;
+            } else if (currentUser.roleId === 'depo') {
+                // Depocu Kamber: Satıştan onaylanmış ve depoda hazırlık bekleyen veya sevk edilmiş siparişler (currentStep >= 2)
+                visibleOrders = orders.filter(ord => ord.currentStep >= 2);
+                document.getElementById("dashboard-table-title").innerText = `Depo Sevkiyat & Hazırlık Masası`;
+                document.getElementById("dashboard-table-subtitle").innerText = `Satış ekibinden gelen ve araç yüklemesi yapılacak aktif siparişler.`;
+            } else if (currentUser.roleId === 'saha') {
+                // Saha Sefa Usta: Depodan sevk edilmiş ve montaj bekleyen siparişler (currentStep >= 3)
+                visibleOrders = orders.filter(ord => ord.currentStep >= 3);
+                document.getElementById("dashboard-table-title").innerText = `Saha Montaj & İade/İlave Masası`;
+                document.getElementById("dashboard-table-subtitle").innerText = `Depodan araca yüklenip sahaya gelen ve montajı yapılacak işler.`;
+            } else if (currentUser.roleId === 'muhasebe') {
+                // Muhasebe Gökhan: Depo ve Saha onayı tamamlanmış ve faturası kesilecek fişler (currentStep >= 2 ve 3)
+                visibleOrders = orders.filter(ord => ord.currentStep >= 2);
+                document.getElementById("dashboard-table-title").innerText = `Muhasebe Fatura Onay Kuyruğu`;
+                document.getElementById("dashboard-table-subtitle").innerText = `Depo veya Saha onayı tamamlanmış, faturalandırılmayı bekleyen fişler.`;
             } else {
-                const tTitle = document.getElementById("dashboard-table-title");
-                if (tTitle) tTitle.innerText = `Tüm Sipariş Dosyaları`;
-                const tSub = document.getElementById("dashboard-table-subtitle");
-                if (tSub) tSub.innerText = `Sistemde kayıtlı olan tüm birimlere ait aktif dosyalar.`;
+                // Admin: Tüm siparişleri görür
+                visibleOrders = orders;
+                document.getElementById("dashboard-table-title").innerText = `Tüm Sipariş Dosyaları (Admin)`;
+                document.getElementById("dashboard-table-subtitle").innerText = `Sistemde kayıtlı olan tüm birimlere ait aktif dosyalar.`;
             }
 
             if (visibleOrders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Bu ekranda görüntülenecek onaylı dosya bulunamadı.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Bu ekranda yetki alanınıza ait aktif dosya bulunmuyor.</td></tr>`;
                 return;
             }
 
@@ -1574,7 +1575,7 @@
                 if (ord.currentStep === 1) badge = `<span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-file-signature mr-1"></i> 1. Satış Formunda</span>`;
                 else if (ord.currentStep === 2) badge = `<span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-boxes-packing mr-1"></i> 2. Depo Onaylı / Sevk</span>`;
                 else if (ord.currentStep === 3) badge = `<span class="bg-purple-100 text-purple-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-truck-ramp-box mr-1"></i> 3. Saha Onaylı</span>`;
-                else if (ord.currentStep === 4) badge = `<span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-receipt mr-1"></i> 4. Muhasebe Aşamasında</span>`;
+                else if (ord.currentStep === 4) badge = `<span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-receipt mr-1"></i> 4. Muhasebede Bekliyor</span>`;
                 else badge = `<span class="bg-slate-900 text-white text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-check-double text-emerald-400 mr-1"></i> Fatura Kesildi (Kapandı)</span>`;
 
                 tr.innerHTML = `
@@ -1591,11 +1592,13 @@
             });
         }
 
+        // --- DETAY EKRANINDA KESİN ROL İZOLASYONU ---
         function openOrderDetail(orderId) {
             activeOrder = orders.find(o => o.id === orderId);
             if (!activeOrder) return;
 
-            if (currentUser && currentUser.roleId === 'satis' && (activeOrder.salesRep || '').trim().toLowerCase() !== currentUser.name.trim().toLowerCase()) {
+            // Satış yetki kontrolü
+            if (currentUser.roleId === 'satis' && (activeOrder.salesRep || '').trim().toLowerCase() !== currentUser.name.trim().toLowerCase()) {
                 showToast("YETKİSİZ ERİŞİM: Yalnızca kendi siparişlerinizi açabilirsiniz.", true);
                 return;
             }
@@ -1609,22 +1612,25 @@
 
             buildDynamicStepperTabs();
             
-            // Muhasebe girişi yapıldıysa doğrudan 4. adıma (Muhasebe Fatura Ekranına) yönlendir
-            const defaultStep = (currentUser.roleId === 'muhasebe') ? 4 : (currentUser.visibleSteps[0] || 1);
+            // Kullanıcıyı doğrudan YALNIZCA kendi yetkili olduğu adıma yönlendir
+            const defaultStep = currentUser.visibleSteps[0] || 1;
             switchStepTab(defaultStep);
             populateProductSelects();
         }
 
+        // --- SADECE YETKİLİ OLUNAN ADIMLARIN BUTONLARINI GÖSTER (KAMBER USTA MUHASEBEYİ GÖREMEZ) ---
         function buildDynamicStepperTabs() {
             const container = document.getElementById("stepper-buttons-container");
             if (!container) return;
             container.innerHTML = "";
             const stepNames = {
-                1: { num: 1, title: "1. Sipariş Formu (Satış)" },
-                2: { num: 2, title: "2. Sevk İrsaliyesi (Depo)" },
+                1: { num: 1, title: "1. Satış Sipariş Formu" },
+                2: { num: 2, title: "2. Depo Sevk İrsaliyesi" },
                 3: { num: 3, title: "3. Saha İade & İlave" },
-                4: { num: 4, title: "4. Muhasebe & Fatura" }
+                4: { num: 4, title: "4. Muhasebe Fatura & Kapanış" }
             };
+
+            // Kullanıcının visibleSteps dizisinde olmayan hiçbir adım DOM'a dahi eklenmez!
             currentUser.visibleSteps.forEach(stepIdx => {
                 const info = stepNames[stepIdx];
                 const btn = document.createElement("button");
@@ -1643,6 +1649,12 @@
         }
 
         function switchStepTab(step) {
+            // Güvenlik: Kullanıcının bu adıma yetkisi yoksa çalıştırma!
+            if (!currentUser.visibleSteps.includes(step) && currentUser.roleId !== 'admin') {
+                showToast("YETKİSİZ ERİŞİM: Bu adımı görüntüleme izniniz yok!", true);
+                return;
+            }
+
             activeStepTab = step;
             for (let i = 1; i <= 4; i++) {
                 const content = document.getElementById(`content-step-${i}`);
@@ -1858,40 +1870,6 @@
             searchDepoCatalogDropdown("");
         }
 
-        function searchDepoCatalogDropdown(query) {
-            const sel = document.getElementById("depo-select-product");
-            if (!sel) return;
-            sel.innerHTML = "";
-            const q = (query || "").trim().toLowerCase();
-            
-            let matched = [];
-            if (!q) {
-                matched = masterProducts.slice(0, 50);
-            } else {
-                matched = masterProducts.filter(p => 
-                    p.id.toLowerCase().includes(q) || 
-                    p.name.toLowerCase().includes(q) || 
-                    (p.color && p.color.toLowerCase().includes(q))
-                ).slice(0, 50);
-            }
-
-            if (matched.length === 0) {
-                const opt = document.createElement("option");
-                opt.value = "";
-                opt.innerText = "Eşleşen ürün bulunamadı";
-                sel.appendChild(opt);
-                return;
-            }
-
-            matched.forEach(p => {
-                const opt = document.createElement("option");
-                opt.value = p.id;
-                const colorTxt = (p.color && p.color !== "-") ? ` [${p.color}]` : "";
-                opt.innerText = `${p.id} - ${p.name}${colorTxt} (${Number(p.price).toLocaleString('tr-TR')} ₺)`;
-                sel.appendChild(opt);
-            });
-        }
-
         function addItemFromDepo() {
             const prodId = document.getElementById("depo-select-product").value;
             const qty = parseInt(document.getElementById("depo-add-qty").value) || 1;
@@ -1931,6 +1909,7 @@
             returnToDashboard();
         }
 
+        // --- 3. ADIM: SAHA ---
         function renderStep3() {
             const retCont = document.getElementById("step3-returns-container");
             const extCont = document.getElementById("step3-extras-container");
@@ -2020,6 +1999,7 @@
             returnToDashboard();
         }
 
+        // --- 4. ADIM: MUHASEBE ---
         function renderStep4() {
             const tbody = document.getElementById("step4-items-tbody");
             if (!tbody) return;
