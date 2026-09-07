@@ -59,7 +59,7 @@
                 <label class="block text-xs font-extrabold text-emerald-800 uppercase tracking-wider text-center">Giriş Yapmak İstediğiniz Profil</label>
                 <div class="grid grid-cols-1 gap-2.5">
                     
-                    <!-- Satış Profili Seçimi (Şifreli) -->
+                    <!-- Satış Profili Seçimi -->
                     <div class="p-3.5 rounded-2xl border border-emerald-100 hover:border-emerald-500 bg-emerald-50/30 transition text-left space-y-2.5">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-base">
@@ -125,7 +125,7 @@
                                     <span>Muhasebe (Gökhan)</span>
                                     <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
                                 </div>
-                                <div class="text-[11px] text-slate-500 font-medium">Tüm Evrakları Görür (Şifre Korumalı)</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Tamamlanacak Fişler (Şifre: 3278)</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs"></i>
@@ -160,7 +160,6 @@
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center space-x-3 cursor-pointer" onclick="returnToDashboard()">
                         
-                        <!-- Üst Menü Logo -->
                         <div class="flex flex-col justify-center">
                             <span class="text-xl font-black tracking-[0.18em] text-white leading-none font-serif">CİNPA</span>
                             <span class="text-[6px] font-bold tracking-[0.25em] text-emerald-300 uppercase mt-0.5">PLANTS &amp; FLOWERS</span>
@@ -232,7 +231,7 @@
                 </div>
             </div>
 
-            <!-- ADMIN ÖZEL: YÖNETİCİ ÖZET PANELİ & PERFORMANS ANALİZİ -->
+            <!-- ADMIN ÖZEL: YÖNETİCİ ÖZET PANELİ -->
             <section id="admin-performance-section" class="hidden space-y-4">
                 <div class="bg-emerald-900 text-white p-6 rounded-3xl shadow-lg space-y-4 border border-emerald-800">
                     <div class="flex items-center justify-between border-b border-emerald-800 pb-3">
@@ -248,9 +247,7 @@
                         <span class="bg-emerald-800 text-emerald-200 text-xs font-bold px-3 py-1 rounded-full border border-emerald-700">Yönetim Modu</span>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="admin-kpi-cards">
-                        <!-- JS ile doldurulacak -->
-                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="admin-kpi-cards"></div>
 
                     <div class="overflow-x-auto bg-white/10 rounded-2xl p-2 border border-emerald-800">
                         <table class="w-full text-left text-sm text-white">
@@ -377,7 +374,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Canlı Arama ile Ürün Ekleme -->
                             <div id="add-mode-catalog-box" class="space-y-3">
                                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
                                     <div class="sm:col-span-8">
@@ -404,19 +400,19 @@
                             <div id="add-mode-manual-box" class="hidden grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
                                 <div class="sm:col-span-3">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Ürün Kodu</label>
-                                    <input type="text" id="manual-code" placeholder="Örn: 0101007" class="w-full text-xs font-bold p-3 rounded-xl border border-emerald-300 bg-white">
+                                    <input type="text" id="manual-code" placeholder="Örn: 0101007" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 bg-white">
                                 </div>
                                 <div class="sm:col-span-5">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Ürün Adı & Renk</label>
-                                    <input type="text" id="manual-name" placeholder="Örn: YUCCA BUSH (BEYAZ)" class="w-full text-xs font-semibold p-3 rounded-xl border border-emerald-300 bg-white">
+                                    <input type="text" id="manual-name" placeholder="Örn: YUCCA BUSH (BEYAZ)" class="w-full text-xs font-semibold p-3 rounded-xl border border-slate-300 bg-white">
                                 </div>
                                 <div class="sm:col-span-2">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Fiyat (TL)</label>
-                                    <input type="number" id="manual-price" placeholder="0" min="0" step="any" class="w-full text-xs font-bold p-3 rounded-xl border border-emerald-300 bg-white text-right">
+                                    <input type="number" id="manual-price" placeholder="0" min="0" step="any" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 bg-white text-right">
                                 </div>
                                 <div class="sm:col-span-2">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Adet</label>
-                                    <input type="number" id="manual-qty" value="1" min="1" class="w-full text-xs font-bold p-3 rounded-xl border border-emerald-300 text-center bg-white">
+                                    <input type="number" id="manual-qty" value="1" min="1" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 text-center bg-white">
                                 </div>
                                 <div class="sm:col-span-12 flex justify-between items-center pt-2">
                                     <label class="flex items-center space-x-2 text-xs text-slate-600 font-semibold cursor-pointer">
@@ -499,7 +495,7 @@
                         <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
                             <div class="text-xs text-slate-500 flex items-center"><i class="fa-solid fa-truck-ramp-box text-slate-400 mr-2"></i> Kolilendi ve araca yüklenmeye hazır.</div>
                             <div id="step2-action-buttons">
-                                <button type="button" onclick="forwardToField()" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2">
+                                <button type="button" onclick="forwardToField()" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-lg shadow-lg transition flex items-center space-x-2">
                                     <i class="fa-solid fa-truck-fast"></i><span>Sevk İrsaliyesini Kes & Sahaya İlet</span>
                                 </button>
                             </div>
@@ -646,7 +642,7 @@
     <!-- NEBİM / EXCEL'DEN FİŞ İÇE AKTAR MODAL -->
     <div id="modal-excel-import" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center justify-between border-b border-emerald-100 pb-3">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg"><i class="fa-solid fa-file-excel"></i></div>
                     <div>
@@ -710,7 +706,6 @@
                 <button type="button" onclick="closeCatalogModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <!-- Excel'den Toplu Katalog Yükleme ve Toplu Silme Araçları -->
             <div class="bg-emerald-50/40 border border-emerald-200 p-4 rounded-2xl flex flex-col lg:flex-row items-center justify-between gap-3">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
@@ -812,7 +807,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE ŞİFRE DOĞRULAMA MOTORU -->
+    <!-- JAVASCRIPT STATE VE İZOLASYON MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -837,9 +832,9 @@
             },
             muhasebe: {
                 roleId: 'muhasebe', name: 'Gökhan', title: 'Muhasebe Uzmanı', badgeText: 'MUHASEBE PANELİ',
-                dutyText: '4 Adımın HEPSİNİ görür ve inceler. İlk 3 adımı değiştiremez, sadece 4. adımda faturalandırır.',
+                dutyText: 'Tamamlanmak üzere olan (Saha onaylı) fişleri inceler ve faturalandırarak kapatır.',
                 colorClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', avatarBg: 'bg-emerald-100 text-emerald-700', avatarIcon: 'fa-receipt',
-                visibleSteps: [1, 2, 3, 4], canCreateOrder: false, canManageCatalog: false
+                visibleSteps: [4], canCreateOrder: false, canManageCatalog: false
             },
             admin: {
                 roleId: 'admin', name: 'Sistem Yöneticisi', title: 'Admin (Tam Yetki)', badgeText: 'TAM YETKİLİ ADMIN',
@@ -865,7 +860,7 @@
         let parsedExcelItems = [];
 
         // --- INDEXEDDB KALICI VERİTABANI MOTORU ---
-        const DB_NAME = "CinpaMasterDB_v7";
+        const DB_NAME = "CinpaMasterDB_v8";
         const DB_VERSION = 1;
         const STORE_CATALOG = "catalog";
         const STORE_ORDERS = "orders";
@@ -891,7 +886,6 @@
             try {
                 const db = await openDB();
                 
-                // Katalog yükle
                 const txCat = db.transaction(STORE_CATALOG, "readonly");
                 const storeCat = txCat.objectStore(STORE_CATALOG);
                 const reqCat = storeCat.getAll();
@@ -901,7 +895,6 @@
                     if (masterProducts.length > 0) populateProductSelects();
                 };
 
-                // Siparişleri yükle
                 const txOrd = db.transaction(STORE_ORDERS, "readonly");
                 const storeOrd = txOrd.objectStore(STORE_ORDERS);
                 const reqOrd = storeOrd.getAll();
@@ -1467,7 +1460,7 @@
                         if (ext.faikApproval) sub += ext.qty * ext.price;
                     });
                 }
-                totalRevenue += sub * 1.20; // KDV Dahil
+                totalRevenue += sub * 1.20;
             });
 
             kpiContainer.innerHTML = `
@@ -1540,7 +1533,15 @@
             tbody.innerHTML = "";
 
             let visibleOrders = orders;
-            if (currentUser && currentUser.roleId === 'satis') {
+            
+            // MUHASEBE (GÖKHAN) İÇİN ÖZEL FİLTRE: Sadece 3. aşamayı tamamlamış veya onay bekleyenleri listele
+            if (currentUser && currentUser.roleId === 'muhasebe') {
+                visibleOrders = orders.filter(ord => ord.currentStep >= 3);
+                const tTitle = document.getElementById("dashboard-table-title");
+                if (tTitle) tTitle.innerText = `Muhasebe Fatura Onay Kuyruğu`;
+                const tSub = document.getElementById("dashboard-table-subtitle");
+                if (tSub) tSub.innerText = `Saha montajı tamamlanan ve faturalandırılmayı bekleyen dosyalar.`;
+            } else if (currentUser && currentUser.roleId === 'satis') {
                 visibleOrders = orders.filter(ord => (ord.salesRep || '').trim().toLowerCase() === currentUser.name.trim().toLowerCase());
                 const tTitle = document.getElementById("dashboard-table-title");
                 if (tTitle) tTitle.innerText = `Siparişlerim (${currentUser.name})`;
@@ -1554,7 +1555,7 @@
             }
 
             if (visibleOrders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Bu profile ait sipariş dosyası bulunamadı.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Bu ekranda görüntülenecek dosya bulunamadı.</td></tr>`;
                 return;
             }
 
@@ -1600,7 +1601,9 @@
             document.getElementById("step1-sales-rep").innerText = activeOrder.salesRep;
 
             buildDynamicStepperTabs();
-            const defaultStep = currentUser.visibleSteps[0] || 1;
+            
+            // Muhasebe girişi yapıldıysa doğrudan 4. adıma (Muhasebe Fatura Ekranına) yönlendir
+            const defaultStep = (currentUser.roleId === 'muhasebe') ? 4 : (currentUser.visibleSteps[0] || 1);
             switchStepTab(defaultStep);
             populateProductSelects();
         }
