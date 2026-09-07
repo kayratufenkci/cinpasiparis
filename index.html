@@ -52,30 +52,33 @@
                     <h1 class="logo-text text-3xl m-0 leading-none">CİNPA</h1>
                     <span class="logo-sub text-[8.5px] uppercase mt-1">PLANTS &amp; FLOWERS</span>
                 </div>
-                <p class="text-xs text-slate-500 font-medium pt-1">Nebim Entegreli Yeşil & Beyaz Kurumsal Portal</p>
+                <p class="text-xs text-slate-500 font-medium pt-1">Nebim Entegreli Güvenli Kurumsal Portal</p>
             </div>
 
             <div class="space-y-3 pt-2">
                 <label class="block text-xs font-extrabold text-emerald-800 uppercase tracking-wider text-center">Giriş Yapmak İstediğiniz Profil</label>
                 <div class="grid grid-cols-1 gap-2.5">
                     
-                    <!-- Satış Profili Seçimi -->
+                    <!-- Satış Profili Seçimi (Şifreli) -->
                     <div class="p-3.5 rounded-2xl border border-emerald-100 hover:border-emerald-500 bg-emerald-50/30 transition text-left space-y-2.5">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-base">
                                 <i class="fa-solid fa-file-signature"></i>
                             </div>
                             <div>
-                                <div class="text-xs font-black text-slate-900">Satış Uzmanı Girişi</div>
+                                <div class="text-xs font-black text-slate-900 flex items-center space-x-1.5">
+                                    <span>Satış Uzmanı Girişi</span>
+                                    <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
+                                </div>
                                 <div class="text-[11px] text-slate-500 font-medium">Sadece kendi siparişlerinizi görürsünüz</div>
                             </div>
                         </div>
                         <div class="flex items-center space-x-2 pt-1">
                             <select id="login-sales-rep-select" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-600">
-                                <option value="Orhan Özen">Orhan Özen</option>
+                                <option value="Orhan Özen">Orhan Özen (Şifreli)</option>
+                                <option value="Salih Şahin">Salih Şahin (Şifreli)</option>
                                 <option value="Uğur Morkoç">Uğur Morkoç</option>
                                 <option value="Tolga Keleş">Tolga Keleş</option>
-                                <option value="Salih Şahin">Salih Şahin</option>
                             </select>
                             <button type="button" onclick="loginAsSalesSelected()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md transition whitespace-nowrap">
                                 Giriş <i class="fa-solid fa-arrow-right ml-1"></i>
@@ -111,7 +114,7 @@
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs"></i>
                     </button>
 
-                    <!-- Muhasebe Profili (Şifreli: 1) -->
+                    <!-- Muhasebe Profili (Şifreli: 3278) -->
                     <button type="button" onclick="requestPasswordAndLogin('muhasebe')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
@@ -122,7 +125,7 @@
                                     <span>Muhasebe (Gökhan)</span>
                                     <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
                                 </div>
-                                <div class="text-[11px] text-slate-500 font-medium">Tüm Evrakları Görür (Şifre: 1)</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Tüm Evrakları Görür (Şifre Korumalı)</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs"></i>
@@ -165,7 +168,7 @@
 
                         <div class="border-l border-emerald-700 pl-3">
                             <div class="flex items-center space-x-2">
-                                <span class="bg-emerald-800 text-emerald-200 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-700" id="header-role-badge">SATIŞ PANELİ</span>
+                                <span class="bg-emerald-800 text-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-700" id="header-role-badge">SATIŞ PANELİ</span>
                             </div>
                             <p class="text-[11px] text-emerald-200 font-medium mt-0.5" id="header-user-desc">Kullanıcı: -</p>
                         </div>
@@ -643,7 +646,7 @@
     <!-- NEBİM / EXCEL'DEN FİŞ İÇE AKTAR MODAL -->
     <div id="modal-excel-import" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-emerald-100 pb-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg"><i class="fa-solid fa-file-excel"></i></div>
                     <div>
@@ -809,7 +812,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT STATE VE SİPARİŞ / KATALOG KALICI KAYIT MOTORU -->
+    <!-- JAVASCRIPT STATE VE ŞİFRE DOĞRULAMA MOTORU -->
     <script>
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
 
@@ -862,7 +865,7 @@
         let parsedExcelItems = [];
 
         // --- INDEXEDDB KALICI VERİTABANI MOTORU ---
-        const DB_NAME = "CinpaMasterDB_v6";
+        const DB_NAME = "CinpaMasterDB_v7";
         const DB_VERSION = 1;
         const STORE_CATALOG = "catalog";
         const STORE_ORDERS = "orders";
@@ -1202,7 +1205,7 @@
                     dispatchedQty: qty,
                     returnedQty: 0,
                     price: price,
-                    warehouseNote: "", // BOŞ BIRAKILDI
+                    warehouseNote: "",
                     checked: true
                 });
             }
@@ -1262,7 +1265,7 @@
                 dispatchedQty: i.dispatchedQty,
                 returnedQty: 0,
                 price: i.price,
-                warehouseNote: "", // BOŞ BIRAKILDI
+                warehouseNote: "",
                 checked: true
             }));
 
@@ -1283,6 +1286,58 @@
             closeExcelImportModal();
             showToast(`Sipariş #${newId} başarıyla oluşturuldu!`);
             openOrderDetail(newId);
+        }
+
+        // --- ŞİFRE KONTROLLÜ GİRİŞ İŞLEMLERİ ---
+        function requestPasswordAndLogin(roleKey) {
+            if (roleKey === 'muhasebe') {
+                const pass = prompt("Muhasebe (Gökhan) Giriş Şifresi:");
+                if (pass === null) return;
+                if (pass.trim() === "3278") {
+                    loginAs('muhasebe');
+                } else {
+                    alert("Hatalı Muhasebe şifresi!");
+                }
+            } else if (roleKey === 'admin') {
+                const pass = prompt("Sistem Yöneticisi (Admin) Giriş Şifresi:");
+                if (pass === null) return;
+                if (pass.trim() === "cinpasiparis") {
+                    loginAs('admin');
+                } else {
+                    alert("Hatalı Admin şifresi!");
+                }
+            }
+        }
+
+        function loginAsSalesSelected() {
+            const sel = document.getElementById("login-sales-rep-select");
+            const selectedRep = sel ? sel.value : "Orhan Özen";
+
+            if (selectedRep === "Orhan Özen") {
+                const pass = prompt("Orhan Özen Giriş Şifresi:");
+                if (pass === null) return;
+                if (pass.trim() !== "292520") {
+                    alert("Hatalı Orhan Özen şifresi!");
+                    return;
+                }
+            } else if (selectedRep === "Salih Şahin") {
+                const pass = prompt("Salih Şahin Giriş Şifresi:");
+                if (pass === null) return;
+                if (pass.trim() !== "081016") {
+                    alert("Hatalı Salih Şahin şifresi!");
+                    return;
+                }
+            } else {
+                const pass = prompt(`${selectedRep} Giriş Şifresi:`);
+                if (pass === null) return;
+                if (pass.trim() !== "1907") {
+                    alert("Hatalı şifre!");
+                    return;
+                }
+            }
+
+            USER_ROLES.satis.name = selectedRep;
+            loginAs('satis');
         }
 
         // --- KAMBER USTA İÇİN DEPO ARAMA MOTORU ---
@@ -1325,33 +1380,6 @@
             if (badge) badge.innerText = masterProducts.length;
             const lbl = document.getElementById("master-count-label");
             if (lbl) lbl.innerText = masterProducts.length;
-        }
-
-        function requestPasswordAndLogin(roleKey) {
-            if (roleKey === 'muhasebe') {
-                const pass = prompt("Muhasebe Paneli Giriş Şifresi:");
-                if (pass === null) return;
-                if (pass.trim() === "1") {
-                    loginAs('muhasebe');
-                } else {
-                    alert("Hatalı Muhasebe şifresi!");
-                }
-            } else if (roleKey === 'admin') {
-                const pass = prompt("Sistem Yöneticisi (Admin) Giriş Şifresi:");
-                if (pass === null) return;
-                if (pass.trim() === "cinpasiparis") {
-                    loginAs('admin');
-                } else {
-                    alert("Hatalı Admin şifresi!");
-                }
-            }
-        }
-
-        function loginAsSalesSelected() {
-            const sel = document.getElementById("login-sales-rep-select");
-            const selectedRep = sel ? sel.value : "Orhan Özen";
-            USER_ROLES.satis.name = selectedRep;
-            loginAs('satis');
         }
 
         function loginAs(roleKey) {
