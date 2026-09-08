@@ -59,7 +59,7 @@
                 </div>
                 <div class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span id="cloud-status-text">Kalıcı & Bulut Senkronize Sistem</span>
+                    <span id="cloud-status-text">Nebim & Bulut Canlı Sistem</span>
                 </div>
             </div>
 
@@ -186,8 +186,8 @@
                         </button>
 
                         <button onclick="openExcelImportModal()" id="btn-header-import-excel" class="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl border border-emerald-700 transition flex items-center space-x-1.5 shadow-sm">
-                            <i class="fa-solid fa-file-excel text-emerald-300"></i>
-                            <span class="hidden sm:inline">Nebim / Excel Fişi Yükle</span>
+                            <i class="fa-solid fa-cloud-arrow-down text-emerald-300"></i>
+                            <span class="hidden sm:inline">Nebim / Excel Fişi Çek</span>
                         </button>
 
                         <button onclick="createNewOrderModal()" id="btn-header-new-order" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center space-x-2">
@@ -649,39 +649,66 @@
         </main>
     </div>
 
-    <!-- MODAL 1: EXCEL'DEN FİŞ İÇE AKTAR -->
+    <!-- ================= MODAL: NEBİM / EXCEL FİŞİ ÇEK ================= -->
     <div id="modal-excel-import" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg"><i class="fa-solid fa-file-excel"></i></div>
+                    <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg"><i class="fa-solid fa-cloud-arrow-down"></i></div>
                     <div>
-                        <h3 class="text-base font-extrabold text-slate-900">Nebim / Excel'den Fiş İçe Aktar</h3>
-                        <p class="text-xs text-slate-500">Excel dosyasını yükleyin veya kopyalayıp yapıştırın.</p>
+                        <h3 class="text-base font-extrabold text-slate-900">Nebim / Excel Fişi İçe Aktar</h3>
+                        <p class="text-xs text-slate-500">Canlı SQL Fiş No ile çekebilir veya Excel yükleyebilirsiniz.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeExcelImportModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <div class="space-y-2">
-                <label class="block text-xs font-bold text-slate-700 uppercase">1. Yöntem: Excel Dosyası (.xlsx, .xls, .csv) Seçin</label>
-                <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/40 rounded-2xl p-5 text-center cursor-pointer hover:bg-emerald-50 transition" onclick="document.getElementById('excel-file-input').click()">
-                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-600 mb-1.5"></i>
-                    <div class="text-xs font-extrabold text-slate-800">Bilgisayardan Excel Fişini Seçmek İçin Tıklayın</div>
-                    <div class="text-[11px] text-slate-500">Ürün kodu, renk, miktar ve fiyatlar otomatik işlenir.</div>
-                    <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleExcelFileUpload(event)">
+            <div class="space-y-4 overflow-y-auto pr-1">
+                <!-- YENİ 1. YÖNTEM: NEBİM SQL CANLI FİŞ ÇEKME -->
+                <div class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-black text-emerald-950 uppercase flex items-center space-x-1.5">
+                            <i class="fa-solid fa-bolt text-amber-500 text-sm"></i>
+                            <span>1. Yöntem: Nebim Canlı Fiş Numarası ile Çek (SQL/API)</span>
+                        </label>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-900">En Hızlısı</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="relative flex-1">
+                            <i class="fa-solid fa-barcode absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                            <input type="text" id="nebim-api-fisno-input" placeholder="Nebim Fiş / Sipariş No giriniz (Örn: SIP-2026-001)" class="w-full text-xs font-mono font-bold pl-9 pr-3 py-2.5 rounded-xl border border-emerald-300 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                        </div>
+                        <button type="button" onclick="fetchOrderFromNebimSQL()" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center space-x-1.5 whitespace-nowrap">
+                            <i class="fa-solid fa-arrow-down-to-bracket"></i>
+                            <span>Fişi Getir</span>
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-emerald-800/80">Yerel API köprüsü üzerinden Nebim SQL veritabanındaki sipariş satırlarını saniyeler içinde çeker.</p>
+                </div>
+
+                <!-- 2. YÖNTEM: EXCEL DOSYA SEÇİMİ -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-slate-700 uppercase">2. Yöntem: Excel Dosyası (.xlsx, .xls, .csv) Seçin</label>
+                    <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/40 rounded-2xl p-4 text-center cursor-pointer hover:bg-emerald-50 transition" onclick="document.getElementById('excel-file-input').click()">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl text-emerald-600 mb-1"></i>
+                        <div class="text-xs font-extrabold text-slate-800">Bilgisayardan Excel Fişini Seçmek İçin Tıklayın</div>
+                        <div class="text-[11px] text-slate-500">Ürün kodu, renk, miktar ve fiyatlar otomatik işlenir.</div>
+                        <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleExcelFileUpload(event)">
+                    </div>
+                </div>
+
+                <!-- 3. YÖNTEM: KOPYALA YAPIŞTIR -->
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-bold text-slate-700 uppercase">3. Yöntem: Excel Tablosunu Kopyalayıp Yapıştırın</label>
+                        <span class="text-[11px] text-slate-400">Ctrl + V</span>
+                    </div>
+                    <textarea id="excel-paste-input" rows="2" placeholder="Excel tablosunu kopyalayıp doğrudan buraya yapıştırabilirsiniz..." class="w-full text-xs font-mono p-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white"></textarea>
+                    <button type="button" onclick="parsePastedExcelText()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Yapıştırılan Metni Çözümle</button>
                 </div>
             </div>
 
-            <div class="space-y-2">
-                <div class="flex items-center justify-between">
-                    <label class="text-xs font-bold text-slate-700 uppercase">2. Yöntem: Excel Tablosunu Kopyalayıp Buraya Yapıştırın</label>
-                    <span class="text-[11px] text-slate-400">Ctrl + V</span>
-                </div>
-                <textarea id="excel-paste-input" rows="3" placeholder="Excel tablosunu kopyalayıp doğrudan buraya yapıştırabilirsiniz..." class="w-full text-xs font-mono p-3 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white"></textarea>
-                <button type="button" onclick="parsePastedExcelText()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Yapıştırılan Metni Çözümle</button>
-            </div>
-
+            <!-- OKUNAN ÜRÜNLERİN ÖNİZLEMESİ -->
             <div id="excel-preview-box" class="hidden flex-1 overflow-y-auto border border-emerald-100 rounded-2xl p-3 bg-slate-50 space-y-2">
                 <div class="text-xs font-bold text-slate-700 flex items-center justify-between">
                     <span>Okunan Ürünler: <strong id="excel-preview-count" class="text-emerald-700">0 Kalem</strong></span>
@@ -824,6 +851,14 @@
 
     <!-- ================= JAVASCRIPT MOTORU ================= -->
     <script>
+        // ================= NEBİM SQL ARA KATMAN AYARLARI =================
+        const NEBIM_API_CONFIG = {
+            // Şirket sunucunuzun Cloudflare Tünel adresi veya yerel API adresi
+            baseUrl: "https://api-siparis.cinpa.com", 
+            // Belirlediğiniz gizli Bearer Token
+            authToken: "cinpa_sec_99a8x72b1009_token!" 
+        };
+
         const firebaseConfig = {
             apiKey: "AIzaSyB2VBj_BKmDPPwXbFPV3Pd9Hz4SHiF1saI",
             authDomain: "cinpasiparis.firebaseapp.com",
@@ -895,6 +930,84 @@
             icon.className = isError ? "fa-solid fa-circle-exclamation text-red-400 text-base" : "fa-solid fa-circle-check text-emerald-400 text-base";
             toast.classList.remove("hidden");
             setTimeout(() => { toast.classList.add("hidden"); }, 3000);
+        }
+
+        // ================= NEBİM SQL CANLI FİŞ ÇEKME FONKSİYONU =================
+        async function fetchOrderFromNebimSQL() {
+            const fisInput = document.getElementById("nebim-api-fisno-input");
+            const fisNo = fisInput ? fisInput.value.trim() : "";
+
+            if (!fisNo) {
+                showToast("Lütfen bir Nebim fiş / sipariş numarası giriniz.", true);
+                return;
+            }
+
+            showToast(`Nebim SQL'den fiş #${fisNo} sorgulanıyor...`);
+
+            try {
+                // Şirket ara katmanına güvenli yetkiyle istek gönder
+                const response = await fetch(`${NEBIM_API_CONFIG.baseUrl}/api/siparis/${encodeURIComponent(fisNo)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${NEBIM_API_CONFIG.authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Nebim bağlantı hatası (HTTP ${response.status})`);
+                }
+
+                const data = await response.json();
+                
+                if (!data.items || data.items.length === 0) {
+                    showToast("Nebim'de bu fişe ait satır bulunamadı!", true);
+                    return;
+                }
+
+                // Gelen ürünleri önizleme listesine doldur
+                parsedExcelItems = data.items.map(item => ({
+                    id: String(item.id || item.ItemCode || '').trim(),
+                    name: String(item.name || item.ItemDescription || item.id).trim(),
+                    color: String(item.color || item.ColorCode || '-').trim(),
+                    requestedQty: parseFloat(item.qty || item.Qty1 || 1),
+                    dispatchedQty: parseFloat(item.qty || item.Qty1 || 1),
+                    returnedQty: 0,
+                    price: parseFloat(item.price || item.Price || 0),
+                    warehouseNote: "",
+                    checked: true
+                }));
+
+                // Önizleme tablosunu çiz
+                const tbody = document.getElementById("excel-preview-tbody");
+                tbody.innerHTML = "";
+                let previewTotal = 0;
+
+                parsedExcelItems.forEach(item => {
+                    const sub = item.requestedQty * item.price;
+                    previewTotal += sub;
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td class="p-2 font-mono font-bold text-slate-700">${item.id}</td>
+                        <td class="p-2 font-medium text-slate-900">${item.name}</td>
+                        <td class="p-2 text-center font-bold text-slate-600">${item.color}</td>
+                        <td class="p-2 text-center font-bold">${item.requestedQty} Adet</td>
+                        <td class="p-2 text-right font-bold">${Number(item.price).toLocaleString('tr-TR')} ₺</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById("excel-preview-box").classList.remove("hidden");
+                document.getElementById("excel-preview-count").innerText = `${parsedExcelItems.length} Kalem Ürün`;
+                document.getElementById("excel-preview-total").innerText = `Toplam: ${previewTotal.toLocaleString('tr-TR')} ₺`;
+                updateExcelApplyButton();
+                showToast(`Nebim'den ${parsedExcelItems.length} kalem ürün başarıyla aktarıldı!`);
+
+            } catch (err) {
+                console.error("Nebim API hatası:", err);
+                // Henüz ara katman sunucusu açık değilse bilgi ver
+                showToast("Nebim SQL köprüsü henüz aktif değil veya ulaşılamıyor. (Lütfen ara katmanınızı kontrol edin)", true);
+            }
         }
 
         // ================= CANLI BULUT SİPARİŞ SENKRONİZASYONU =================
@@ -1000,7 +1113,6 @@
                         });
                     });
                     tx.oncomplete = () => {
-                        // Yerel yazma bitti, arka planda buluta da hafif optimize özetini ilet
                         syncCatalogToCloud(productsList);
                         resolve();
                     };
@@ -1014,7 +1126,6 @@
         async function syncCatalogToCloud(productsList) {
             if (!db) return;
             try {
-                // Firestore 1MB limitini aşmamak için ilk 3000 ana ürünü buluta senkronize et
                 const chunk = productsList.slice(0, 3000).map(p => ({
                     id: String(p.id).trim(),
                     name: String(p.name || '').trim(),
@@ -1027,7 +1138,7 @@
                     updatedAt: new Date().toISOString()
                 });
             } catch(e) {
-                console.warn("Bulut katalog sync pas geçildi (Yerel diske kaydedildi):", e);
+                console.warn("Bulut katalog sync pas geçildi:", e);
             }
         }
 
@@ -1121,7 +1232,7 @@
             event.target.value = "";
         }
 
-        // ================= EXCEL'DEN FİŞ ÇEKME (İÇE AKTARMA) MOTORU =================
+        // ================= EXCEL'DEN FİŞ ÇEKME MOTORU =================
         function handleExcelFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1285,7 +1396,7 @@
                 customer: custName,
                 salesRep: currentUser ? currentUser.name : "Orhan Özen",
                 date: new Date().toISOString().split("T")[0],
-                notes: "Excel dosyasından aktarıldı.",
+                notes: "Excel / Nebim SQL üzerinden aktarıldı.",
                 currentStep: 1,
                 items: formattedItems,
                 extras: [],
@@ -2096,6 +2207,8 @@
             document.getElementById("excel-preview-box").classList.add("hidden");
             document.getElementById("excel-paste-input").value = "";
             document.getElementById("excel-file-input").value = "";
+            const fisInput = document.getElementById("nebim-api-fisno-input");
+            if (fisInput) fisInput.value = "";
             updateExcelApplyButton();
         }
 
@@ -2226,8 +2339,7 @@
 
             await saveCatalogToDB(masterProducts);
             renderCatalogTable();
-            populateProductSelects();
-            showToast(`${selectedIndices.length} ürün kalıcı olarak silindi.`);
+            showToast(`${selectedIndices.length} ürün silindi.`);
         }
 
         async function deleteAllCatalogItems() {
@@ -2235,8 +2347,7 @@
             masterProducts = [];
             await saveCatalogToDB(masterProducts);
             renderCatalogTable();
-            populateProductSelects();
-            showToast("Tüm katalog tamamen temizlendi.");
+            showToast("Tüm katalog temizlendi.");
         }
 
         function filterCatalogTable() {
@@ -2253,8 +2364,7 @@
             masterProducts.splice(idx, 1);
             await saveCatalogToDB(masterProducts);
             renderCatalogTable();
-            populateProductSelects();
-            showToast("Ürün katalogdan silindi.");
+            showToast("Ürün silindi.");
         }
 
         function updateHeaderBadgeCounts() {
