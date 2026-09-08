@@ -649,167 +649,6 @@
         </main>
     </div>
 
-    <!-- ================= MODAL: NEBİM / EXCEL FİŞİ ÇEK ================= -->
-    <div id="modal-excel-import" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg"><i class="fa-solid fa-cloud-arrow-down"></i></div>
-                    <div>
-                        <h3 class="text-base font-extrabold text-slate-900">Nebim / Excel Fişi İçe Aktar</h3>
-                        <p class="text-xs text-slate-500">Canlı SQL Fiş No ile çekebilir veya Excel yükleyebilirsiniz.</p>
-                    </div>
-                </div>
-                <button type="button" onclick="closeExcelImportModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <div class="space-y-4 overflow-y-auto pr-1">
-                <!-- YENİ 1. YÖNTEM: NEBİM SQL CANLI FİŞ ÇEKME -->
-                <div class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-2.5">
-                    <div class="flex items-center justify-between">
-                        <label class="text-xs font-black text-emerald-950 uppercase flex items-center space-x-1.5">
-                            <i class="fa-solid fa-bolt text-amber-500 text-sm"></i>
-                            <span>1. Yöntem: Nebim Canlı Fiş Numarası ile Çek (SQL/API)</span>
-                        </label>
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-900">En Hızlısı</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <div class="relative flex-1">
-                            <i class="fa-solid fa-barcode absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                            <input type="text" id="nebim-api-fisno-input" placeholder="Nebim Fiş / Sipariş No giriniz (Örn: SIP-2026-001)" class="w-full text-xs font-mono font-bold pl-9 pr-3 py-2.5 rounded-xl border border-emerald-300 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600">
-                        </div>
-                        <button type="button" onclick="fetchOrderFromNebimSQL()" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center space-x-1.5 whitespace-nowrap">
-                            <i class="fa-solid fa-arrow-down-to-bracket"></i>
-                            <span>Fişi Getir</span>
-                        </button>
-                    </div>
-                    <p class="text-[10px] text-emerald-800/80">Yerel API köprüsü üzerinden Nebim SQL veritabanındaki sipariş satırlarını saniyeler içinde çeker.</p>
-                </div>
-
-                <!-- 2. YÖNTEM: EXCEL DOSYA SEÇİMİ -->
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-bold text-slate-700 uppercase">2. Yöntem: Excel Dosyası (.xlsx, .xls, .csv) Seçin</label>
-                    <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/40 rounded-2xl p-4 text-center cursor-pointer hover:bg-emerald-50 transition" onclick="document.getElementById('excel-file-input').click()">
-                        <i class="fa-solid fa-cloud-arrow-up text-2xl text-emerald-600 mb-1"></i>
-                        <div class="text-xs font-extrabold text-slate-800">Bilgisayardan Excel Fişini Seçmek İçin Tıklayın</div>
-                        <div class="text-[11px] text-slate-500">Ürün kodu, renk, miktar ve fiyatlar otomatik işlenir.</div>
-                        <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleExcelFileUpload(event)">
-                    </div>
-                </div>
-
-                <!-- 3. YÖNTEM: KOPYALA YAPIŞTIR -->
-                <div class="space-y-1.5">
-                    <div class="flex items-center justify-between">
-                        <label class="text-xs font-bold text-slate-700 uppercase">3. Yöntem: Excel Tablosunu Kopyalayıp Yapıştırın</label>
-                        <span class="text-[11px] text-slate-400">Ctrl + V</span>
-                    </div>
-                    <textarea id="excel-paste-input" rows="2" placeholder="Excel tablosunu kopyalayıp doğrudan buraya yapıştırabilirsiniz..." class="w-full text-xs font-mono p-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white"></textarea>
-                    <button type="button" onclick="parsePastedExcelText()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Yapıştırılan Metni Çözümle</button>
-                </div>
-            </div>
-
-            <!-- OKUNAN ÜRÜNLERİN ÖNİZLEMESİ -->
-            <div id="excel-preview-box" class="hidden flex-1 overflow-y-auto border border-emerald-100 rounded-2xl p-3 bg-slate-50 space-y-2">
-                <div class="text-xs font-bold text-slate-700 flex items-center justify-between">
-                    <span>Okunan Ürünler: <strong id="excel-preview-count" class="text-emerald-700">0 Kalem</strong></span>
-                    <span id="excel-preview-total" class="font-extrabold text-slate-900">0 ₺</span>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs bg-white rounded-lg overflow-hidden">
-                        <thead class="bg-slate-100 font-bold text-slate-600">
-                            <tr>
-                                <th class="p-2">Kod</th>
-                                <th class="p-2">Ürün Adı</th>
-                                <th class="p-2 text-center">Renk</th>
-                                <th class="p-2 text-center">Adet</th>
-                                <th class="p-2 text-right">Fiyat</th>
-                            </tr>
-                        </thead>
-                        <tbody id="excel-preview-tbody" class="divide-y divide-slate-100"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end space-x-3 pt-2 border-t border-slate-100">
-                <button type="button" onclick="closeExcelImportModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs">İptal</button>
-                <button type="button" onclick="applyExcelImportToOrder()" id="btn-apply-excel" disabled class="px-5 py-2.5 rounded-xl bg-slate-300 text-white font-bold text-xs cursor-not-allowed transition flex items-center space-x-2">
-                    <i class="fa-solid fa-check"></i><span>Yeni Sipariş Olarak Panele Aktar</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 2: KATALOG PENCERESİ -->
-    <div id="modal-catalog" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-        <div class="bg-white rounded-3xl max-w-5xl w-full p-6 shadow-2xl space-y-5 max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-emerald-100 pb-3">
-                <h3 class="text-base font-extrabold text-slate-900 flex items-center"><i class="fa-solid fa-boxes-stacked text-emerald-700 mr-2"></i> ÇİNPA Ürün Kataloğu & Fiyat Listesi</h3>
-                <button type="button" onclick="closeCatalogModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <div class="bg-emerald-50/40 border border-emerald-200 p-4 rounded-2xl flex flex-col lg:flex-row items-center justify-between gap-3">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
-                        <i class="fa-solid fa-file-excel"></i>
-                    </div>
-                    <div>
-                        <div class="text-xs font-black text-slate-900">Excel'den Fiyatlı Katalog Yükle (Kalıcı Diske Mühürlenir)</div>
-                        <div class="text-[11px] text-slate-500">Sütun A: Kod | Sütun B: Ürün Adı | Sütun C: Renk | Sütun D: Toptan Fiyat (Kayıtlı: <span id="master-count-label" class="font-bold text-emerald-700">0</span>)</div>
-                    </div>
-                </div>
-                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                    <button type="button" onclick="document.getElementById('catalog-excel-file').click()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <span>Excel Seç & Kaydet</span>
-                    </button>
-                    <input type="file" id="catalog-excel-file" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleCatalogExcelUpload(event)">
-
-                    <button type="button" onclick="deleteSelectedCatalogItems()" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5">
-                        <i class="fa-solid fa-square-check"></i>
-                        <span>Seçilenleri Sil</span>
-                    </button>
-
-                    <button type="button" onclick="deleteAllCatalogItems()" class="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5">
-                        <i class="fa-solid fa-trash-can"></i>
-                        <span>Hepsini Sil</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="flex items-center space-x-3">
-                <div class="relative flex-1">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                    <input type="text" id="cat-search-input" onkeyup="filterCatalogTable()" placeholder="Katalogda ürün kodu, adı veya renk ara..." class="w-full text-xs pl-9 pr-3 py-2.5 rounded-xl border border-emerald-200 bg-slate-50 focus:bg-white">
-                </div>
-            </div>
-
-            <div class="bg-slate-50 p-4 rounded-2xl border border-emerald-100 grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
-                <input type="text" id="cat-new-code" placeholder="Kod (Örn: 0101007)" class="sm:col-span-3 p-2.5 rounded-xl border border-slate-300 font-bold bg-white">
-                <input type="text" id="cat-new-name" placeholder="Ürün Tanımı (Örn: YUCCA BUSH)" class="sm:col-span-4 p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
-                <input type="text" id="cat-new-color" placeholder="Renk (Örn: BEYAZ)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
-                <input type="number" id="cat-new-price" placeholder="Fiyat (TL)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 font-bold bg-white text-right">
-                <button type="button" onclick="saveProductToMasterCatalog()" class="sm:col-span-1 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl transition">+ Ekle</button>
-            </div>
-            
-            <div class="overflow-y-auto flex-1 border border-emerald-100 rounded-2xl">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-100 text-slate-700 font-bold uppercase sticky top-0 border-b border-emerald-100">
-                        <tr>
-                            <th class="p-3 w-10 text-center"><input type="checkbox" id="select-all-catalog" onchange="toggleSelectAllCatalog(this.checked)" class="w-4 h-4 text-emerald-700 rounded"></th>
-                            <th class="p-3">Ürün Kodu</th>
-                            <th class="p-3">Ürün Adı</th>
-                            <th class="p-3">Renk</th>
-                            <th class="p-3 text-right">Toptan Fiyat</th>
-                            <th class="p-3 text-center w-16">Sil</th>
-                        </tr>
-                    </thead>
-                    <tbody id="catalog-table-body" class="divide-y divide-slate-100 text-slate-800"></tbody>
-                </table>
-            </div>
-            <div class="flex justify-end pt-2 border-t border-emerald-100"><button type="button" onclick="closeCatalogModal()" class="px-5 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-xs">Kapat</button></div>
-        </div>
-    </div>
-
     <!-- MODAL 3: YENİ SİPARİŞ BAŞLAT -->
     <div id="modal-new-order" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5">
@@ -853,9 +692,7 @@
     <script>
         // ================= NEBİM SQL ARA KATMAN AYARLARI =================
         const NEBIM_API_CONFIG = {
-            // Şirket sunucunuzun Cloudflare Tünel adresi veya yerel API adresi
             baseUrl: "https://api-siparis.cinpa.com", 
-            // Belirlediğiniz gizli Bearer Token
             authToken: "cinpa_sec_99a8x72b1009_token!" 
         };
 
@@ -945,7 +782,6 @@
             showToast(`Nebim SQL'den fiş #${fisNo} sorgulanıyor...`);
 
             try {
-                // Şirket ara katmanına güvenli yetkiyle istek gönder
                 const response = await fetch(`${NEBIM_API_CONFIG.baseUrl}/api/siparis/${encodeURIComponent(fisNo)}`, {
                     method: 'GET',
                     headers: {
@@ -965,7 +801,6 @@
                     return;
                 }
 
-                // Gelen ürünleri önizleme listesine doldur
                 parsedExcelItems = data.items.map(item => ({
                     id: String(item.id || item.ItemCode || '').trim(),
                     name: String(item.name || item.ItemDescription || item.id).trim(),
@@ -978,7 +813,6 @@
                     checked: true
                 }));
 
-                // Önizleme tablosunu çiz
                 const tbody = document.getElementById("excel-preview-tbody");
                 tbody.innerHTML = "";
                 let previewTotal = 0;
@@ -1005,8 +839,7 @@
 
             } catch (err) {
                 console.error("Nebim API hatası:", err);
-                // Henüz ara katman sunucusu açık değilse bilgi ver
-                showToast("Nebim SQL köprüsü henüz aktif değil veya ulaşılamıyor. (Lütfen ara katmanınızı kontrol edin)", true);
+                showToast("Nebim SQL köprüsü henüz aktif değil veya ulaşılamıyor.", true);
             }
         }
 
@@ -1415,6 +1248,7 @@
             const excelRows = [];
             let rowNumber = 1;
 
+            // 1. Ana Sipariş & Sevk Edilen Kalemler
             (activeOrder.items || []).forEach(item => {
                 const requested = item.requestedQty || 0;
                 const dispatched = item.dispatchedQty !== undefined ? item.dispatchedQty : requested;
@@ -1424,28 +1258,27 @@
                 const lineTotal = netQty * unitPrice;
                 const tax = lineTotal * 0.20;
 
-                excelRows.push({
-                    "Sıra": rowNumber++,
-                    "Sipariş No": activeOrder.id,
-                    "Müşteri / Proje": activeOrder.customer,
-                    "Tarih": activeOrder.date,
-                    "Satış Temsilcisi": activeOrder.salesRep || "Satış Ekibi",
-                    "Ürün Kodu": item.id,
-                    "Ürün Açıklaması": item.name,
-                    "İlk Talep": requested,
-                    "Sevk Edilen": dispatched,
-                    "Saha İade": returned,
-                    "İlave Ürün": 0,
-                    "Net Miktar": netQty,
-                    "Birim": "AD",
-                    "Birim Fiyat (TL)": unitPrice,
-                    "KDV (%20) (TL)": Number(tax.toFixed(2)),
-                    "Toplam Tutar (TL)": Number((lineTotal + tax).toFixed(2)),
-                    "İşlem / Durum": "Ana Fiş Kalemi",
-                    "Depo Notu": item.warehouseNote || ""
-                });
+                if (netQty > 0) {
+                    excelRows.push({
+                        "Sıra": rowNumber++,
+                        "Sipariş No": activeOrder.id,
+                        "Müşteri / Proje": activeOrder.customer,
+                        "Tarih": activeOrder.date,
+                        "Satış Temsilcisi": activeOrder.salesRep || "Satış Ekibi",
+                        "Ürün Kodu": item.id,
+                        "Ürün Açıklaması": item.name,
+                        "Miktar": netQty,
+                        "Birim": "AD",
+                        "Birim Fiyat (TL)": unitPrice,
+                        "KDV (%20) (TL)": Number(tax.toFixed(2)),
+                        "Toplam Tutar (TL)": Number((lineTotal + tax).toFixed(2)),
+                        "İşlem / Durum": "Ana Fiş Kalemi",
+                        "Depo Notu": item.warehouseNote || ""
+                    });
+                }
             });
 
+            // 2. Saha İlave (Ekstra) Kalemler
             (activeOrder.extras || []).forEach(ext => {
                 if (ext.faikApproval && (ext.qty || 0) > 0) {
                     const unitPrice = ext.price || 0;
@@ -1460,11 +1293,7 @@
                         "Satış Temsilcisi": activeOrder.salesRep || "Satış Ekibi",
                         "Ürün Kodu": ext.id,
                         "Ürün Açıklaması": ext.name,
-                        "İlk Talep": 0,
-                        "Sevk Edilen": 0,
-                        "Saha İade": 0,
-                        "İlave Ürün": ext.qty,
-                        "Net Miktar": ext.qty,
+                        "Miktar": ext.qty,
                         "Birim": "AD",
                         "Birim Fiyat (TL)": unitPrice,
                         "KDV (%20) (TL)": Number(tax.toFixed(2)),
@@ -1485,16 +1314,26 @@
             XLSX.utils.book_append_sheet(workbook, worksheet, "Fis_Ozeti");
 
             worksheet['!cols'] = [
-                { wch: 6 }, { wch: 14 }, { wch: 28 }, { wch: 12 }, { wch: 16 },
-                { wch: 14 }, { wch: 32 }, { wch: 10 }, { wch: 12 }, { wch: 10 },
-                { wch: 10 }, { wch: 12 }, { wch: 6 }, { wch: 14 }, { wch: 14 },
-                { wch: 16 }, { wch: 24 }, { wch: 20 }
+                { wch: 6 },  // Sıra
+                { wch: 14 }, // Sipariş No
+                { wch: 28 }, // Müşteri / Proje
+                { wch: 12 }, // Tarih
+                { wch: 18 }, // Satış Temsilcisi
+                { wch: 14 }, // Ürün Kodu
+                { wch: 34 }, // Ürün Açıklaması
+                { wch: 10 }, // Miktar
+                { wch: 6 },  // Birim
+                { wch: 14 }, // Birim Fiyat
+                { wch: 14 }, // KDV
+                { wch: 16 }, // Toplam Tutar
+                { wch: 24 }, // İşlem / Durum
+                { wch: 20 }  // Depo Notu
             ];
 
             const safeName = activeOrder.customer.replace(/[^a-zA-Z0-9_-]/g, "_");
             const fileName = `CINPA_FIS_${activeOrder.id}_${safeName}.xlsx`;
             XLSX.writeFile(workbook, fileName);
-            showToast("Fişin son hali Excel (.xlsx) olarak indirildi!");
+            showToast("Fişin son hali sade formatta Excel (.xlsx) olarak indirildi!");
         }
 
         // ================= GİRİŞ & ROL İŞLEMLERİ =================
