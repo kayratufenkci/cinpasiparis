@@ -325,6 +325,10 @@
                             <i class="fa-solid fa-file-excel text-emerald-300 text-sm"></i>
                             <span>Fişin Son Halini Excel Olarak İndir (.xlsx)</span>
                         </button>
+                        <button onclick="exportIrsaliyeExcel()" class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center space-x-1.5 shadow transition">
+                            <i class="fa-solid fa-truck-ramp-box text-blue-200 text-sm"></i>
+                            <span>İrsaliye Oluştur (.xlsx)</span>
+                        </button>
                         <button onclick="sendWhatsAppNotification()" class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold flex items-center space-x-1.5 transition">
                             <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i>
                             <span>WhatsApp Durum Gönder</span>
@@ -633,8 +637,8 @@
                                 <button type="button" onclick="exportFinalOrderToExcel()" class="px-4 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center space-x-2 shadow transition">
                                     <i class="fa-solid fa-file-excel text-sm"></i><span>Fişin Son Halini Excel Olarak İndir (.xlsx)</span>
                                 </button>
-                                <button type="button" onclick="exportToNebimJSON()" class="px-4 py-3 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 text-xs font-bold flex items-center space-x-2 transition">
-                                    <i class="fa-solid fa-cloud-arrow-down"></i><span>Nebim V3 JSON Formatında Aktar</span>
+                                <button type="button" onclick="exportIrsaliyeExcel()" class="px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center space-x-2 shadow transition">
+                                    <i class="fa-solid fa-truck-ramp-box text-sm"></i><span>İrsaliye Oluştur (.xlsx)</span>
                                 </button>
                             </div>
                             <div id="step4-action-buttons">
@@ -1404,21 +1408,21 @@
             openOrderDetail(newId);
         }
 
-        // ================= FİŞİN SON HALİNİ NEBİM V3 FORMATINDA EXCEL'E AKTARMA (.XLSX) =================
-        function exportFinalOrderToExcel() {
+        // ================= YENİ: İRSALİYE OLUŞTUR (.XLSX) - İRSALİYE DENEMESİ FORMATI =================
+        function exportIrsaliyeExcel() {
             if (!activeOrder) return;
             const excelRows = [];
 
-            // Satış temsilcisi kod eşleştirmesi (kayroş.xlsx standart 107 kodu veya temsilci kodu)
+            // Satış temsilcisi kodu (İRSALİYE DENEMESİ.xlsx şablonundaki 101/107 kodları)
             const salesCodeMap = {
-                "Orhan Özen": "107",
+                "Orhan Özen": "101",
                 "Salih Şahin": "108",
                 "Uğur Morkoç": "109",
                 "Tolga Keleş": "110"
             };
-            const spCode = salesCodeMap[activeOrder.salesRep] || "107";
+            const spCode = salesCodeMap[activeOrder.salesRep] || "101";
 
-            // 1. Ana Sipariş & Sevk Edilen Kalemler
+            // 1. Ana Sipariş Kalemleri (Sevk edilen net miktar üzerinden)
             (activeOrder.items || []).forEach(item => {
                 const requested = item.requestedQty || 0;
                 const dispatched = item.dispatchedQty !== undefined ? item.dispatchedQty : requested;
@@ -1482,7 +1486,158 @@
                 }
             });
 
-            // 2. Saha İlave (Ekstra) Kalemler
+            // 2. Saha Ekstra Kalemleri
+            (activeOrder.extras || []).forEach(ext => {
+                if (ext.faikApproval && (ext.qty || 0) > 0) {
+                    const unitPrice = parseFloat(ext.price) || 0;
+                    const priceVI = Number((unitPrice * 1.20).toFixed(2));
+
+                    let colorCode = (ext.color && ext.color !== '-' && ext.color !== 'undefined') ? ext.color : '';
+                    if (!colorCode && ext.name && ext.name.includes('(')) {
+                        const m = ext.name.match(/\(([^)]+)\)/);
+                        if (m) colorCode = m[1].trim();
+                    }
+
+                    excelRows.push({
+                        "Barcode": "",
+                        "ItemTypeCode": 1,
+                        "ItemCode": String(ext.id || '').trim(),
+                        "ColorCode": colorCode,
+                        "ItemDim1Code": "",
+                        "ItemDim2Code": "",
+                        "ItemDim3Code": "",
+                        "Qty1": ext.qty,
+                        "Qty2": 0,
+                        "LineDescription": "",
+                        "PriceCurrencyCode": "TRY",
+                        "PriceExchangeRate": null,
+                        "Price": unitPrice,
+                        "PriceVI": priceVI,
+                        "DocCurrencyCode": "TRY",
+                        "LDisRate1": 0,
+                        "LDisRate2": 0,
+                        "LDisRate3": 0,
+                        "LDisRate4": 0,
+                        "LDisRate5": 0,
+                        "UnitOfMeasureCode": "AD",
+                        "PaymentPlanCode": "",
+                        "SalespersonCode": spCode,
+                        "CostCenterCode": "",
+                        "ITAtt01": "",
+                        "ITAtt02": "",
+                        "ITAtt03": "",
+                        "ITAtt04": "",
+                        "ITAtt05": "",
+                        "ITAtt06": "",
+                        "ITAtt07": "",
+                        "ITAtt08": "",
+                        "ITAtt09": "",
+                        "ITAtt10": "",
+                        "LineSumID": 0,
+                        "LotCode": null,
+                        "ImportFileNumber": null,
+                        "ExportFileNumber": null,
+                        "ProductSerialNumber": null,
+                        "PurchasePlanCode": null,
+                        "BatchCode": "",
+                        "GLTypeCode": null,
+                        "ManufactureDate": "00:00:00"
+                    });
+                }
+            });
+
+            if (excelRows.length === 0) {
+                showToast("İrsaliye oluşturulacak sevk edilmiş ürün kalemi bulunamadı!", true);
+                return;
+            }
+
+            // İRSALİYE DENEMESİ.xlsx ile birebir aynı 43 sütun ve 'Excel' sayfası
+            const worksheet = XLSX.utils.json_to_sheet(excelRows);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Excel");
+
+            const safeName = activeOrder.customer.replace(/[^a-zA-Z0-9_-]/g, "_");
+            const fileName = `IRSALIYE_${activeOrder.id}_${safeName}.xlsx`;
+            XLSX.writeFile(workbook, fileName);
+            showToast("İrsaliye Excel (.xlsx) dosyası başarıyla oluşturuldu ve indirildi!");
+        }
+
+        // ================= FİŞİN SON HALİNİ NEBİM V3 FORMATINDA EXCEL'E AKTARMA (.XLSX) =================
+        function exportFinalOrderToExcel() {
+            if (!activeOrder) return;
+            const excelRows = [];
+
+            const salesCodeMap = {
+                "Orhan Özen": "107",
+                "Salih Şahin": "108",
+                "Uğur Morkoç": "109",
+                "Tolga Keleş": "110"
+            };
+            const spCode = salesCodeMap[activeOrder.salesRep] || "107";
+
+            (activeOrder.items || []).forEach(item => {
+                const requested = item.requestedQty || 0;
+                const dispatched = item.dispatchedQty !== undefined ? item.dispatchedQty : requested;
+                const returned = item.returnedQty || 0;
+                const netQty = Math.max(0, dispatched - returned);
+                const unitPrice = parseFloat(item.price) || 0;
+                const priceVI = Number((unitPrice * 1.20).toFixed(2));
+
+                let colorCode = (item.color && item.color !== '-' && item.color !== 'undefined') ? item.color : '';
+                if (!colorCode && item.name && item.name.includes('(')) {
+                    const m = item.name.match(/\(([^)]+)\)/);
+                    if (m) colorCode = m[1].trim();
+                }
+
+                if (netQty > 0) {
+                    excelRows.push({
+                        "Barcode": "",
+                        "ItemTypeCode": 1,
+                        "ItemCode": String(item.id || '').trim(),
+                        "ColorCode": colorCode,
+                        "ItemDim1Code": "",
+                        "ItemDim2Code": "",
+                        "ItemDim3Code": "",
+                        "Qty1": netQty,
+                        "Qty2": 0,
+                        "LineDescription": "",
+                        "PriceCurrencyCode": "TRY",
+                        "PriceExchangeRate": null,
+                        "Price": unitPrice,
+                        "PriceVI": priceVI,
+                        "DocCurrencyCode": "TRY",
+                        "LDisRate1": 0,
+                        "LDisRate2": 0,
+                        "LDisRate3": 0,
+                        "LDisRate4": 0,
+                        "LDisRate5": 0,
+                        "UnitOfMeasureCode": "AD",
+                        "PaymentPlanCode": "",
+                        "SalespersonCode": spCode,
+                        "CostCenterCode": "",
+                        "ITAtt01": "",
+                        "ITAtt02": "",
+                        "ITAtt03": "",
+                        "ITAtt04": "",
+                        "ITAtt05": "",
+                        "ITAtt06": "",
+                        "ITAtt07": "",
+                        "ITAtt08": "",
+                        "ITAtt09": "",
+                        "ITAtt10": "",
+                        "LineSumID": 0,
+                        "LotCode": null,
+                        "ImportFileNumber": null,
+                        "ExportFileNumber": null,
+                        "ProductSerialNumber": null,
+                        "PurchasePlanCode": null,
+                        "BatchCode": "",
+                        "GLTypeCode": null,
+                        "ManufactureDate": "00:00:00"
+                    });
+                }
+            });
+
             (activeOrder.extras || []).forEach(ext => {
                 if (ext.faikApproval && (ext.qty || 0) > 0) {
                     const unitPrice = parseFloat(ext.price) || 0;
@@ -1547,7 +1702,6 @@
                 return;
             }
 
-            // kayroş.xlsx ile birebir aynı 'Excel' sekme adı ve 43 sütun
             const worksheet = XLSX.utils.json_to_sheet(excelRows);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Excel");
@@ -2239,29 +2393,6 @@
             showToast("Tebrikler! Fatura kesildi ve dosya kapatıldı.");
             renderOrderList();
             returnToDashboard();
-        }
-
-        function exportToNebimJSON() {
-            const payload = {
-                NebimExportVersion: "V3.1",
-                CustomerCode: activeOrder.id,
-                CustomerName: activeOrder.customer,
-                DocumentDate: activeOrder.date,
-                Items: (activeOrder.items || []).map(i => ({
-                    ProductCode: i.id,
-                    ProductName: i.name,
-                    NetQuantity: Math.max(0, i.dispatchedQty - (i.returnedQty || 0)),
-                    UnitPrice: i.price
-                }))
-            };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `NEBIM_FATURA_${activeOrder.id}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-            showToast("Nebim V3 Entegrasyon JSON dosyası indirildi!");
         }
 
         function openExcelImportModal() {
