@@ -367,6 +367,7 @@
                                 <thead class="bg-emerald-50/60 text-emerald-900 text-xs font-bold uppercase border-b border-emerald-100">
                                     <tr>
                                         <th class="p-3.5">Ürün Kodu & Tanımı</th>
+                                        <th class="p-3.5 text-center w-28 bg-emerald-100/60 text-emerald-950">Renk Kodu</th>
                                         <th class="p-3.5 text-center w-32">Talep Adedi</th>
                                         <th class="p-3.5 text-right w-36">Birim Fiyat (TL)</th>
                                         <th class="p-3.5 text-right w-36">Toplam Tutar</th>
@@ -390,18 +391,22 @@
                             
                             <div id="add-mode-catalog-box" class="space-y-3">
                                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
-                                    <div class="sm:col-span-8">
+                                    <div class="sm:col-span-6">
                                         <label class="block text-[11px] font-bold text-slate-500 mb-1">Katalogda Ürün Ara (Kod veya İsim Yazın)</label>
                                         <input type="text" id="step1-product-search" oninput="searchCatalogDropdown(this.value)" placeholder="Örn: 0101007 veya YUCCA..." class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white mb-2">
                                         <select id="step1-select-product" onchange="syncSelectedCatalogPrice()" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white"></select>
                                     </div>
                                     <div class="sm:col-span-2">
+                                        <label class="block text-[11px] font-bold text-emerald-900 mb-1">Renk Kodu</label>
+                                        <input type="text" id="step1-catalog-color" placeholder="Örn: 1016" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-400 bg-emerald-50 text-center">
+                                    </div>
+                                    <div class="sm:col-span-2">
                                         <label class="block text-[11px] font-bold text-slate-500 mb-1">Birim Fiyat (TL)</label>
-                                        <input type="number" id="step1-catalog-price" min="0" step="any" class="w-full text-xs font-bold p-3 rounded-xl border border-emerald-300 bg-white text-right">
+                                        <input type="number" id="step1-catalog-price" min="0" step="any" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-300 bg-white text-right">
                                     </div>
                                     <div class="sm:col-span-2">
                                         <label class="block text-[11px] font-bold text-slate-500 mb-1">Adet</label>
-                                        <input type="number" id="step1-catalog-qty" value="1" min="1" class="w-full text-xs font-bold p-3 rounded-xl border border-emerald-300 text-center bg-white">
+                                        <input type="number" id="step1-catalog-qty" value="1" min="1" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-300 text-center bg-white">
                                     </div>
                                     <div class="sm:col-span-12 flex justify-end">
                                         <button type="button" onclick="addItemFromCatalog()" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition flex items-center space-x-1.5 shadow-md">
@@ -414,19 +419,23 @@
                             <div id="add-mode-manual-box" class="hidden grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
                                 <div class="sm:col-span-3">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Ürün Kodu</label>
-                                    <input type="text" id="manual-code" placeholder="Örn: 0101007" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 bg-white">
+                                    <input type="text" id="manual-code" placeholder="Örn: 0109037" class="w-full text-xs font-bold p-2.5 rounded-xl border border-slate-300 bg-white">
                                 </div>
-                                <div class="sm:col-span-5">
-                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Ürün Adı & Renk</label>
-                                    <input type="text" id="manual-name" placeholder="Örn: YUCCA BUSH (BEYAZ)" class="w-full text-xs font-semibold p-3 rounded-xl border border-slate-300 bg-white">
+                                <div class="sm:col-span-4">
+                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Ürün Tanımı</label>
+                                    <input type="text" id="manual-name" placeholder="Örn: YUCCA BUSH" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-[11px] font-bold text-emerald-900 mb-1">Renk Kodu</label>
+                                    <input type="text" id="manual-color" placeholder="Örn: 1016" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-400 bg-emerald-50 text-center">
                                 </div>
                                 <div class="sm:col-span-2">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Fiyat (TL)</label>
-                                    <input type="number" id="manual-price" placeholder="0" min="0" step="any" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 bg-white text-right">
+                                    <input type="number" id="manual-price" placeholder="0" min="0" step="any" class="w-full text-xs font-bold p-2.5 rounded-xl border border-slate-300 bg-white text-right">
                                 </div>
-                                <div class="sm:col-span-2">
+                                <div class="sm:col-span-1">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Adet</label>
-                                    <input type="number" id="manual-qty" value="1" min="1" class="w-full text-xs font-bold p-3 rounded-xl border border-slate-300 text-center bg-white">
+                                    <input type="number" id="manual-qty" value="1" min="1" class="w-full text-xs font-bold p-2.5 rounded-xl border border-slate-300 text-center bg-white">
                                 </div>
                                 <div class="sm:col-span-12 flex justify-between items-center pt-2">
                                     <label class="flex items-center space-x-2 text-xs text-slate-600 font-semibold cursor-pointer">
@@ -473,6 +482,7 @@
                                     <tr>
                                         <th class="p-3.5 w-12 text-center">Toplandı</th>
                                         <th class="p-3.5">Talep Edilen Ürün</th>
+                                        <th class="p-3.5 text-center w-28 bg-emerald-100/60 text-emerald-950">Renk Kodu</th>
                                         <th class="p-3.5 text-center">Sipariş Miktarı</th>
                                         <th class="p-3.5 text-center w-36">Fiili Sevk Miktarı</th>
                                         <th class="p-3.5">Depo Hazırlık & İkame Notu</th>
@@ -489,10 +499,14 @@
                                 <i class="fa-solid fa-magnifying-glass text-emerald-700 mr-1.5 text-sm"></i> Depo Operasyon: Katalogdan Ürün / İkame Bul ve Ekle
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
-                                <div class="sm:col-span-8">
+                                <div class="sm:col-span-6">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Katalogda Ürün Ara (Kod veya Ad Yazın)</label>
                                     <input type="text" id="depo-product-search" oninput="searchDepoCatalogDropdown(this.value)" placeholder="Örn: 101123 veya POTHOS..." class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white mb-2">
                                     <select id="depo-select-product" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white"></select>
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-[11px] font-bold text-emerald-900 mb-1">Renk Kodu</label>
+                                    <input type="text" id="depo-add-color" placeholder="Örn: 1016" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-400 bg-emerald-50 text-center">
                                 </div>
                                 <div class="sm:col-span-2">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Adet</label>
@@ -606,6 +620,7 @@
                                 <thead class="bg-emerald-900 text-white text-xs font-bold uppercase tracking-wider">
                                     <tr>
                                         <th class="p-3.5">Ürün / Kalem Açıklaması</th>
+                                        <th class="p-3.5 text-center w-28 bg-emerald-950 text-emerald-200">Renk Kodu</th>
                                         <th class="p-3.5 text-center">İlk Sipariş</th>
                                         <th class="p-3.5 text-center">Sevk Edilen</th>
                                         <th class="p-3.5 text-center">İade</th>
@@ -618,15 +633,15 @@
                                 <tbody id="step4-items-tbody" class="divide-y divide-slate-200 font-medium text-slate-800"></tbody>
                                 <tfoot class="bg-slate-50 border-t-2 border-slate-300 font-bold text-slate-900">
                                     <tr>
-                                        <td colspan="5" class="p-3 text-right uppercase text-xs text-slate-500">Ara Toplam:</td>
+                                        <td colspan="6" class="p-3 text-right uppercase text-xs text-slate-500">Ara Toplam:</td>
                                         <td colspan="3" class="p-3 text-right font-bold text-base" id="final-subtotal">0,00 ₺</td>
                                     </tr>
                                     <tr>
-                                        <td colspan="5" class="p-3 text-right uppercase text-xs text-slate-500">KDV (%20):</td>
+                                        <td colspan="6" class="p-3 text-right uppercase text-xs text-slate-500">KDV (%20):</td>
                                         <td colspan="3" class="p-3 text-right font-bold text-base text-slate-700" id="final-tax">0,00 ₺</td>
                                     </tr>
                                     <tr class="bg-emerald-100/70 text-emerald-950">
-                                        <td colspan="5" class="p-4 text-right uppercase text-sm font-black">Genel Fatura Toplamı:</td>
+                                        <td colspan="6" class="p-4 text-right uppercase text-sm font-black">Genel Fatura Toplamı:</td>
                                         <td colspan="3" class="p-4 text-right font-black text-2xl text-emerald-800" id="final-grandtotal">0,00 ₺</td>
                                     </tr>
                                 </tfoot>
@@ -638,7 +653,7 @@
                                     <i class="fa-solid fa-file-excel text-sm"></i><span>Fişin Son Halini Excel Olarak İndir (.xlsx)</span>
                                 </button>
                                 <button type="button" onclick="exportIrsaliyeExcel()" class="px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center space-x-2 shadow transition">
-                                    <i class="fa-solid fa-truck-ramp-box text-sm"></i><span>İrsaliye Oluştur (.xlsx)</span>
+                                    <i class="fa-solid fa-truck-ramp-box text-blue-200 text-sm"></i><span>İrsaliye Oluştur (.xlsx)</span>
                                 </button>
                             </div>
                             <div id="step4-action-buttons">
@@ -696,7 +711,7 @@
                     <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/40 rounded-2xl p-4 text-center cursor-pointer hover:bg-emerald-50 transition" onclick="document.getElementById('excel-file-input').click()">
                         <i class="fa-solid fa-cloud-arrow-up text-2xl text-emerald-600 mb-1"></i>
                         <div class="text-xs font-extrabold text-slate-800">Bilgisayardan Excel Fişini Seçmek İçin Tıklayın</div>
-                        <div class="text-[11px] text-slate-500">Ürün kodu, renk, miktar ve fiyatlar otomatik işlenir.</div>
+                        <div class="text-[11px] text-slate-500">Ürün kodu, renk kodu, adet ve fiyatlar eksiksiz işlenir.</div>
                         <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleExcelFileUpload(event)">
                     </div>
                 </div>
@@ -722,11 +737,11 @@
                     <table class="w-full text-left text-xs bg-white rounded-lg overflow-hidden">
                         <thead class="bg-slate-100 font-bold text-slate-600">
                             <tr>
-                                <th class="p-2">Kod</th>
+                                <th class="p-2">Ürün Kodu</th>
                                 <th class="p-2">Ürün Adı</th>
-                                <th class="p-2 text-center">Renk</th>
-                                <th class="p-2 text-center">Adet</th>
-                                <th class="p-2 text-right">Fiyat</th>
+                                <th class="p-2 text-center bg-emerald-100 text-emerald-950 font-extrabold">Renk Kodu</th>
+                                <th class="p-2 text-center">Miktar (Qty1)</th>
+                                <th class="p-2 text-right">Birim Fiyat</th>
                             </tr>
                         </thead>
                         <tbody id="excel-preview-tbody" class="divide-y divide-slate-100"></tbody>
@@ -790,7 +805,7 @@
             <div class="bg-slate-50 p-4 rounded-2xl border border-emerald-100 grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
                 <input type="text" id="cat-new-code" placeholder="Kod (Örn: 0101007)" class="sm:col-span-3 p-2.5 rounded-xl border border-slate-300 font-bold bg-white">
                 <input type="text" id="cat-new-name" placeholder="Ürün Tanımı (Örn: YUCCA BUSH)" class="sm:col-span-4 p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
-                <input type="text" id="cat-new-color" placeholder="Renk (Örn: BEYAZ)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
+                <input type="text" id="cat-new-color" placeholder="Renk Kodu (Örn: 1016)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
                 <input type="number" id="cat-new-price" placeholder="Fiyat (TL)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 font-bold bg-white text-right">
                 <button type="button" onclick="saveProductToMasterCatalog()" class="sm:col-span-1 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl transition">+ Ekle</button>
             </div>
@@ -802,7 +817,7 @@
                             <th class="p-3 w-10 text-center"><input type="checkbox" id="select-all-catalog" onchange="toggleSelectAllCatalog(this.checked)" class="w-4 h-4 text-emerald-700 rounded"></th>
                             <th class="p-3">Ürün Kodu</th>
                             <th class="p-3">Ürün Adı</th>
-                            <th class="p-3">Renk</th>
+                            <th class="p-3">Renk Kodu</th>
                             <th class="p-3 text-right">Toptan Fiyat</th>
                             <th class="p-3 text-center w-16">Sil</th>
                         </tr>
@@ -855,7 +870,6 @@
 
     <!-- ================= JAVASCRIPT MOTORU ================= -->
     <script>
-        // ================= NEBİM SQL ARA KATMAN AYARLARI =================
         const NEBIM_API_CONFIG = {
             baseUrl: "https://api-siparis.cinpa.com", 
             authToken: "cinpa_sec_99a8x72b1009_token!" 
@@ -934,7 +948,7 @@
             setTimeout(() => { toast.classList.add("hidden"); }, 3000);
         }
 
-        // ================= NEBİM SQL CANLI FİŞ ÇEKME FONKSİYONU =================
+        // ================= NEBİM SQL CANLI FİŞ ÇEKME =================
         async function fetchOrderFromNebimSQL() {
             const fisInput = document.getElementById("nebim-api-fisno-input");
             const fisNo = fisInput ? fisInput.value.trim() : "";
@@ -989,7 +1003,7 @@
                     tr.innerHTML = `
                         <td class="p-2 font-mono font-bold text-slate-700">${item.id}</td>
                         <td class="p-2 font-medium text-slate-900">${item.name}</td>
-                        <td class="p-2 text-center font-bold text-slate-600">${item.color}</td>
+                        <td class="p-2 text-center font-bold text-emerald-800 bg-emerald-50">${item.color || '-'}</td>
                         <td class="p-2 text-center font-bold">${item.requestedQty} Adet</td>
                         <td class="p-2 text-right font-bold">${Number(item.price).toLocaleString('tr-TR')} ₺</td>
                     `;
@@ -1000,7 +1014,7 @@
                 document.getElementById("excel-preview-count").innerText = `${parsedExcelItems.length} Kalem Ürün`;
                 document.getElementById("excel-preview-total").innerText = `Toplam: ${previewTotal.toLocaleString('tr-TR')} ₺`;
                 updateExcelApplyButton();
-                showToast(`Nebim'den ${parsedExcelItems.length} kalem ürün başarıyla aktarıldı!`);
+                showToast(`Nebim'den ${parsedExcelItems.length} kalem ürün aktarıldı!`);
 
             } catch (err) {
                 console.error("Nebim API hatası:", err);
@@ -1230,7 +1244,7 @@
             event.target.value = "";
         }
 
-        // ================= EXCEL'DEN FİŞ ÇEKME MOTORU =================
+        // ================= KUSURSUZ VE KARIŞMAYAN EXCEL FİŞİ OKUMA MOTORU =================
         function handleExcelFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1270,32 +1284,101 @@
             let startRow = 0;
 
             for (let r = 0; r < Math.min(5, rows.length); r++) {
-                const header = rows[r].map(c => String(c || '').toLowerCase().trim());
-                header.forEach((h, idx) => {
-                    if (h.includes("itemcode") || h.includes("stok") || h.includes("kod")) itemCodeCol = idx;
-                    if (h.includes("color") || h.includes("renk")) colorCodeCol = idx;
-                    if (h.includes("ad") || h.includes("tanım") || h.includes("ürün")) nameCol = idx;
-                    if (h.includes("qty") || h.includes("miktar") || h.includes("adet")) qtyCol = idx;
-                    if (h.includes("price") || h.includes("fiyat") || h.includes("tutar")) priceCol = idx;
-                });
+                const rawH = rows[r].map(c => String(c || '').trim());
+                const cleanH = rawH.map(c => c.toLowerCase());
+
+                // 1. Ürün Kodu Tespiti (Öncelikli tam eşleşme)
+                for (let idx = 0; idx < cleanH.length; idx++) {
+                    const h = cleanH[idx];
+                    if (h === 'itemcode' || h === 'stok kodu' || h === 'stokkodu' || h === 'ürün kodu' || h === 'urunkodu') {
+                        itemCodeCol = idx; break;
+                    }
+                }
+                if (itemCodeCol === -1) {
+                    for (let idx = 0; idx < cleanH.length; idx++) {
+                        const h = cleanH[idx];
+                        if ((h.includes('itemcode') || h.includes('stok kod') || h.includes('ürün kod')) && !h.includes('renk') && !h.includes('color') && !h.includes('type') && !h.includes('dim')) {
+                            itemCodeCol = idx; break;
+                        }
+                    }
+                }
+
+                // 2. Renk Kodu Tespiti
+                for (let idx = 0; idx < cleanH.length; idx++) {
+                    const h = cleanH[idx];
+                    if (h === 'colorcode' || h === 'renk kodu' || h === 'renkkodu' || h === 'color' || h === 'renk') {
+                        colorCodeCol = idx; break;
+                    }
+                }
+
+                // 3. Ürün Adı / Açıklaması Tespiti
+                for (let idx = 0; idx < cleanH.length; idx++) {
+                    const h = cleanH[idx];
+                    if (h === 'itemdescription' || h === 'ürün adı' || h === 'urun adi' || h === 'ürün tanımı' || h === 'stok adı' || h === 'stok adi' || h === 'açıklama' || h === 'aciklama' || h === 'tanım' || h === 'tanim') {
+                        nameCol = idx; break;
+                    }
+                }
+                if (nameCol === -1) {
+                    for (let idx = 0; idx < cleanH.length; idx++) {
+                        const h = cleanH[idx];
+                        if (h === 'linedescription' || (h.includes('ürün') && h.includes('ad')) || (h.includes('stok') && h.includes('ad'))) {
+                            nameCol = idx; break;
+                        }
+                    }
+                }
+
+                // 4. Miktar Tespiti (ÖNEMLİ: Qty1 önceliklidir, Qty2 ikincil paket adedidir ve karışmaz)
+                for (let idx = 0; idx < cleanH.length; idx++) {
+                    const h = cleanH[idx];
+                    if (h === 'qty1' || h === 'miktar' || h === 'adet' || h === 'sipariş miktarı' || h === 'sevk miktarı' || h === 'talep adedi') {
+                        qtyCol = idx; break;
+                    }
+                }
+                if (qtyCol === -1) {
+                    for (let idx = 0; idx < cleanH.length; idx++) {
+                        const h = cleanH[idx];
+                        if ((h.includes('qty1') || h.includes('miktar') || h.includes('adet')) && !h.includes('qty2')) {
+                            qtyCol = idx; break;
+                        }
+                    }
+                }
+
+                // 5. Birim Fiyat Tespiti (PriceCurrencyCode veya PriceExchangeRate ile karışmaz)
+                for (let idx = 0; idx < cleanH.length; idx++) {
+                    const h = cleanH[idx];
+                    if (h === 'price' || h === 'fiyat' || h === 'birim fiyat' || h === 'birimfiyat' || h === 'tutar') {
+                        priceCol = idx; break;
+                    }
+                }
+                if (priceCol === -1) {
+                    for (let idx = 0; idx < cleanH.length; idx++) {
+                        const h = cleanH[idx];
+                        if ((h.includes('fiyat') || h.includes('price')) && !h.includes('currency') && !h.includes('rate') && !h.includes('vi') && !h.includes('kdv')) {
+                            priceCol = idx; break;
+                        }
+                    }
+                }
+
                 if (itemCodeCol !== -1 || qtyCol !== -1) {
                     startRow = r + 1;
                     break;
                 }
             }
 
-            if (itemCodeCol === -1) itemCodeCol = 2; 
-            if (colorCodeCol === -1) colorCodeCol = 3; 
-            if (nameCol === -1) nameCol = 1; 
-            if (qtyCol === -1) qtyCol = 7; 
-            if (priceCol === -1) priceCol = 12; 
+            // Standart Nebim şablonu varsayılanları (kayroş.xlsx / İRSALİYE DENEMESİ.xlsx)
+            if (itemCodeCol === -1) itemCodeCol = 2; // C sütunu: ItemCode
+            if (colorCodeCol === -1) colorCodeCol = 3; // D sütunu: ColorCode
+            if (nameCol === -1) nameCol = 9; // J sütunu: LineDescription
+            if (qtyCol === -1) qtyCol = 7; // H sütunu: Qty1
+            if (priceCol === -1) priceCol = 12; // M sütunu: Price
 
             for (let i = startRow; i < rows.length; i++) {
                 const cols = rows[i];
                 if (!cols || cols.length === 0) continue;
 
-                let code = String(cols[itemCodeCol] !== undefined ? cols[itemCodeCol] : '').trim();
-                if (!code || code.toLowerCase() === "itemcode" || code.toLowerCase() === "stok kodu") continue;
+                let rawCode = cols[itemCodeCol] !== undefined ? cols[itemCodeCol] : '';
+                let code = String(rawCode).trim();
+                if (!code || code.toLowerCase() === 'itemcode' || code.toLowerCase() === 'stok kodu' || code === 'null' || code === 'undefined') continue;
 
                 let color = String(cols[colorCodeCol] !== undefined ? cols[colorCodeCol] : '').trim();
                 let explicitName = String(cols[nameCol] !== undefined ? cols[nameCol] : '').trim();
@@ -1305,17 +1388,25 @@
                 let qty = parseFloat(String(rawQty).replace(/[^0-9,.-]/g, '').replace(',', '.')) || 1;
                 let price = parseFloat(String(rawPrice).replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
 
-                let productName = explicitName || code;
-                let finalColor = (color && color !== "" && color !== "nan" && color !== "undefined") ? color : "-";
+                let finalColor = (color && color !== '' && color !== 'nan' && color !== 'undefined' && color !== '-') ? color : '-';
+                let productName = (explicitName && explicitName !== '' && explicitName !== 'nan') ? explicitName : '';
 
+                // Katalogdan Ürün Adı ve Fiyat Eşleme (Boşluk ve sıfır toleranslı)
                 if (masterProducts.length > 0) {
-                    const found = masterProducts.find(p => p.id.toLowerCase() === code.toLowerCase());
+                    const cleanCode = code.toLowerCase().replace(/^0+/, '');
+                    const found = masterProducts.find(p => {
+                        const pCode = String(p.id || '').trim().toLowerCase();
+                        return pCode === code.toLowerCase() || pCode.replace(/^0+/, '') === cleanCode;
+                    });
+
                     if (found) {
-                        productName = found.name;
-                        if (finalColor === "-" && found.color && found.color !== "-") finalColor = found.color;
+                        if (!productName) productName = found.name;
+                        if (finalColor === '-' && found.color && found.color !== '-') finalColor = found.color;
                         if (price === 0 && found.price > 0) price = found.price;
                     }
                 }
+
+                if (!productName) productName = code;
 
                 parsedExcelItems.push({
                     id: code,
@@ -1346,7 +1437,7 @@
                 tr.innerHTML = `
                     <td class="p-2 font-mono font-bold text-slate-700">${item.id}</td>
                     <td class="p-2 font-medium text-slate-900">${item.name}</td>
-                    <td class="p-2 text-center font-bold text-slate-600">${item.color}</td>
+                    <td class="p-2 text-center font-bold text-emerald-800 bg-emerald-50">${item.color || '-'}</td>
                     <td class="p-2 text-center font-bold">${item.requestedQty} Adet</td>
                     <td class="p-2 text-right font-bold">${Number(item.price).toLocaleString('tr-TR')} ₺</td>
                 `;
@@ -1380,7 +1471,7 @@
             
             const formattedItems = parsedExcelItems.map(i => ({
                 id: i.id,
-                name: i.name + (i.color && i.color !== "-" ? ` (${i.color})` : ""),
+                name: i.name,
                 color: (i.color && i.color !== "-" && i.color !== "undefined") ? i.color : "",
                 requestedQty: i.requestedQty,
                 dispatchedQty: i.dispatchedQty,
@@ -1408,12 +1499,11 @@
             openOrderDetail(newId);
         }
 
-        // ================= YENİ: İRSALİYE OLUŞTUR (.XLSX) - İRSALİYE DENEMESİ FORMATI =================
+        // ================= İRSALİYE OLUŞTUR (.XLSX) - İRSALİYE DENEMESİ FORMATI =================
         function exportIrsaliyeExcel() {
             if (!activeOrder) return;
             const excelRows = [];
 
-            // Satış temsilcisi kodu (İRSALİYE DENEMESİ.xlsx şablonundaki 101/107 kodları)
             const salesCodeMap = {
                 "Orhan Özen": "101",
                 "Salih Şahin": "108",
@@ -1422,7 +1512,7 @@
             };
             const spCode = salesCodeMap[activeOrder.salesRep] || "101";
 
-            // 1. Ana Sipariş Kalemleri (Sevk edilen net miktar üzerinden)
+            // 1. Ana Sipariş Kalemleri
             (activeOrder.items || []).forEach(item => {
                 const requested = item.requestedQty || 0;
                 const dispatched = item.dispatchedQty !== undefined ? item.dispatchedQty : requested;
@@ -1551,7 +1641,6 @@
                 return;
             }
 
-            // İRSALİYE DENEMESİ.xlsx ile birebir aynı 43 sütun ve 'Excel' sayfası
             const worksheet = XLSX.utils.json_to_sheet(excelRows);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Excel");
@@ -1982,7 +2071,7 @@
             document.getElementById("step1-lock-alert").style.display = (!canEdit && !isAdmin) ? "flex" : "none";
 
             if (!activeOrder.items || activeOrder.items.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 italic">Siparişte henüz ürün bulunmuyor.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 italic">Siparişte henüz ürün bulunmuyor.</td></tr>`;
             } else {
                 activeOrder.items.forEach((item, index) => {
                     const sub = item.requestedQty * item.price;
@@ -1992,6 +2081,9 @@
                         <td class="p-3.5 font-bold text-slate-900">
                             <div class="text-xs text-slate-400 font-mono">${item.id || 'ÖZEL'}</div>
                             <div>${item.name}</div>
+                        </td>
+                        <td class="p-3.5 text-center">
+                            ${canEdit ? `<input type="text" value="${item.color && item.color !== '-' ? item.color : ''}" placeholder="Renk Kodu" onchange="updateStep1Color(${index}, this.value)" class="w-20 text-center font-bold border border-emerald-400 bg-emerald-50 text-emerald-950 rounded p-1 text-xs">` : `<span class="font-bold text-xs bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded">${item.color || '-'}</span>`}
                         </td>
                         <td class="p-3.5 text-center">
                             ${canEdit ? `<input type="number" min="1" value="${item.requestedQty}" onchange="updateStep1Qty(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold">${item.requestedQty} Adet</span>`}
@@ -2058,13 +2150,24 @@
         async function addItemFromCatalog() {
             const prodId = document.getElementById("step1-select-product").value;
             const customPrice = parseFloat(document.getElementById("step1-catalog-price").value);
+            const customColor = document.getElementById("step1-catalog-color").value.trim();
             const qty = parseInt(document.getElementById("step1-catalog-qty").value) || 1;
             const p = masterProducts.find(x => x.id === prodId);
             if (!p) { showToast("Lütfen bir ürün seçin.", true); return; }
             const finalPrice = isNaN(customPrice) ? p.price : customPrice;
+            const finalColor = customColor || (p.color && p.color !== "-" ? p.color : "");
+
             if (!activeOrder.items) activeOrder.items = [];
             activeOrder.items.push({
-                id: p.id, name: p.name + (p.color && p.color !== "-" ? " (" + p.color + ")" : ""), color: (p.color && p.color !== "-") ? p.color : "", requestedQty: qty, dispatchedQty: qty, returnedQty: 0, price: finalPrice, warehouseNote: "", checked: true
+                id: p.id,
+                name: p.name,
+                color: finalColor,
+                requestedQty: qty,
+                dispatchedQty: qty,
+                returnedQty: 0,
+                price: finalPrice,
+                warehouseNote: "",
+                checked: true
             });
             await syncOrderToCloud(activeOrder);
             renderStep1();
@@ -2074,16 +2177,17 @@
         async function addItemManual() {
             const code = document.getElementById("manual-code").value.trim() || `ÇNP-${Math.floor(100 + Math.random() * 900)}`;
             const name = document.getElementById("manual-name").value.trim();
+            const color = document.getElementById("manual-color").value.trim() || "-";
             const price = parseFloat(document.getElementById("manual-price").value) || 0;
             const qty = parseInt(document.getElementById("manual-qty").value) || 1;
             const saveMaster = document.getElementById("chk-save-to-master").checked;
             if (!name) { showToast("Lütfen ürün adını yazınız.", true); return; }
             if (!activeOrder.items) activeOrder.items = [];
             activeOrder.items.push({
-                id: code, name: name, color: "", requestedQty: qty, dispatchedQty: qty, returnedQty: 0, price: price, warehouseNote: "", checked: true
+                id: code, name: name, color: color, requestedQty: qty, dispatchedQty: qty, returnedQty: 0, price: price, warehouseNote: "", checked: true
             });
             if (saveMaster) {
-                masterProducts.unshift({ id: code, name: name, color: "-", price: price });
+                masterProducts.unshift({ id: code, name: name, color: color, price: price });
                 saveCatalogToDB(masterProducts);
             }
             await syncOrderToCloud(activeOrder);
@@ -2091,9 +2195,16 @@
             renderStep1();
             document.getElementById("manual-code").value = "";
             document.getElementById("manual-name").value = "";
+            document.getElementById("manual-color").value = "";
             document.getElementById("manual-price").value = "";
             document.getElementById("manual-qty").value = "1";
             showToast(`${name} fişe eklendi!`);
+        }
+
+        async function updateStep1Color(index, val) {
+            activeOrder.items[index].color = val.trim();
+            await syncOrderToCloud(activeOrder);
+            renderStep1();
         }
 
         async function updateStep1Qty(index, val) {
@@ -2138,6 +2249,7 @@
                             <input type="checkbox" ${item.checked ? "checked" : ""} ${!canEditWarehouse ? "disabled" : ""} onchange="toggleCheckStep2(${index}, this.checked)" class="w-4 h-4 text-emerald-700 rounded">
                         </td>
                         <td class="p-3.5 font-bold text-slate-900">${item.name}</td>
+                        <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${item.color || '-'}</td>
                         <td class="p-3.5 text-center font-bold text-slate-500">${item.requestedQty} Adet</td>
                         <td class="p-3.5 text-center">
                             ${canEditWarehouse ? `<input type="number" min="0" value="${item.dispatchedQty}" onchange="updateStep2Dispatched(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold text-amber-900">${item.dispatchedQty} Adet</span>`}
@@ -2189,15 +2301,18 @@
 
         async function addItemFromDepo() {
             const prodId = document.getElementById("depo-select-product").value;
+            const customColor = document.getElementById("depo-add-color").value.trim();
             const qty = parseInt(document.getElementById("depo-add-qty").value) || 1;
             const p = masterProducts.find(x => x.id === prodId);
             if (!p) { showToast("Lütfen bir ürün seçin.", true); return; }
 
+            const finalColor = customColor || (p.color && p.color !== "-" ? p.color : "");
+
             if (!activeOrder.items) activeOrder.items = [];
             activeOrder.items.push({
                 id: p.id,
-                name: p.name + (p.color && p.color !== "-" ? ` (${p.color})` : "") + " [Depo İlavesi]",
-                color: (p.color && p.color !== "-") ? p.color : "",
+                name: p.name + " [Depo İlavesi]",
+                color: finalColor,
                 requestedQty: qty,
                 dispatchedQty: qty,
                 returnedQty: 0,
@@ -2249,7 +2364,7 @@
                     row.innerHTML = `
                         <div>
                             <span class="font-bold text-slate-800">${item.name}</span>
-                            <div class="text-[11px] text-slate-400">Sevk Edilen: ${item.dispatchedQty} Adet</div>
+                            <div class="text-[11px] text-emerald-800 font-bold">Renk: ${item.color || '-'} | Sevk: ${item.dispatchedQty} Adet</div>
                         </div>
                         <div class="flex items-center space-x-2">
                             <span class="text-slate-500 font-bold">İade:</span>
@@ -2266,7 +2381,10 @@
                     row.className = "bg-white p-3 rounded-xl border border-slate-200 text-xs space-y-2";
                     row.innerHTML = `
                         <div class="flex items-center justify-between">
-                            <span class="font-bold text-slate-800">${ext.name}</span>
+                            <div>
+                                <span class="font-bold text-slate-800">${ext.name}</span>
+                                <div class="text-[10px] text-emerald-700 font-bold">Renk: ${ext.color || '-'}</div>
+                            </div>
                             <span class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">+${ext.qty} Adet</span>
                         </div>
                         <div class="flex items-center justify-between text-[11px] bg-slate-50 p-2 rounded-lg">
@@ -2335,6 +2453,7 @@
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td class="p-3.5 font-bold text-slate-900">${item.name}</td>
+                        <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${item.color || '-'}</td>
                         <td class="p-3.5 text-center text-slate-500">${item.requestedQty}</td>
                         <td class="p-3.5 text-center text-amber-900">${item.dispatchedQty}</td>
                         <td class="p-3.5 text-center font-bold text-red-600">${item.returnedQty ? "-" + item.returnedQty : "-"}</td>
@@ -2357,6 +2476,7 @@
                         tr.className = "bg-emerald-50/40";
                         tr.innerHTML = `
                             <td class="p-3.5 font-bold text-emerald-950">${ext.name}</td>
+                            <td class="p-3.5 text-center font-bold text-xs bg-emerald-100 text-emerald-950">${ext.color || '-'}</td>
                             <td class="p-3.5 text-center text-slate-400">0</td>
                             <td class="p-3.5 text-center text-slate-400">0</td>
                             <td class="p-3.5 text-center text-slate-400">-</td>
@@ -2427,7 +2547,11 @@
             const s1 = document.getElementById("step1-select-product");
             if (!s1 || s1.options.length === 0) return;
             const p = masterProducts.find(x => x.id === s1.value);
-            if (p) document.getElementById("step1-catalog-price").value = p.price;
+            if (p) {
+                document.getElementById("step1-catalog-price").value = p.price;
+                const cInput = document.getElementById("step1-catalog-color");
+                if (cInput && p.color && p.color !== "-") cInput.value = p.color;
+            }
         }
 
         function toggleAddMode(mode) {
@@ -2505,7 +2629,7 @@
                     <td class="p-3 text-center"><input type="checkbox" value="${idx}" class="catalog-row-checkbox w-4 h-4 text-emerald-700 rounded"></td>
                     <td class="p-3 font-mono font-bold text-slate-900">${p.id}</td>
                     <td class="p-3 font-medium">${p.name}</td>
-                    <td class="p-3 text-slate-500 font-semibold">${p.color || '-'}</td>
+                    <td class="p-3 text-emerald-800 font-bold bg-emerald-50 text-center">${p.color || '-'}</td>
                     <td class="p-3 text-right font-bold text-emerald-800">${Number(p.price).toLocaleString('tr-TR')} ₺</td>
                     <td class="p-3 text-center"><button type="button" onclick="removeProductByIndex(${idx})" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>
                 `;
