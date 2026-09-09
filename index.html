@@ -43,7 +43,7 @@
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased">
 
-    <!-- Dinamik Bildirim -->
+    <!-- Dinamik Bildirim Kutusu -->
     <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-950 text-white text-xs sm:text-sm font-bold px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-2.5 no-print border border-emerald-800">
         <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
         <span id="toast-msg"></span>
@@ -124,7 +124,7 @@
                                     <span>Saha Ekibi (Sefa Usta)</span>
                                     <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
                                 </div>
-                                <div class="text-[11px] text-slate-500 font-medium">Yalnızca uygulamalı montaj işlerini görür</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Yalnızca montaj/uygulamalı işleri görür</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs"></i>
@@ -978,7 +978,6 @@
             }
         };
 
-        // ÖRNEK VE KALICI BAŞLANGIÇ VERİLERİ (TÜM SATIŞÇILAR İÇİN)
         let orders = [
             {
                 id: "CNP-2026-916",
@@ -1052,7 +1051,7 @@
             return subtotal * 1.20;
         }
 
-        // ================= CANLI BULUT SİPARİŞ SENKRONİZASYONU =================
+        // ================= BULUT SENKRONİZASYONU =================
         function listenToOrdersCloud() {
             try {
                 const cachedOrders = localStorage.getItem("cinpa_cached_orders");
@@ -1168,7 +1167,7 @@
             }
         }
 
-        // ================= INDEXEDDB KATALOG MOTORU =================
+        // ================= KATALOG MOTORU =================
         const CATALOG_DB_NAME = "CinpaOfficialCatalog_v2";
         const CATALOG_STORE_NAME = "catalog";
 
@@ -2368,7 +2367,7 @@
             showToast("Ürün fişten çıkarıldı.");
         }
 
-        // ================= 2. ADIM: DEPO (ÜRÜN KODU BELİRGİN) =================
+        // ================= 2. ADIM: DEPO =================
         function renderStep2() {
             const tbody = document.getElementById("step2-items-tbody");
             if (!tbody) return;
@@ -2492,19 +2491,6 @@
         async function toggleCheckStep2(index, chk) { activeOrder.items[index].checked = chk; await syncOrderToCloud(activeOrder); }
         async function updateStep2Dispatched(index, val) { activeOrder.items[index].dispatchedQty = parseInt(val) || 0; await syncOrderToCloud(activeOrder); }
         async function updateStep2Note(index, val) { activeOrder.items[index].warehouseNote = val; await syncOrderToCloud(activeOrder); }
-
-        async function forwardFromWarehouse() {
-            if (activeOrder.hasApplication !== false) {
-                activeOrder.currentStep = 3;
-                await syncOrderToCloud(activeOrder);
-                showToast("Sevk İrsaliyesi kesildi ve Sahaya iletildi!");
-            } else {
-                activeOrder.currentStep = 4;
-                await syncOrderToCloud(activeOrder);
-                showToast("Ürünler sevk edildi (Saha uygulaması olmadığı için doğrudan Muhasebeye iletildi)!");
-            }
-            returnToDashboard();
-        }
 
         // ================= BAŞLANGIÇ YÜKLEMESİ =================
         window.addEventListener('DOMContentLoaded', () => {
