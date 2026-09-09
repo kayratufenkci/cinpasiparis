@@ -124,7 +124,7 @@
                                     <span>Saha Ekibi (Sefa Usta)</span>
                                     <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
                                 </div>
-                                <div class="text-[11px] text-slate-500 font-medium">Yalnızca montaj/uygulamalı işleri görür</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Yalnızca uygulamalı montaj işlerini görür</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs"></i>
@@ -978,11 +978,11 @@
             }
         };
 
-        // ÖRNEK BAŞLANGIÇ VERİLERİ (VERİLERİN KAYBOLMAMASI İÇİN)
+        // KESİNLİKLE BOŞ KALMAMASI İÇİN VARSAYILAN BAŞLANGIÇ SİPARİŞLERİ
         let orders = [
             {
                 id: "CNP-2026-916",
-                customer: "Swissotel Balo Salonu",
+                customer: "Swissotel Balo Salonu Projesi",
                 salesRep: "Orhan Özen",
                 date: "2026-09-08",
                 notes: "Acil teslimat",
@@ -991,6 +991,20 @@
                 items: [
                     { id: "0109024", name: "YUCCA BUSH", color: "1001", requestedQty: 20, dispatchedQty: 20, returnedQty: 0, price: 860, warehouseNote: "", checked: true },
                     { id: "0109037", name: "MONSTERA", color: "1004", requestedQty: 70, dispatchedQty: 70, returnedQty: 0, price: 624, warehouseNote: "", checked: true }
+                ],
+                extras: [],
+                isClosed: false
+            },
+            {
+                id: "CNP-2026-826",
+                customer: "Ankara Sheraton Otel",
+                salesRep: "Salih Şahin",
+                date: "2026-09-07",
+                notes: "Sadece ürün teslimatı",
+                hasApplication: false,
+                currentStep: 2,
+                items: [
+                    { id: "0107029", name: "DRACAENA", color: "1003", requestedQty: 10, dispatchedQty: 10, returnedQty: 0, price: 70, warehouseNote: "", checked: true }
                 ],
                 extras: [],
                 isClosed: false
@@ -1182,7 +1196,6 @@
                 req.onsuccess = () => {
                     masterProducts = req.result || [];
                     if (masterProducts.length === 0) {
-                        // Varsayılan örnek katalog ürünleri
                         masterProducts = [
                             { id: "0109024", name: "YUCCA BUSH", color: "1001", price: 860 },
                             { id: "0109037", name: "MONSTERA", color: "1004", price: 624 },
@@ -2480,6 +2493,19 @@
         async function updateStep2Dispatched(index, val) { activeOrder.items[index].dispatchedQty = parseInt(val) || 0; await syncOrderToCloud(activeOrder); }
         async function updateStep2Note(index, val) { activeOrder.items[index].warehouseNote = val; await syncOrderToCloud(activeOrder); }
 
+        async function forwardFromWarehouse() {
+            if (activeOrder.hasApplication !== false) {
+                activeOrder.currentStep = 3;
+                await syncOrderToCloud(activeOrder);
+                showToast("Sevk İrsaliyesi kesildi ve Sahaya iletildi!");
+            } else {
+                activeOrder.currentStep = 4;
+                await syncOrderToCloud(activeOrder);
+                showToast("Ürünler sevk edildi (Saha uygulaması olmadığı için doğrudan Muhasebeye iletildi)!");
+            }
+            returnToDashboard();
+        }
+
         // ================= BAŞLANGIÇ YÜKLEMESİ =================
         window.addEventListener('DOMContentLoaded', () => {
             loadCatalogFromDB();
@@ -2488,7 +2514,7 @@
                 firebase.auth().signInAnonymously()
                     .then(() => {
                         const st = document.getElementById("cloud-status-text");
-                        if (st) st.innerText = "Kalıcı & Bulut Senkronize Sistem";
+                        if (st) st.innerText = "Kalıcı & Bulut Canlı Sistem";
                         listenToOrdersCloud();
                     })
                     .catch((err) => {
