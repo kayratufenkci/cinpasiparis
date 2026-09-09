@@ -902,31 +902,31 @@
                 roleId: 'satis', name: 'Orhan Özen', title: 'Satış Uzmanı', badgeText: 'SATIŞ PANELİ',
                 dutyText: 'Sadece KENDİ siparişlerinizi görürsünüz. Fiş depoya iletildikten sonra değişiklik yapamazsınız.',
                 colorClass: 'bg-blue-50 text-blue-700 border-blue-200', avatarBg: 'bg-emerald-100 text-emerald-800', avatarIcon: 'fa-file-signature',
-                visibleSteps: [1], canCreateOrder: true, canManageCatalog: true
+                visibleSteps: [1], canCreateOrder: true, canManageCatalog: true, canDeleteOrder: true
             },
             depo: {
                 roleId: 'depo', name: 'Kamber Usta', title: 'Depo Sorumlusu', badgeText: 'DEPO PANELİ',
                 dutyText: 'Sadece Depo Hazırlık & Sevkiyat Bekleyen siparişleri görür ve düzenlersiniz.',
                 colorClass: 'bg-amber-50 text-amber-800 border-amber-200', avatarBg: 'bg-amber-100 text-amber-700', avatarIcon: 'fa-boxes-packing',
-                visibleSteps: [2], canCreateOrder: false, canManageCatalog: false
+                visibleSteps: [2], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false
             },
             saha: {
                 roleId: 'saha', name: 'Sefa Usta', title: 'Saha & Uygulama Ekibi', badgeText: 'SAHA MOBİL PANELİ',
                 dutyText: 'Sadece sevk edilen ve montaj bekleyen siparişleri görür, mal kabul/iade/ilave işlersiniz.',
                 colorClass: 'bg-purple-50 text-purple-700 border-purple-200', avatarBg: 'bg-purple-100 text-purple-700', avatarIcon: 'fa-helmet-safety',
-                visibleSteps: [3], canCreateOrder: false, canManageCatalog: false
+                visibleSteps: [3], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false
             },
             muhasebe: {
                 roleId: 'muhasebe', name: 'Gökhan', title: 'Muhasebe Uzmanı', badgeText: 'MUHASEBE PANELİ',
                 dutyText: 'Depo veya Saha onayı tamamlanmış fişleri inceler, faturalandırır ve kapatırsınız.',
                 colorClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', avatarBg: 'bg-emerald-100 text-emerald-700', avatarIcon: 'fa-receipt',
-                visibleSteps: [4], canCreateOrder: false, canManageCatalog: false
+                visibleSteps: [4], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false
             },
             admin: {
                 roleId: 'admin', name: 'Sistem Yöneticisi', title: 'Admin (Tam Yetki)', badgeText: 'TAM YETKİLİ ADMIN',
                 dutyText: 'Tüm aşamaları görür ve her aşamada sınırsız düzenleme / değiştirme yetkisine sahiptir.',
                 colorClass: 'bg-emerald-950 text-white border-emerald-900', avatarBg: 'bg-emerald-900 text-emerald-200', avatarIcon: 'fa-crown',
-                visibleSteps: [1, 2, 3, 4], canCreateOrder: true, canManageCatalog: true
+                visibleSteps: [1, 2, 3, 4], canCreateOrder: true, canManageCatalog: true, canDeleteOrder: true
             }
         };
 
@@ -998,17 +998,25 @@
             }
         }
 
-        // ================= SİPARİŞ SİLME FONKSİYONU (YALNIZCA SATIŞ VE ADMİN) =================
+        // ================= SİPARİŞ SİLME FONKSİYONU (YALNIZCA KENDİ SATIŞÇISI VE ADMİN) =================
         async function deleteOrder(orderId, event) {
             if (event) event.stopPropagation();
 
-            if (!currentUser || (currentUser.roleId !== 'satis' && currentUser.roleId !== 'admin')) {
-                showToast("YETKİSİZ İŞLEM: Sipariş silme yetkiniz bulunmamaktadır!", true);
+            if (!currentUser) return;
+
+            const targetOrder = orders.find(o => o.id === orderId);
+            if (!targetOrder) return;
+
+            // KURAL: Sadece Admin silebilir VEYA Satış Uzmanı SADECE KENDİ fişini silebilir
+            const isAdmin = currentUser.roleId === 'admin';
+            const isOwnSalesOrder = currentUser.roleId === 'satis' && (targetOrder.salesRep || '').trim().toLowerCase() === currentUser.name.trim().toLowerCase();
+
+            if (!isAdmin && !isOwnSalesOrder) {
+                showToast("YETKİSİZ İŞLEM: Bu sipariş dosyasını silme yetkiniz bulunmamaktadır!", true);
                 return;
             }
 
-            const targetOrder = orders.find(o => o.id === orderId);
-            const orderLabel = targetOrder ? `${targetOrder.id} - ${targetOrder.customer}` : orderId;
+            const orderLabel = `${targetOrder.id} - ${targetOrder.customer}`;
 
             if (!confirm(`"${orderLabel}" sipariş dosyasını kalıcı olarak silmek istediğinize emin misiniz?`)) {
                 return;
@@ -1896,8 +1904,9 @@
                 return;
             }
 
-            // SİLME BUTONU YALNIZCA SATIŞÇILAR VE ADMİNDE GÖRÜNÜR
-            const canDelete = (currentUser.roleId === 'satis' || currentUser.roleId === 'admin');
+            // KURAL: Silme yetkisi yalnızca 'satis' ve 'admin' rollerindedir.
+            // Depo, Saha ve Muhasebe rollerinde canDelete false'tur.
+            const userCanDelete = currentUser.canDeleteOrder === true;
 
             visibleOrders.forEach(ord => {
                 const tr = document.createElement("tr");
@@ -1910,6 +1919,9 @@
                 else if (ord.currentStep === 4) badge = `<span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-receipt mr-1"></i> 4. Muhasebede Bekliyor</span>`;
                 else badge = `<span class="bg-slate-900 text-white text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-check-double text-emerald-400 mr-1"></i> Fatura Kesildi (Kapandı)</span>`;
 
+                // Bir satışçı yalnızca kendi fişini silebilir, admin herkesinkini silebilir
+                const isItemDeletable = userCanDelete && (currentUser.roleId === 'admin' || (ord.salesRep || '').trim().toLowerCase() === currentUser.name.trim().toLowerCase());
+
                 tr.innerHTML = `
                     <td class="p-4 font-mono font-bold text-slate-900">${ord.id}</td>
                     <td class="p-4 font-bold text-slate-800">${ord.customer}</td>
@@ -1918,7 +1930,7 @@
                     <td class="p-4">${badge}</td>
                     <td class="p-4 text-right">
                         <div class="inline-flex items-center justify-end space-x-2">
-                            ${canDelete ? `
+                            ${isItemDeletable ? `
                             <button onclick="deleteOrder('${ord.id}', event)" class="px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 text-xs font-bold hover:bg-red-600 hover:text-white transition flex items-center space-x-1" title="Siparişi Sil">
                                 <i class="fa-solid fa-trash-can"></i>
                                 <span class="hidden sm:inline">Sil</span>
@@ -2626,6 +2638,7 @@
 
             await saveCatalogToDB(masterProducts);
             renderCatalogTable();
+            populateProductSelects();
             showToast(`${selectedIndices.length} ürün silindi.`);
         }
 
@@ -2634,6 +2647,7 @@
             masterProducts = [];
             await saveCatalogToDB(masterProducts);
             renderCatalogTable();
+            populateProductSelects();
             showToast("Tüm katalog temizlendi.");
         }
 
@@ -2651,6 +2665,7 @@
             masterProducts.splice(idx, 1);
             await saveCatalogToDB(masterProducts);
             renderCatalogTable();
+            populateProductSelects();
             showToast("Ürün silindi.");
         }
 
