@@ -288,12 +288,13 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
                             <thead class="bg-emerald-50/60 text-emerald-900 text-xs font-bold uppercase border-b border-emerald-100">
-                                <tr>
+                                <tr id="orders-table-header-row">
                                     <th class="p-4">İş No / Dosya</th>
                                     <th class="p-4">Müşteri / Proje</th>
                                     <th class="p-4">Satış Uzmanı</th>
                                     <th class="p-4">Tarih</th>
                                     <th class="p-4">Aşama / Durum</th>
+                                    <th class="p-4 text-right" id="th-order-price">Toplam Tutar</th>
                                     <th class="p-4 text-right">İşlem</th>
                                 </tr>
                             </thead>
@@ -902,31 +903,31 @@
                 roleId: 'satis', name: 'Orhan Özen', title: 'Satış Uzmanı', badgeText: 'SATIŞ PANELİ',
                 dutyText: 'Sadece KENDİ siparişlerinizi görürsünüz. Fiş depoya iletildikten sonra değişiklik yapamazsınız.',
                 colorClass: 'bg-blue-50 text-blue-700 border-blue-200', avatarBg: 'bg-emerald-100 text-emerald-800', avatarIcon: 'fa-file-signature',
-                visibleSteps: [1], canCreateOrder: true, canManageCatalog: true, canDeleteOrder: true
+                visibleSteps: [1], canCreateOrder: true, canManageCatalog: true, canDeleteOrder: true, canSeePrices: true
             },
             depo: {
                 roleId: 'depo', name: 'Kamber Usta', title: 'Depo Sorumlusu', badgeText: 'DEPO PANELİ',
                 dutyText: 'Sadece Depo Hazırlık & Sevkiyat Bekleyen siparişleri görür ve düzenlersiniz.',
                 colorClass: 'bg-amber-50 text-amber-800 border-amber-200', avatarBg: 'bg-amber-100 text-amber-700', avatarIcon: 'fa-boxes-packing',
-                visibleSteps: [2], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false
+                visibleSteps: [2], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false, canSeePrices: false
             },
             saha: {
                 roleId: 'saha', name: 'Sefa Usta', title: 'Saha & Uygulama Ekibi', badgeText: 'SAHA MOBİL PANELİ',
                 dutyText: 'Sadece sevk edilen ve montaj bekleyen siparişleri görür, mal kabul/iade/ilave işlersiniz.',
                 colorClass: 'bg-purple-50 text-purple-700 border-purple-200', avatarBg: 'bg-purple-100 text-purple-700', avatarIcon: 'fa-helmet-safety',
-                visibleSteps: [3], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false
+                visibleSteps: [3], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false, canSeePrices: false
             },
             muhasebe: {
                 roleId: 'muhasebe', name: 'Gökhan', title: 'Muhasebe Uzmanı', badgeText: 'MUHASEBE PANELİ',
                 dutyText: 'Depo veya Saha onayı tamamlanmış fişleri inceler, faturalandırır ve kapatırsınız.',
                 colorClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', avatarBg: 'bg-emerald-100 text-emerald-700', avatarIcon: 'fa-receipt',
-                visibleSteps: [4], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false
+                visibleSteps: [4], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false, canSeePrices: true
             },
             admin: {
                 roleId: 'admin', name: 'Sistem Yöneticisi', title: 'Admin (Tam Yetki)', badgeText: 'TAM YETKİLİ ADMIN',
                 dutyText: 'Tüm aşamaları görür ve her aşamada sınırsız düzenleme / değiştirme yetkisine sahiptir.',
                 colorClass: 'bg-emerald-950 text-white border-emerald-900', avatarBg: 'bg-emerald-900 text-emerald-200', avatarIcon: 'fa-crown',
-                visibleSteps: [1, 2, 3, 4], canCreateOrder: true, canManageCatalog: true, canDeleteOrder: true
+                visibleSteps: [1, 2, 3, 4], canCreateOrder: true, canManageCatalog: true, canDeleteOrder: true, canSeePrices: true
             }
         };
 
@@ -946,6 +947,31 @@
             icon.className = isError ? "fa-solid fa-circle-exclamation text-red-400 text-base" : "fa-solid fa-circle-check text-emerald-400 text-base";
             toast.classList.remove("hidden");
             setTimeout(() => { toast.classList.add("hidden"); }, 3000);
+        }
+
+        // Fişin KDV Dahil Net Toplam Tutarını Hesaplayan Fonksiyon
+        function calculateOrderTotal(order) {
+            let subtotal = 0;
+            if (order.items && Array.isArray(order.items)) {
+                order.items.forEach(item => {
+                    const requested = parseFloat(item.requestedQty) || 0;
+                    const dispatched = item.dispatchedQty !== undefined ? (parseFloat(item.dispatchedQty) || 0) : requested;
+                    const returned = parseFloat(item.returnedQty) || 0;
+                    const netQty = Math.max(0, dispatched - returned);
+                    const unitPrice = parseFloat(item.price) || 0;
+                    subtotal += netQty * unitPrice;
+                });
+            }
+            if (order.extras && Array.isArray(order.extras)) {
+                order.extras.forEach(ext => {
+                    if (ext.faikApproval) {
+                        const qty = parseFloat(ext.qty) || 0;
+                        const price = parseFloat(ext.price) || 0;
+                        subtotal += qty * price;
+                    }
+                });
+            }
+            return subtotal * 1.20; // %20 KDV Dahil
         }
 
         // ================= CANLI BULUT SİPARİŞ SENKRONİZASYONU =================
@@ -1899,13 +1925,17 @@
                 document.getElementById("dashboard-table-subtitle").innerText = `Sistemde kayıtlı olan tüm birimlere ait aktif dosyalar.`;
             }
 
+            // Fiyat Sütunu Başlığı Görünürlüğü (Yalnızca Admin, Muhasebe ve Satışçı görebilir)
+            const showPrices = currentUser.canSeePrices === true;
+            const thPrice = document.getElementById("th-order-price");
+            if (thPrice) thPrice.style.display = showPrices ? "table-cell" : "none";
+
             if (visibleOrders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Bu ekranda görüntülenecek aktif dosya bulunmuyor.</td></tr>`;
+                const colSpan = showPrices ? 7 : 6;
+                tbody.innerHTML = `<tr><td colspan="${colSpan}" class="p-8 text-center text-slate-400 font-medium">Bu ekranda görüntülenecek aktif dosya bulunmuyor.</td></tr>`;
                 return;
             }
 
-            // KURAL: Silme yetkisi yalnızca 'satis' ve 'admin' rollerindedir.
-            // Depo, Saha ve Muhasebe rollerinde canDelete false'tur.
             const userCanDelete = currentUser.canDeleteOrder === true;
 
             visibleOrders.forEach(ord => {
@@ -1919,8 +1949,8 @@
                 else if (ord.currentStep === 4) badge = `<span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-receipt mr-1"></i> 4. Muhasebede Bekliyor</span>`;
                 else badge = `<span class="bg-slate-900 text-white text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-check-double text-emerald-400 mr-1"></i> Fatura Kesildi (Kapandı)</span>`;
 
-                // Bir satışçı yalnızca kendi fişini silebilir, admin herkesinkini silebilir
                 const isItemDeletable = userCanDelete && (currentUser.roleId === 'admin' || (ord.salesRep || '').trim().toLowerCase() === currentUser.name.trim().toLowerCase());
+                const totalAmount = calculateOrderTotal(ord);
 
                 tr.innerHTML = `
                     <td class="p-4 font-mono font-bold text-slate-900">${ord.id}</td>
@@ -1928,6 +1958,7 @@
                     <td class="p-4 font-medium text-slate-600">${ord.salesRep || "Satış Ekibi"}</td>
                     <td class="p-4 text-xs font-medium text-slate-500">${ord.date || "-"}</td>
                     <td class="p-4">${badge}</td>
+                    ${showPrices ? `<td class="p-4 text-right font-black text-emerald-800 whitespace-nowrap">${Number(totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>` : ''}
                     <td class="p-4 text-right">
                         <div class="inline-flex items-center justify-end space-x-2">
                             ${isItemDeletable ? `
@@ -2638,7 +2669,6 @@
 
             await saveCatalogToDB(masterProducts);
             renderCatalogTable();
-            populateProductSelects();
             showToast(`${selectedIndices.length} ürün silindi.`);
         }
 
@@ -2647,113 +2677,11 @@
             masterProducts = [];
             await saveCatalogToDB(masterProducts);
             renderCatalogTable();
-            populateProductSelects();
             showToast("Tüm katalog temizlendi.");
         }
 
         function filterCatalogTable() {
             const q = document.getElementById("cat-search-input").value.toLowerCase();
-            const filtered = masterProducts.filter(p => 
-                p.id.toLowerCase().includes(q) || 
-                p.name.toLowerCase().includes(q) || 
-                (p.color && p.color.toLowerCase().includes(q))
-            );
-            renderCatalogTable(filtered);
-        }
-
-        async function removeProductByIndex(idx) {
-            masterProducts.splice(idx, 1);
-            await saveCatalogToDB(masterProducts);
-            renderCatalogTable();
-            populateProductSelects();
-            showToast("Ürün silindi.");
-        }
-
-        function updateHeaderBadgeCounts() {
-            const badge = document.getElementById("cat-count-badge");
-            if (badge) badge.innerText = masterProducts.length;
-            const lbl = document.getElementById("master-count-label");
-            if (lbl) lbl.innerText = masterProducts.length;
-        }
-
-        function renderAdminPerformance() {
-            const kpiContainer = document.getElementById("admin-kpi-cards");
-            const tbody = document.getElementById("admin-performance-tbody");
-            if (!kpiContainer || !tbody) return;
-
-            kpiContainer.innerHTML = "";
-            tbody.innerHTML = "";
-
-            let totalOrders = orders.length;
-            let totalRevenue = 0;
-            let closedOrdersCount = orders.filter(o => o.isClosed).length;
-
-            orders.forEach(ord => {
-                let sub = 0;
-                if (ord.items) {
-                    ord.items.forEach(i => {
-                        const netQty = Math.max(0, i.dispatchedQty - (i.returnedQty || 0));
-                        sub += netQty * (i.price || 0);
-                    });
-                }
-                if (ord.extras) {
-                    ord.extras.forEach(ext => {
-                        if (ext.faikApproval) sub += (ext.qty || 0) * (ext.price || 0);
-                    });
-                }
-                totalRevenue += sub * 1.20;
-            });
-
-            kpiContainer.innerHTML = `
-                <div class="bg-white/10 p-4 rounded-2xl border border-emerald-800">
-                    <div class="text-[10px] font-bold text-emerald-300 uppercase">Toplam Sipariş Dosyası</div>
-                    <div class="text-2xl font-black text-white mt-1">${totalOrders} Adet</div>
-                </div>
-                <div class="bg-white/10 p-4 rounded-2xl border border-emerald-800">
-                    <div class="text-[10px] font-bold text-emerald-300 uppercase">Tamamlanan / Faturalanan</div>
-                    <div class="text-2xl font-black text-emerald-300 mt-1">${closedOrdersCount} Dosya</div>
-                </div>
-                <div class="bg-white/10 p-4 rounded-2xl border border-emerald-800">
-                    <div class="text-[10px] font-bold text-emerald-300 uppercase">Toplam Konsolide Ciro (KDV Dahil)</div>
-                    <div class="text-2xl font-black text-white mt-1">${totalRevenue.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</div>
-                </div>
-            `;
-
-            SALES_TEAM.forEach(repName => {
-                const repOrders = orders.filter(o => (o.salesRep || '').trim().toLowerCase() === repName.trim().toLowerCase());
-                let repCount = repOrders.length;
-                let repClosed = repOrders.filter(o => o.isClosed).length;
-                let repRev = 0;
-
-                repOrders.forEach(ord => {
-                    let sub = 0;
-                    if (ord.items) {
-                        ord.items.forEach(i => {
-                            const netQty = Math.max(0, i.dispatchedQty - (i.returnedQty || 0));
-                            sub += netQty * (i.price || 0);
-                        });
-                    }
-                    if (ord.extras) {
-                        ord.extras.forEach(ext => {
-                            if (ext.faikApproval) sub += (ext.qty || 0) * (ext.price || 0);
-                        });
-                    }
-                    repRev += sub * 1.20;
-                });
-
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td class="p-3 font-bold text-white">${repName}</td>
-                    <td class="p-3 text-center font-bold">${repCount} Dosya</td>
-                    <td class="p-3 text-center text-emerald-300 font-bold">${repClosed} Kapalı</td>
-                    <td class="p-3 text-right font-black text-white text-sm">${repRev.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function filterOrders() {
-            const q = document.getElementById("search-input").value.toLowerCase();
             const rows = document.querySelectorAll("#orders-table-body tr");
             rows.forEach(r => { r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; });
         }
