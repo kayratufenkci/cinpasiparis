@@ -227,7 +227,7 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <button onclick="logout()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 sm:hidden">
+                    <button onclick="logout()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex items-center space-x-1 sm:hidden">
                         <i class="fa-solid fa-arrow-left"></i>
                         <span>Geri Dön</span>
                     </button>
@@ -668,7 +668,7 @@
         </main>
     </div>
 
-    <!-- ================= MODAL 1: EXCEL FİŞİ YÜKLE (DÜZELTİLDİ VE SADELEŞTİRİLDİ) ================= -->
+    <!-- ================= MODAL 1: EXCEL FİŞİ YÜKLE ================= -->
     <div id="modal-excel-import" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -998,9 +998,14 @@
             }
         }
 
-        // ================= SİPARİŞ SİLME FONKSİYONU =================
+        // ================= SİPARİŞ SİLME FONKSİYONU (YALNIZCA SATIŞ VE ADMİN) =================
         async function deleteOrder(orderId, event) {
             if (event) event.stopPropagation();
+
+            if (!currentUser || (currentUser.roleId !== 'satis' && currentUser.roleId !== 'admin')) {
+                showToast("YETKİSİZ İŞLEM: Sipariş silme yetkiniz bulunmamaktadır!", true);
+                return;
+            }
 
             const targetOrder = orders.find(o => o.id === orderId);
             const orderLabel = targetOrder ? `${targetOrder.id} - ${targetOrder.customer}` : orderId;
@@ -1891,6 +1896,9 @@
                 return;
             }
 
+            // SİLME BUTONU YALNIZCA SATIŞÇILAR VE ADMİNDE GÖRÜNÜR
+            const canDelete = (currentUser.roleId === 'satis' || currentUser.roleId === 'admin');
+
             visibleOrders.forEach(ord => {
                 const tr = document.createElement("tr");
                 tr.className = "hover:bg-slate-50 transition cursor-pointer";
@@ -1908,12 +1916,15 @@
                     <td class="p-4 font-medium text-slate-600">${ord.salesRep || "Satış Ekibi"}</td>
                     <td class="p-4 text-xs font-medium text-slate-500">${ord.date || "-"}</td>
                     <td class="p-4">${badge}</td>
-                    <td class="p-4 text-right flex items-center justify-end space-x-2">
-                        <button onclick="deleteOrder('${ord.id}', event)" class="px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 text-xs font-bold hover:bg-red-600 hover:text-white transition flex items-center space-x-1" title="Siparişi Sil">
-                            <i class="fa-solid fa-trash-can"></i>
-                            <span class="hidden sm:inline">Sil</span>
-                        </button>
-                        <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-emerald-700 hover:text-white transition">Aç <i class="fa-solid fa-chevron-right ml-1"></i></button>
+                    <td class="p-4 text-right">
+                        <div class="inline-flex items-center justify-end space-x-2">
+                            ${canDelete ? `
+                            <button onclick="deleteOrder('${ord.id}', event)" class="px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 text-xs font-bold hover:bg-red-600 hover:text-white transition flex items-center space-x-1" title="Siparişi Sil">
+                                <i class="fa-solid fa-trash-can"></i>
+                                <span class="hidden sm:inline">Sil</span>
+                            </button>` : ''}
+                            <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-emerald-700 hover:text-white transition">Aç <i class="fa-solid fa-chevron-right ml-1"></i></button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
