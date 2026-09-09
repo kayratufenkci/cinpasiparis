@@ -59,7 +59,7 @@
                 </div>
                 <div class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span id="cloud-status-text">Nebim & Bulut Canlı Sistem</span>
+                    <span id="cloud-status-text">Kalıcı & Bulut Canlı Sistem</span>
                 </div>
             </div>
 
@@ -976,6 +976,15 @@
 
         // ================= CANLI BULUT SİPARİŞ SENKRONİZASYONU =================
         function listenToOrdersCloud() {
+            // Önce yerel yedekten oku (Ağ yavaşsa veya kopuksa ekrana anında getirir)
+            try {
+                const cachedOrders = localStorage.getItem("cinpa_cached_orders");
+                if (cachedOrders) {
+                    orders = JSON.parse(cachedOrders);
+                    if (currentUser) renderOrderList();
+                }
+            } catch(e) {}
+
             if (!db) return;
             try {
                 db.collection("orders").onSnapshot((snapshot) => {
@@ -985,6 +994,7 @@
                     });
                     cloudOrders.sort((a, b) => (b.id > a.id ? 1 : -1));
                     orders = cloudOrders;
+                    try { localStorage.setItem("cinpa_cached_orders", JSON.stringify(orders)); } catch(e) {}
                     if (currentUser) {
                         renderOrderList();
                         if (currentUser.roleId === 'admin') renderAdminPerformance();
@@ -1011,6 +1021,7 @@
             } else {
                 orders.unshift(JSON.parse(JSON.stringify(orderObj)));
             }
+            try { localStorage.setItem("cinpa_cached_orders", JSON.stringify(orders)); } catch(e) {}
             if (currentUser) {
                 renderOrderList();
                 if (currentUser.roleId === 'admin') renderAdminPerformance();
@@ -1024,7 +1035,7 @@
             }
         }
 
-        // ================= SİPARİŞ SİLME FONKSİYONU (YALNIZCA KENDİ SATIŞÇISI VE ADMİN) =================
+        // ================= SİPARİŞ SİLME FONKSİYONU =================
         async function deleteOrder(orderId, event) {
             if (event) event.stopPropagation();
 
@@ -1033,7 +1044,6 @@
             const targetOrder = orders.find(o => o.id === orderId);
             if (!targetOrder) return;
 
-            // KURAL: Sadece Admin silebilir VEYA Satış Uzmanı SADECE KENDİ fişini silebilir
             const isAdmin = currentUser.roleId === 'admin';
             const isOwnSalesOrder = currentUser.roleId === 'satis' && (targetOrder.salesRep || '').trim().toLowerCase() === currentUser.name.trim().toLowerCase();
 
@@ -1049,19 +1059,17 @@
             }
 
             try {
-                // 1. Yerel listeden kaldır
                 orders = orders.filter(o => o.id !== orderId);
+                try { localStorage.setItem("cinpa_cached_orders", JSON.stringify(orders)); } catch(e) {}
                 renderOrderList();
                 if (currentUser && currentUser.roleId === 'admin') renderAdminPerformance();
 
-                // 2. Buluttan kaldır
                 if (db) {
                     await db.collection("orders").doc(orderId).delete();
                 }
 
                 showToast(`Sipariş #${orderId} başarıyla silindi.`);
 
-                // Eğer o an açık olan detay ekranı silindiyse listeye dön
                 if (activeOrder && activeOrder.id === orderId) {
                     returnToDashboard();
                 }
@@ -1243,7 +1251,7 @@
             event.target.value = "";
         }
 
-        // ================= KUSURSUZ VE KARIŞMAYAN EXCEL FİŞİ OKUMA MOTORU =================
+        // ================= EXCEL FİŞİ OKUMA =================
         function handleExcelFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1286,7 +1294,6 @@
                 const rawH = rows[r].map(c => String(c || '').trim());
                 const cleanH = rawH.map(c => c.toLowerCase());
 
-                // 1. Ürün Kodu Tespiti
                 for (let idx = 0; idx < cleanH.length; idx++) {
                     const h = cleanH[idx];
                     if (h === 'itemcode' || h === 'stok kodu' || h === 'stokkodu' || h === 'ürün kodu' || h === 'urunkodu') {
@@ -1302,7 +1309,6 @@
                     }
                 }
 
-                // 2. Renk Kodu Tespiti
                 for (let idx = 0; idx < cleanH.length; idx++) {
                     const h = cleanH[idx];
                     if (h === 'colorcode' || h === 'renk kodu' || h === 'renkkodu' || h === 'color' || h === 'renk') {
@@ -1310,7 +1316,6 @@
                     }
                 }
 
-                // 3. Ürün Adı / Açıklaması Tespiti
                 for (let idx = 0; idx < cleanH.length; idx++) {
                     const h = cleanH[idx];
                     if (h === 'itemdescription' || h === 'ürün adı' || h === 'urun adi' || h === 'ürün tanımı' || h === 'stok adı' || h === 'stok adi' || h === 'açıklama' || h === 'aciklama' || h === 'tanım' || h === 'tanim') {
@@ -1326,7 +1331,6 @@
                     }
                 }
 
-                // 4. Miktar Tespiti (ÖNEMLİ: Qty1 önceliklidir, Qty2 ikincil paket adedidir ve karışmaz)
                 for (let idx = 0; idx < cleanH.length; idx++) {
                     const h = cleanH[idx];
                     if (h === 'qty1' || h === 'miktar' || h === 'adet' || h === 'sipariş miktarı' || h === 'sevk miktarı' || h === 'talep adedi') {
@@ -1342,7 +1346,6 @@
                     }
                 }
 
-                // 5. Birim Fiyat Tespiti
                 for (let idx = 0; idx < cleanH.length; idx++) {
                     const h = cleanH[idx];
                     if (h === 'price' || h === 'fiyat' || h === 'birim fiyat' || h === 'birimfiyat' || h === 'tutar') {
@@ -1364,12 +1367,11 @@
                 }
             }
 
-            // Standart Nebim şablonu varsayılanları (kayroş.xlsx / İRSALİYE DENEMESİ.xlsx)
-            if (itemCodeCol === -1) itemCodeCol = 2; // C: ItemCode
-            if (colorCodeCol === -1) colorCodeCol = 3; // D: ColorCode
-            if (nameCol === -1) nameCol = 9; // J: LineDescription
-            if (qtyCol === -1) qtyCol = 7; // H: Qty1
-            if (priceCol === -1) priceCol = 12; // M: Price
+            if (itemCodeCol === -1) itemCodeCol = 2;
+            if (colorCodeCol === -1) colorCodeCol = 3;
+            if (nameCol === -1) nameCol = 9;
+            if (qtyCol === -1) qtyCol = 7;
+            if (priceCol === -1) priceCol = 12;
 
             for (let i = startRow; i < rows.length; i++) {
                 const cols = rows[i];
@@ -1390,7 +1392,6 @@
                 let finalColor = normalizeColorCode(color);
                 let productName = (explicitName && explicitName !== '' && explicitName !== 'nan') ? explicitName : '';
 
-                // Katalogdan Ürün Adı ve Renk Kodu Eşleme
                 if (masterProducts.length > 0) {
                     const cleanCode = code.toLowerCase().replace(/^0+/, '');
                     const found = masterProducts.find(p => {
@@ -1498,7 +1499,7 @@
             openOrderDetail(newId);
         }
 
-        // ================= İRSALİYE OLUŞTUR (.XLSX) - İRSALİYE DENEMESİ FORMATI =================
+        // ================= İRSALİYE OLUŞTUR (.XLSX) =================
         function exportIrsaliyeExcel() {
             if (!activeOrder) return;
             const excelRows = [];
@@ -1511,7 +1512,6 @@
             };
             const spCode = salesCodeMap[activeOrder.salesRep] || "101";
 
-            // 1. Ana Sipariş Kalemleri
             (activeOrder.items || []).forEach(item => {
                 const requested = item.requestedQty || 0;
                 const dispatched = item.dispatchedQty !== undefined ? item.dispatchedQty : requested;
@@ -1570,7 +1570,6 @@
                 }
             });
 
-            // 2. Saha Ekstra Kalemleri
             (activeOrder.extras || []).forEach(ext => {
                 if (ext.faikApproval && (ext.qty || 0) > 0) {
                     const unitPrice = parseFloat(ext.price) || 0;
@@ -1640,7 +1639,7 @@
             showToast("İrsaliye Excel (.xlsx) dosyası başarıyla oluşturuldu ve indirildi!");
         }
 
-        // ================= FİŞİN SON HALİNİ NEBİM V3 FORMATINDA EXCEL'E AKTARMA (.XLSX) =================
+        // ================= NEBİM V3 FORMATINDA EXCEL AKTAR (.XLSX) =================
         function exportFinalOrderToExcel() {
             if (!activeOrder) return;
             const excelRows = [];
@@ -1925,7 +1924,6 @@
                 document.getElementById("dashboard-table-subtitle").innerText = `Sistemde kayıtlı olan tüm birimlere ait aktif dosyalar.`;
             }
 
-            // Fiyat Sütunu Başlığı Görünürlüğü (Yalnızca Admin, Muhasebe ve Satışçı görebilir)
             const showPrices = currentUser.canSeePrices === true;
             const thPrice = document.getElementById("th-order-price");
             if (thPrice) thPrice.style.display = showPrices ? "table-cell" : "none";
@@ -2682,6 +2680,106 @@
 
         function filterCatalogTable() {
             const q = document.getElementById("cat-search-input").value.toLowerCase();
+            const filtered = masterProducts.filter(p => 
+                p.id.toLowerCase().includes(q) || 
+                p.name.toLowerCase().includes(q) || 
+                (p.color && p.color.toLowerCase().includes(q))
+            );
+            renderCatalogTable(filtered);
+        }
+
+        async function removeProductByIndex(idx) {
+            masterProducts.splice(idx, 1);
+            await saveCatalogToDB(masterProducts);
+            renderCatalogTable();
+            showToast("Ürün silindi.");
+        }
+
+        function updateHeaderBadgeCounts() {
+            const badge = document.getElementById("cat-count-badge");
+            if (badge) badge.innerText = masterProducts.length;
+            const lbl = document.getElementById("master-count-label");
+            if (lbl) lbl.innerText = masterProducts.length;
+        }
+
+        function renderAdminPerformance() {
+            const kpiContainer = document.getElementById("admin-kpi-cards");
+            const tbody = document.getElementById("admin-performance-tbody");
+            if (!kpiContainer || !tbody) return;
+
+            kpiContainer.innerHTML = "";
+            tbody.innerHTML = "";
+
+            let totalOrders = orders.length;
+            let totalRevenue = 0;
+            let closedOrdersCount = orders.filter(o => o.isClosed).length;
+
+            orders.forEach(ord => {
+                let sub = 0;
+                if (ord.items) {
+                    ord.items.forEach(i => {
+                        const netQty = Math.max(0, i.dispatchedQty - (i.returnedQty || 0));
+                        sub += netQty * (i.price || 0);
+                    });
+                }
+                if (ord.extras) {
+                    ord.extras.forEach(ext => {
+                        if (ext.faikApproval) sub += (ext.qty || 0) * (ext.price || 0);
+                    });
+                }
+                totalRevenue += sub * 1.20;
+            });
+
+            kpiContainer.innerHTML = `
+                <div class="bg-white/10 p-4 rounded-2xl border border-emerald-800">
+                    <div class="text-[10px] font-bold text-emerald-300 uppercase">Toplam Sipariş Dosyası</div>
+                    <div class="text-2xl font-black text-white mt-1">${totalOrders} Adet</div>
+                </div>
+                <div class="bg-white/10 p-4 rounded-2xl border border-emerald-800">
+                    <div class="text-[10px] font-bold text-emerald-300 uppercase">Tamamlanan / Faturalanan</div>
+                    <div class="text-2xl font-black text-emerald-300 mt-1">${closedOrdersCount} Dosya</div>
+                </div>
+                <div class="bg-white/10 p-4 rounded-2xl border border-emerald-800">
+                    <div class="text-[10px] font-bold text-emerald-300 uppercase">Toplam Konsolide Ciro (KDV Dahil)</div>
+                    <div class="text-2xl font-black text-white mt-1">${totalRevenue.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</div>
+                </div>
+            `;
+
+            SALES_TEAM.forEach(repName => {
+                const repOrders = orders.filter(o => (o.salesRep || '').trim().toLowerCase() === repName.trim().toLowerCase());
+                let repCount = repOrders.length;
+                let repClosed = repOrders.filter(o => o.isClosed).length;
+                let repRev = 0;
+
+                repOrders.forEach(ord => {
+                    let sub = 0;
+                    if (ord.items) {
+                        ord.items.forEach(i => {
+                            const netQty = Math.max(0, i.dispatchedQty - (i.returnedQty || 0));
+                            sub += netQty * (i.price || 0);
+                        });
+                    }
+                    if (ord.extras) {
+                        ord.extras.forEach(ext => {
+                            if (ext.faikApproval) sub += (ext.qty || 0) * (ext.price || 0);
+                        });
+                    }
+                    repRev += sub * 1.20;
+                });
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-white">${repName}</td>
+                    <td class="p-3 text-center font-bold">${repCount} Dosya</td>
+                    <td class="p-3 text-center text-emerald-300 font-bold">${repClosed} Kapalı</td>
+                    <td class="p-3 text-right font-black text-white text-sm">${repRev.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterOrders() {
+            const q = document.getElementById("search-input").value.toLowerCase();
             const rows = document.querySelectorAll("#orders-table-body tr");
             rows.forEach(r => { r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; });
         }
