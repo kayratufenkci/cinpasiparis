@@ -85,6 +85,8 @@
                             <select id="login-sales-rep-select" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-600">
                                 <option value="Orhan Özen">Orhan Özen</option>
                                 <option value="Salih Şahin">Salih Şahin</option>
+                                <option value="Zeki Karadavut">Zeki Karadavut</option>
+                                <option value="Faik Kavas">Faik Kavas</option>
                                 <option value="Uğur Morkoç">Uğur Morkoç</option>
                                 <option value="Tolga Keleş">Tolga Keleş</option>
                             </select>
@@ -94,14 +96,17 @@
                         </div>
                     </div>
 
-                    <!-- Depo Profili -->
-                    <button type="button" onclick="loginAs('depo')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full">
+                    <!-- Depo Profili (Şifreli 1981) -->
+                    <button type="button" onclick="requestPasswordAndLogin('depo')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
                                 <i class="fa-solid fa-boxes-packing"></i>
                             </div>
                             <div>
-                                <div class="text-xs font-black text-slate-900">Depocu (Kamber Usta)</div>
+                                <div class="text-xs font-black text-slate-900 flex items-center space-x-1.5">
+                                    <span>Depocu (Kamber Usta)</span>
+                                    <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
+                                </div>
                                 <div class="text-[11px] text-slate-500 font-medium">Sadece Depo Hazırlık & İkame Masasını Görür</div>
                             </div>
                         </div>
@@ -825,9 +830,11 @@
                         <label class="block font-bold text-slate-700 uppercase mb-1">Satış Uzmanı</label>
                         <select id="new-sales-rep" class="w-full text-xs font-semibold p-3 rounded-xl border border-emerald-200 bg-slate-50">
                             <option value="Orhan Özen">Orhan Özen</option>
+                            <option value="Salih Şahin">Salih Şahin</option>
+                            <option value="Zeki Karadavut">Zeki Karadavut</option>
+                            <option value="Faik Kavas">Faik Kavas</option>
                             <option value="Uğur Morkoç">Uğur Morkoç</option>
                             <option value="Tolga Keleş">Tolga Keleş</option>
-                            <option value="Salih Şahin">Salih Şahin</option>
                         </select>
                     </div>
                     <div>
@@ -896,7 +903,8 @@
             console.error("Firebase init:", e);
         }
 
-        const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Salih Şahin"];
+        // Güncel Satış Ekibi Listesi
+        const SALES_TEAM = ["Orhan Özen", "Salih Şahin", "Zeki Karadavut", "Faik Kavas", "Uğur Morkoç", "Tolga Keleş"];
 
         const USER_ROLES = {
             satis: {
@@ -976,7 +984,6 @@
 
         // ================= CANLI BULUT SİPARİŞ SENKRONİZASYONU =================
         function listenToOrdersCloud() {
-            // Önce yerel yedekten oku (Ağ yavaşsa veya kopuksa ekrana anında getirir)
             try {
                 const cachedOrders = localStorage.getItem("cinpa_cached_orders");
                 if (cachedOrders) {
@@ -1504,9 +1511,12 @@
             if (!activeOrder) return;
             const excelRows = [];
 
+            // Satışçı kod eşleşmesi (Nebim V3 Standartları)
             const salesCodeMap = {
                 "Orhan Özen": "101",
                 "Salih Şahin": "108",
+                "Zeki Karadavut": "111",
+                "Faik Kavas": "112",
                 "Uğur Morkoç": "109",
                 "Tolga Keleş": "110"
             };
@@ -1647,6 +1657,8 @@
             const salesCodeMap = {
                 "Orhan Özen": "107",
                 "Salih Şahin": "108",
+                "Zeki Karadavut": "111",
+                "Faik Kavas": "112",
                 "Uğur Morkoç": "109",
                 "Tolga Keleş": "110"
             };
@@ -1779,9 +1791,17 @@
             showToast("Fişin son hali Nebim V3 formatında Excel (.xlsx) olarak indirildi!");
         }
 
-        // ================= GİRİŞ & ROL İŞLEMLERİ =================
+        // ================= GİRİŞ & ROL İŞLEMLERİ (GÜNCELLENMİŞ ŞİFRELER) =================
         function requestPasswordAndLogin(roleKey) {
-            if (roleKey === 'muhasebe') {
+            if (roleKey === 'depo') {
+                const pass = prompt("Depocu (Kamber Usta) Giriş Şifresi:");
+                if (pass === null) return;
+                if (pass.trim() === "1981") {
+                    loginAs('depo');
+                } else {
+                    alert("Hatalı Depocu şifresi!");
+                }
+            } else if (roleKey === 'muhasebe') {
                 const pass = prompt("Muhasebe (Gökhan) Giriş Şifresi:");
                 if (pass === null) return;
                 if (pass.trim() === "3278") {
@@ -1816,6 +1836,20 @@
                 if (pass === null) return;
                 if (pass.trim() !== "081016") {
                     alert("Hatalı Salih Şahin şifresi!");
+                    return;
+                }
+            } else if (selectedRep === "Zeki Karadavut") {
+                const pass = prompt("Zeki Karadavut Giriş Şifresi:");
+                if (pass === null) return;
+                if (pass.trim() !== "1234") {
+                    alert("Hatalı Zeki Karadavut şifresi!");
+                    return;
+                }
+            } else if (selectedRep === "Faik Kavas") {
+                const pass = prompt("Faik Kavas Giriş Şifresi:");
+                if (pass === null) return;
+                if (pass.trim() !== "1212") {
+                    alert("Hatalı Faik Kavas şifresi!");
                     return;
                 }
             } else if (selectedRep === "Uğur Morkoç") {
