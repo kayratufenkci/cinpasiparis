@@ -1037,8 +1037,17 @@
                     snapshot.forEach((doc) => {
                         cloudOrders.push(doc.data());
                     });
-                    cloudOrders.sort((a, b) => (b.id > a.id ? 1 : -1));
-                    orders = cloudOrders;
+                    
+                    // EĞER BULUT BOŞSA VE YERELDE ESKİ VERİ VARSA İLK YÜKLEMEDE YÜKLE
+                    if (cloudOrders.length === 0 && orders.length > 0) {
+                        orders.forEach(async (ord) => {
+                            await db.collection("orders").doc(ord.id).set(ord);
+                        });
+                    } else if (cloudOrders.length > 0) {
+                        cloudOrders.sort((a, b) => (b.id > a.id ? 1 : -1));
+                        orders = cloudOrders;
+                    }
+
                     try { localStorage.setItem("cinpa_cached_orders", JSON.stringify(orders)); } catch(e) {}
                     if (currentUser) {
                         renderOrderList();
