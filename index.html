@@ -679,7 +679,7 @@
         </main>
     </div>
 
-    <!-- ================= MODAL 1: EXCEL FİŞİ YÜKLE (UYGULAMA SEÇİMİ EKLENDİ) ================= -->
+    <!-- ================= MODAL 1: EXCEL FİŞİ YÜKLE ================= -->
     <div id="modal-excel-import" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-5 max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -719,10 +719,7 @@
 
                 <!-- 2. YÖNTEM: KOPYALA YAPIŞTIR -->
                 <div class="space-y-1.5">
-                    <div class="flex items-center justify-between">
-                        <label class="text-xs font-bold text-slate-700 uppercase">2. Yöntem: Excel Tablosunu Kopyalayıp Buraya Yapıştırın</label>
-                        <span class="text-[11px] text-slate-400">Ctrl + V</span>
-                    </div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase">2. Yöntem: Excel Tablosunu Kopyalayıp Buraya Yapıştırın</label>
                     <textarea id="excel-paste-input" rows="3" placeholder="Excel tablosunu kopyalayıp doğrudan buraya yapıştırabilirsiniz..." class="w-full text-xs font-mono p-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white"></textarea>
                     <button type="button" onclick="parsePastedExcelText()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Yapıştırılan Metni Çözümle</button>
                 </div>
@@ -1538,7 +1535,7 @@
                 salesRep: currentUser ? currentUser.name : "Orhan Özen",
                 date: new Date().toISOString().split("T")[0],
                 notes: "Excel üzerinden aktarıldı.",
-                hasApplication: hasApplication, // Saha Montaj/Uygulama var mı?
+                hasApplication: hasApplication,
                 currentStep: 1,
                 items: formattedItems,
                 extras: [],
@@ -1979,7 +1976,6 @@
                 document.getElementById("dashboard-table-title").innerText = `Depo Sevkiyat & Hazırlık Masası`;
                 document.getElementById("dashboard-table-subtitle").innerText = `Satış ekibinden gelen ve araç yüklemesi yapılacak aktif siparişler.`;
             } else if (currentUser.roleId === 'saha') {
-                // KURAL: Saha ekibi SADECE 'hasApplication !== false' olan yani uygulaması yapılacak işleri görür
                 visibleOrders = orders.filter(ord => ord.currentStep >= 3 && ord.hasApplication !== false);
                 document.getElementById("dashboard-table-title").innerText = `Saha Montaj & Uygulama Masası`;
                 document.getElementById("dashboard-table-subtitle").innerText = `Yalnızca montaj/uygulaması yapılacak işler listelenmektedir.`;
@@ -2073,7 +2069,6 @@
                 }
             }
 
-            // Depo ilerletme butonu yazısını dinamik yap
             const forwardBtnText = document.getElementById("btn-depo-forward-text");
             if (forwardBtnText) {
                 if (activeOrder.hasApplication !== false) {
@@ -2102,7 +2097,6 @@
             };
 
             currentUser.visibleSteps.forEach(stepIdx => {
-                // Eğer uygulaması yoksa ve kullanıcı admin veya satışçıysa, kafa karıştırmamak için 3. adımı atlayabiliriz
                 if (stepIdx === 3 && activeOrder && activeOrder.hasApplication === false && currentUser.roleId !== 'admin') {
                     return;
                 }
@@ -2323,6 +2317,7 @@
             showToast("Ürün fişten çıkarıldı.");
         }
 
+        // ================= 2. ADIM: DEPO (ÜRÜN KODU EKLENDİ) =================
         function renderStep2() {
             const tbody = document.getElementById("step2-items-tbody");
             if (!tbody) return;
@@ -2344,7 +2339,10 @@
                         <td class="p-3.5 text-center">
                             <input type="checkbox" ${item.checked ? "checked" : ""} ${!canEditWarehouse ? "disabled" : ""} onchange="toggleCheckStep2(${index}, this.checked)" class="w-4 h-4 text-emerald-700 rounded">
                         </td>
-                        <td class="p-3.5 font-bold text-slate-900">${item.name}</td>
+                        <td class="p-3.5 font-bold text-slate-900">
+                            <div class="text-xs text-slate-400 font-mono">${item.id || 'ÖZEL'}</div>
+                            <div>${item.name}</div>
+                        </td>
                         <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${item.color || '-'}</td>
                         <td class="p-3.5 text-center font-bold text-slate-500">${item.requestedQty} Adet</td>
                         <td class="p-3.5 text-center">
@@ -2444,7 +2442,6 @@
         async function updateStep2Dispatched(index, val) { activeOrder.items[index].dispatchedQty = parseInt(val) || 0; await syncOrderToCloud(activeOrder); }
         async function updateStep2Note(index, val) { activeOrder.items[index].warehouseNote = val; await syncOrderToCloud(activeOrder); }
 
-        // DEPO ONAYI: Uygulama varsa Sahaya (3), yoksa doğrudan Muhasebeye (4) ilet
         async function forwardFromWarehouse() {
             if (activeOrder.hasApplication !== false) {
                 activeOrder.currentStep = 3;
@@ -2478,6 +2475,7 @@
                     row.className = "flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 text-xs";
                     row.innerHTML = `
                         <div>
+                            <div class="text-[10px] text-slate-400 font-mono">${item.id || 'ÖZEL'}</div>
                             <span class="font-bold text-slate-800">${item.name}</span>
                             <div class="text-[11px] text-emerald-800 font-bold">Renk Kodu: ${item.color || '-'} | Sevk: ${item.dispatchedQty} Adet</div>
                         </div>
@@ -2567,7 +2565,10 @@
 
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
-                        <td class="p-3.5 font-bold text-slate-900">${item.name}</td>
+                        <td class="p-3.5 font-bold text-slate-900">
+                            <div class="text-xs text-slate-400 font-mono">${item.id || 'ÖZEL'}</div>
+                            <div>${item.name}</div>
+                        </td>
                         <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${item.color || '-'}</td>
                         <td class="p-3.5 text-center text-slate-500">${item.requestedQty}</td>
                         <td class="p-3.5 text-center text-amber-900">${item.dispatchedQty}</td>
