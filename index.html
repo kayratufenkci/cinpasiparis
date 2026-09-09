@@ -694,7 +694,6 @@
             </div>
             
             <div class="space-y-4 overflow-y-auto pr-1">
-                <!-- SAHA UYGULAMASI SEÇENEĞİ -->
                 <div class="p-3.5 bg-amber-50 rounded-2xl border border-amber-200 space-y-2">
                     <label class="block text-xs font-black text-amber-950 uppercase flex items-center space-x-1.5">
                         <i class="fa-solid fa-helmet-safety text-amber-600"></i>
@@ -706,7 +705,6 @@
                     </select>
                 </div>
 
-                <!-- 1. YÖNTEM: EXCEL DOSYA SEÇİMİ -->
                 <div class="space-y-1.5">
                     <label class="block text-xs font-bold text-slate-700 uppercase">1. Yöntem: Excel Dosyası (.xlsx, .xls, .csv) Seçin</label>
                     <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/40 rounded-2xl p-5 text-center cursor-pointer hover:bg-emerald-50 transition" onclick="document.getElementById('excel-file-input').click()">
@@ -717,7 +715,6 @@
                     </div>
                 </div>
 
-                <!-- 2. YÖNTEM: KOPYALA YAPIŞTIR -->
                 <div class="space-y-1.5">
                     <label class="block text-xs font-bold text-slate-700 uppercase">2. Yöntem: Excel Tablosunu Kopyalayıp Buraya Yapıştırın</label>
                     <textarea id="excel-paste-input" rows="3" placeholder="Excel tablosunu kopyalayıp doğrudan buraya yapıştırabilirsiniz..." class="w-full text-xs font-mono p-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white"></textarea>
@@ -725,7 +722,6 @@
                 </div>
             </div>
 
-            <!-- OKUNAN ÜRÜNLERİN ÖNİZLEMESİ -->
             <div id="excel-preview-box" class="hidden flex-1 overflow-y-auto border border-emerald-100 rounded-2xl p-3 bg-slate-50 space-y-2">
                 <div class="text-xs font-bold text-slate-700 flex items-center justify-between">
                     <span>Okunan Ürünler: <strong id="excel-preview-count" class="text-emerald-700">0 Kalem</strong></span>
@@ -978,6 +974,7 @@
             }
         };
 
+        // KESİNLİKLE BOŞ KALMAMASI İÇİN ÖRNEK SİPARİŞLER (ORHAN ÖZEN'E ÖZEL KONTROL)
         let orders = [
             {
                 id: "CNP-2026-916",
@@ -990,20 +987,6 @@
                 items: [
                     { id: "0109024", name: "YUCCA BUSH", color: "1001", requestedQty: 20, dispatchedQty: 20, returnedQty: 0, price: 860, warehouseNote: "", checked: true },
                     { id: "0109037", name: "MONSTERA", color: "1004", requestedQty: 70, dispatchedQty: 70, returnedQty: 0, price: 624, warehouseNote: "", checked: true }
-                ],
-                extras: [],
-                isClosed: false
-            },
-            {
-                id: "CNP-2026-826",
-                customer: "Ankara Sheraton Otel",
-                salesRep: "Salih Şahin",
-                date: "2026-09-07",
-                notes: "Sadece ürün teslimatı",
-                hasApplication: false,
-                currentStep: 2,
-                items: [
-                    { id: "0107029", name: "DRACAENA", color: "1003", requestedQty: 10, dispatchedQty: 10, returnedQty: 0, price: 70, warehouseNote: "", checked: true }
                 ],
                 extras: [],
                 isClosed: false
@@ -1051,7 +1034,7 @@
             return subtotal * 1.20;
         }
 
-        // ================= BULUT SENKRONİZASYONU =================
+        // ================= CANLI BULUT SİPARİŞ SENKRONİZASYONU =================
         function listenToOrdersCloud() {
             try {
                 const cachedOrders = localStorage.getItem("cinpa_cached_orders");
@@ -1971,6 +1954,7 @@
             document.getElementById("role-avatar-box").className = `w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold ${currentUser.avatarBg}`;
             document.getElementById("role-avatar-icon").className = `fa-solid ${currentUser.avatarIcon}`;
 
+            // Butonların görünürlüğü ve erişilebilirliği garantileniyor
             document.getElementById("btn-header-new-order").style.display = currentUser.canCreateOrder ? "flex" : "none";
             document.getElementById("btn-header-import-excel").style.display = currentUser.canCreateOrder ? "flex" : "none";
             document.getElementById("btn-header-catalog").style.display = currentUser.canManageCatalog ? "flex" : "none";
@@ -2491,6 +2475,19 @@
         async function toggleCheckStep2(index, chk) { activeOrder.items[index].checked = chk; await syncOrderToCloud(activeOrder); }
         async function updateStep2Dispatched(index, val) { activeOrder.items[index].dispatchedQty = parseInt(val) || 0; await syncOrderToCloud(activeOrder); }
         async function updateStep2Note(index, val) { activeOrder.items[index].warehouseNote = val; await syncOrderToCloud(activeOrder); }
+
+        async function forwardFromWarehouse() {
+            if (activeOrder.hasApplication !== false) {
+                activeOrder.currentStep = 3;
+                await syncOrderToCloud(activeOrder);
+                showToast("Sevk İrsaliyesi kesildi ve Sahaya iletildi!");
+            } else {
+                activeOrder.currentStep = 4;
+                await syncOrderToCloud(activeOrder);
+                showToast("Ürünler sevk edildi (Saha uygulaması olmadığı için doğrudan Muhasebeye iletildi)!");
+            }
+            returnToDashboard();
+        }
 
         // ================= BAŞLANGIÇ YÜKLEMESİ =================
         window.addEventListener('DOMContentLoaded', () => {
