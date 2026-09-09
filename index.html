@@ -124,7 +124,7 @@
                                     <span>Saha Ekibi (Sefa Usta)</span>
                                     <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
                                 </div>
-                                <div class="text-[11px] text-slate-500 font-medium">Sadece Mal Kabul, İade & İlave Masasını Görür</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Yalnızca montaj/uygulamalı işleri görür</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs"></i>
@@ -301,6 +301,7 @@
                                     <th class="p-4">Müşteri / Proje</th>
                                     <th class="p-4">Satış Uzmanı</th>
                                     <th class="p-4">Tarih</th>
+                                    <th class="p-4">Uygulama Durumu</th>
                                     <th class="p-4">Aşama / Durum</th>
                                     <th class="p-4 text-right" id="th-order-price">Toplam Tutar</th>
                                     <th class="p-4 text-right">İşlem</th>
@@ -324,6 +325,7 @@
                             <div class="flex items-center space-x-2">
                                 <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-md bg-emerald-900 text-white font-mono" id="detail-order-code">-</span>
                                 <span class="text-xs font-bold text-slate-500" id="detail-order-date">-</span>
+                                <span class="text-[10px] font-black px-2 py-0.5 rounded-md" id="detail-order-application-badge">-</span>
                             </div>
                             <h2 class="text-lg font-black text-slate-900 mt-1" id="detail-customer-name">-</h2>
                         </div>
@@ -532,8 +534,8 @@
                         <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
                             <div class="text-xs text-slate-500 flex items-center"><i class="fa-solid fa-truck-ramp-box text-slate-400 mr-2"></i> Kolilendi ve araca yüklenmeye hazır.</div>
                             <div id="step2-action-buttons">
-                                <button type="button" onclick="forwardToField()" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2">
-                                    <i class="fa-solid fa-truck-fast"></i><span>Sevk İrsaliyesini Kes & Sahaya İlet</span>
+                                <button type="button" onclick="forwardFromWarehouse()" id="btn-depo-forward" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2">
+                                    <i class="fa-solid fa-truck-fast"></i><span id="btn-depo-forward-text">Sevk İrsaliyesini Kes & İlerlet</span>
                                 </button>
                             </div>
                         </div>
@@ -677,9 +679,9 @@
         </main>
     </div>
 
-    <!-- ================= MODAL 1: EXCEL FİŞİ YÜKLE ================= -->
+    <!-- ================= MODAL 1: EXCEL FİŞİ YÜKLE (UYGULAMA SEÇİMİ EKLENDİ) ================= -->
     <div id="modal-excel-import" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] flex flex-col">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-5 max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg"><i class="fa-solid fa-file-excel"></i></div>
@@ -692,6 +694,19 @@
             </div>
             
             <div class="space-y-4 overflow-y-auto pr-1">
+                <!-- SAHA UYGULAMASI SEÇENEĞİ -->
+                <div class="p-3.5 bg-amber-50 rounded-2xl border border-amber-200 space-y-2">
+                    <label class="block text-xs font-black text-amber-950 uppercase flex items-center space-x-1.5">
+                        <i class="fa-solid fa-helmet-safety text-amber-600"></i>
+                        <span>Saha Uygulama / Montaj Durumu:</span>
+                    </label>
+                    <select id="excel-import-has-application" class="w-full text-xs font-bold p-2.5 rounded-xl border border-amber-300 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <option value="true">Evet, Sahada Uygulama / Montaj Yapılacak (Saha Ekibine Düşsün)</option>
+                        <option value="false">Hayır, Yalnızca Ürün Teslimatı (Saha Yok, Depodan Direkt Muhasebeye)</option>
+                    </select>
+                </div>
+
+                <!-- 1. YÖNTEM: EXCEL DOSYA SEÇİMİ -->
                 <div class="space-y-1.5">
                     <label class="block text-xs font-bold text-slate-700 uppercase">1. Yöntem: Excel Dosyası (.xlsx, .xls, .csv) Seçin</label>
                     <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/40 rounded-2xl p-5 text-center cursor-pointer hover:bg-emerald-50 transition" onclick="document.getElementById('excel-file-input').click()">
@@ -702,6 +717,7 @@
                     </div>
                 </div>
 
+                <!-- 2. YÖNTEM: KOPYALA YAPIŞTIR -->
                 <div class="space-y-1.5">
                     <div class="flex items-center justify-between">
                         <label class="text-xs font-bold text-slate-700 uppercase">2. Yöntem: Excel Tablosunu Kopyalayıp Buraya Yapıştırın</label>
@@ -844,6 +860,13 @@
                     </div>
                 </div>
                 <div>
+                    <label class="block font-bold text-slate-700 uppercase mb-1">Saha Uygulama Durumu</label>
+                    <select id="new-has-application" class="w-full text-xs font-bold p-3 rounded-xl border border-emerald-200 bg-slate-50">
+                        <option value="true">Evet, Sahada Uygulama / Montaj Yapılacak</option>
+                        <option value="false">Hayır, Yalnızca Ürün Teslimatı (Saha Yok)</option>
+                    </select>
+                </div>
+                <div>
                     <label class="block font-bold text-slate-700 uppercase mb-1">Notlar</label>
                     <textarea id="new-notes" rows="2" placeholder="Özel talepler..." class="w-full text-xs p-3 rounded-xl border border-emerald-200 bg-slate-50"></textarea>
                 </div>
@@ -903,10 +926,8 @@
             console.error("Firebase init:", e);
         }
 
-        // Güncel Satış Ekibi Listesi
         const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Faik Kavas", "Salih Şahin", "Zeki Karadavut"];
 
-        // NEBİM V3 RESMİ SATIŞ TEMSİLCİSİ KOD EŞLEŞTİRMESİ
         const SALES_PERSON_CODE_MAP = {
             "Orhan Özen": "106",
             "Uğur Morkoç": "107",
@@ -942,7 +963,7 @@
             },
             saha: {
                 roleId: 'saha', name: 'Sefa Usta', title: 'Saha & Uygulama Ekibi', badgeText: 'SAHA MOBİL PANELİ',
-                dutyText: 'Sadece sevk edilen ve montaj bekleyen siparişleri görür, mal kabul/iade/ilave işlersiniz.',
+                dutyText: 'Yalnızca UYGULAMASI / MONTAJI yapılacak olan işleri görürsünüz.',
                 colorClass: 'bg-purple-50 text-purple-700 border-purple-200', avatarBg: 'bg-purple-100 text-purple-700', avatarIcon: 'fa-helmet-safety',
                 visibleSteps: [3], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false, canSeePrices: false
             },
@@ -978,7 +999,6 @@
             setTimeout(() => { toast.classList.add("hidden"); }, 3000);
         }
 
-        // Fişin KDV Dahil Net Toplam Tutarını Hesaplayan Fonksiyon
         function calculateOrderTotal(order) {
             let subtotal = 0;
             if (order.items && Array.isArray(order.items)) {
@@ -1000,7 +1020,7 @@
                     }
                 });
             }
-            return subtotal * 1.20; // %20 KDV Dahil
+            return subtotal * 1.20;
         }
 
         // ================= CANLI BULUT SİPARİŞ SENKRONİZASYONU =================
@@ -1063,7 +1083,7 @@
             }
         }
 
-        // ================= SİPARİŞ SİLME FONKSİYONU =================
+        // ================= SİPARİŞ SİLME =================
         async function deleteOrder(orderId, event) {
             if (event) event.stopPropagation();
 
@@ -1107,7 +1127,7 @@
             }
         }
 
-        // ================= KALICI VE GÜVENLİ INDEXEDDB KATALOG MOTORU =================
+        // ================= KALICI INDEXEDDB KATALOG MOTORU =================
         const CATALOG_DB_NAME = "CinpaOfficialCatalog_v2";
         const CATALOG_STORE_NAME = "catalog";
 
@@ -1495,6 +1515,9 @@
             const custName = prompt("Müşteri / Proje Adı giriniz:", "Yeni Excel Sipariş Projesi");
             if (!custName) return;
 
+            const hasAppSelect = document.getElementById("excel-import-has-application");
+            const hasApplication = hasAppSelect ? (hasAppSelect.value === "true") : true;
+
             const newId = "CNP-2026-" + String(Math.floor(100 + Math.random() * 900));
             
             const formattedItems = parsedExcelItems.map(i => ({
@@ -1515,6 +1538,7 @@
                 salesRep: currentUser ? currentUser.name : "Orhan Özen",
                 date: new Date().toISOString().split("T")[0],
                 notes: "Excel üzerinden aktarıldı.",
+                hasApplication: hasApplication, // Saha Montaj/Uygulama var mı?
                 currentStep: 1,
                 items: formattedItems,
                 extras: [],
@@ -1523,7 +1547,7 @@
 
             await syncOrderToCloud(newOrd);
             closeExcelImportModal();
-            showToast(`Sipariş #${newId} açıldı ve kaydedildi!`);
+            showToast(`Sipariş #${newId} (${hasApplication ? 'Uygulamalı' : 'Sadece Teslimat'}) açıldı!`);
             openOrderDetail(newId);
         }
 
@@ -1955,9 +1979,10 @@
                 document.getElementById("dashboard-table-title").innerText = `Depo Sevkiyat & Hazırlık Masası`;
                 document.getElementById("dashboard-table-subtitle").innerText = `Satış ekibinden gelen ve araç yüklemesi yapılacak aktif siparişler.`;
             } else if (currentUser.roleId === 'saha') {
-                visibleOrders = orders.filter(ord => ord.currentStep >= 3);
-                document.getElementById("dashboard-table-title").innerText = `Saha Montaj & İade/İlave Masası`;
-                document.getElementById("dashboard-table-subtitle").innerText = `Depodan araca yüklenip sahaya gelen ve montajı yapılacak işler.`;
+                // KURAL: Saha ekibi SADECE 'hasApplication !== false' olan yani uygulaması yapılacak işleri görür
+                visibleOrders = orders.filter(ord => ord.currentStep >= 3 && ord.hasApplication !== false);
+                document.getElementById("dashboard-table-title").innerText = `Saha Montaj & Uygulama Masası`;
+                document.getElementById("dashboard-table-subtitle").innerText = `Yalnızca montaj/uygulaması yapılacak işler listelenmektedir.`;
             } else if (currentUser.roleId === 'muhasebe') {
                 visibleOrders = orders.filter(ord => ord.currentStep >= 2);
                 document.getElementById("dashboard-table-title").innerText = `Muhasebe Fatura Onay Kuyruğu`;
@@ -1973,7 +1998,7 @@
             if (thPrice) thPrice.style.display = showPrices ? "table-cell" : "none";
 
             if (visibleOrders.length === 0) {
-                const colSpan = showPrices ? 7 : 6;
+                const colSpan = showPrices ? 8 : 7;
                 tbody.innerHTML = `<tr><td colspan="${colSpan}" class="p-8 text-center text-slate-400 font-medium">Bu ekranda görüntülenecek aktif dosya bulunmuyor.</td></tr>`;
                 return;
             }
@@ -1991,6 +2016,10 @@
                 else if (ord.currentStep === 4) badge = `<span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-receipt mr-1"></i> 4. Muhasebede Bekliyor</span>`;
                 else badge = `<span class="bg-slate-900 text-white text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-check-double text-emerald-400 mr-1"></i> Fatura Kesildi (Kapandı)</span>`;
 
+                const appBadge = ord.hasApplication !== false 
+                    ? `<span class="bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-extrabold px-2 py-0.5 rounded-md"><i class="fa-solid fa-helmet-safety mr-1"></i> Uygulama Var</span>` 
+                    : `<span class="bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-bold px-2 py-0.5 rounded-md"><i class="fa-solid fa-truck mr-1"></i> Sadece Teslimat</span>`;
+
                 const isItemDeletable = userCanDelete && (currentUser.roleId === 'admin' || (ord.salesRep || '').trim().toLowerCase() === currentUser.name.trim().toLowerCase());
                 const totalAmount = calculateOrderTotal(ord);
 
@@ -1999,6 +2028,7 @@
                     <td class="p-4 font-bold text-slate-800">${ord.customer}</td>
                     <td class="p-4 font-medium text-slate-600">${ord.salesRep || "Satış Ekibi"}</td>
                     <td class="p-4 text-xs font-medium text-slate-500">${ord.date || "-"}</td>
+                    <td class="p-4">${appBadge}</td>
                     <td class="p-4">${badge}</td>
                     ${showPrices ? `<td class="p-4 text-right font-black text-emerald-800 whitespace-nowrap">${Number(totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>` : ''}
                     <td class="p-4 text-right">
@@ -2032,6 +2062,27 @@
             document.getElementById("detail-order-date").innerText = activeOrder.date;
             document.getElementById("step1-sales-rep").innerText = activeOrder.salesRep;
 
+            const appBadge = document.getElementById("detail-order-application-badge");
+            if (appBadge) {
+                if (activeOrder.hasApplication !== false) {
+                    appBadge.className = "text-[10px] font-black px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 border border-purple-200";
+                    appBadge.innerText = "Uygulama / Montaj Var";
+                } else {
+                    appBadge.className = "text-[10px] font-black px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200";
+                    appBadge.innerText = "Yalnızca Teslimat (Saha Yok)";
+                }
+            }
+
+            // Depo ilerletme butonu yazısını dinamik yap
+            const forwardBtnText = document.getElementById("btn-depo-forward-text");
+            if (forwardBtnText) {
+                if (activeOrder.hasApplication !== false) {
+                    forwardBtnText.innerText = "Sevk İrsaliyesini Kes & Sahaya İlet";
+                } else {
+                    forwardBtnText.innerText = "Sevk İrsaliyesini Kes & Doğrudan Muhasebeye İlet (Saha Yok)";
+                }
+            }
+
             buildDynamicStepperTabs();
             
             const defaultStep = currentUser.visibleSteps[0] || 1;
@@ -2051,6 +2102,11 @@
             };
 
             currentUser.visibleSteps.forEach(stepIdx => {
+                // Eğer uygulaması yoksa ve kullanıcı admin veya satışçıysa, kafa karıştırmamak için 3. adımı atlayabiliriz
+                if (stepIdx === 3 && activeOrder && activeOrder.hasApplication === false && currentUser.roleId !== 'admin') {
+                    return;
+                }
+
                 const info = stepNames[stepIdx];
                 const btn = document.createElement("button");
                 btn.id = `tab-btn-${stepIdx}`;
@@ -2388,10 +2444,17 @@
         async function updateStep2Dispatched(index, val) { activeOrder.items[index].dispatchedQty = parseInt(val) || 0; await syncOrderToCloud(activeOrder); }
         async function updateStep2Note(index, val) { activeOrder.items[index].warehouseNote = val; await syncOrderToCloud(activeOrder); }
 
-        async function forwardToField() {
-            activeOrder.currentStep = 3;
-            await syncOrderToCloud(activeOrder);
-            showToast("Sevk İrsaliyesi kesildi ve Sahaya iletildi!");
+        // DEPO ONAYI: Uygulama varsa Sahaya (3), yoksa doğrudan Muhasebeye (4) ilet
+        async function forwardFromWarehouse() {
+            if (activeOrder.hasApplication !== false) {
+                activeOrder.currentStep = 3;
+                await syncOrderToCloud(activeOrder);
+                showToast("Sevk İrsaliyesi kesildi ve Sahaya iletildi!");
+            } else {
+                activeOrder.currentStep = 4;
+                await syncOrderToCloud(activeOrder);
+                showToast("Ürünler sevk edildi (Saha uygulaması olmadığı için doğrudan Muhasebeye iletildi)!");
+            }
             returnToDashboard();
         }
 
@@ -2642,9 +2705,14 @@
             if (!cust) { showToast("Lütfen müşteri adını giriniz.", true); return; }
             const newId = "CNP-2026-" + String(Math.floor(100 + Math.random() * 900));
             const rep = (currentUser && currentUser.roleId === 'satis') ? currentUser.name : (document.getElementById("new-sales-rep").value || "Orhan Özen");
+            
+            const hasAppSelect = document.getElementById("new-has-application");
+            const hasApplication = hasAppSelect ? (hasAppSelect.value === "true") : true;
+
             const newOrd = {
                 id: newId, customer: cust, salesRep: rep,
                 date: document.getElementById("new-date").value, notes: document.getElementById("new-notes").value,
+                hasApplication: hasApplication,
                 currentStep: 1, items: [], extras: [], isClosed: false
             };
             await syncOrderToCloud(newOrd);
