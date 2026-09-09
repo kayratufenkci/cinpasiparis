@@ -83,12 +83,12 @@
                         </div>
                         <div class="flex items-center space-x-2 pt-1">
                             <select id="login-sales-rep-select" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-200 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-600">
-                                <option value="Orhan Özen">Orhan Özen</option>
-                                <option value="Salih Şahin">Salih Şahin</option>
-                                <option value="Zeki Karadavut">Zeki Karadavut</option>
-                                <option value="Faik Kavas">Faik Kavas</option>
-                                <option value="Uğur Morkoç">Uğur Morkoç</option>
-                                <option value="Tolga Keleş">Tolga Keleş</option>
+                                <option value="Orhan Özen">Orhan Özen (106)</option>
+                                <option value="Uğur Morkoç">Uğur Morkoç (107)</option>
+                                <option value="Tolga Keleş">Tolga Keleş (108)</option>
+                                <option value="Faik Kavas">Faik Kavas (113)</option>
+                                <option value="Salih Şahin">Salih Şahin (114)</option>
+                                <option value="Zeki Karadavut">Zeki Karadavut (115)</option>
                             </select>
                             <button type="button" onclick="loginAsSalesSelected()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md transition whitespace-nowrap">
                                 Giriş <i class="fa-solid fa-arrow-right ml-1"></i>
@@ -113,14 +113,17 @@
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs"></i>
                     </button>
 
-                    <!-- Saha Profili -->
-                    <button type="button" onclick="loginAs('saha')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full">
+                    <!-- Saha Profili (Şifreli 1) -->
+                    <button type="button" onclick="requestPasswordAndLogin('saha')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
                                 <i class="fa-solid fa-helmet-safety"></i>
                             </div>
                             <div>
-                                <div class="text-xs font-black text-slate-900">Saha Ekibi (Sefa Usta)</div>
+                                <div class="text-xs font-black text-slate-900 flex items-center space-x-1.5">
+                                    <span>Saha Ekibi (Sefa Usta)</span>
+                                    <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
+                                </div>
                                 <div class="text-[11px] text-slate-500 font-medium">Sadece Mal Kabul, İade & İlave Masasını Görür</div>
                             </div>
                         </div>
@@ -689,7 +692,6 @@
             </div>
             
             <div class="space-y-4 overflow-y-auto pr-1">
-                <!-- 1. YÖNTEM: EXCEL DOSYA SEÇİMİ -->
                 <div class="space-y-1.5">
                     <label class="block text-xs font-bold text-slate-700 uppercase">1. Yöntem: Excel Dosyası (.xlsx, .xls, .csv) Seçin</label>
                     <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/40 rounded-2xl p-5 text-center cursor-pointer hover:bg-emerald-50 transition" onclick="document.getElementById('excel-file-input').click()">
@@ -700,7 +702,6 @@
                     </div>
                 </div>
 
-                <!-- 2. YÖNTEM: KOPYALA YAPIŞTIR -->
                 <div class="space-y-1.5">
                     <div class="flex items-center justify-between">
                         <label class="text-xs font-bold text-slate-700 uppercase">2. Yöntem: Excel Tablosunu Kopyalayıp Buraya Yapıştırın</label>
@@ -829,12 +830,12 @@
                     <div>
                         <label class="block font-bold text-slate-700 uppercase mb-1">Satış Uzmanı</label>
                         <select id="new-sales-rep" class="w-full text-xs font-semibold p-3 rounded-xl border border-emerald-200 bg-slate-50">
-                            <option value="Orhan Özen">Orhan Özen</option>
-                            <option value="Salih Şahin">Salih Şahin</option>
-                            <option value="Zeki Karadavut">Zeki Karadavut</option>
-                            <option value="Faik Kavas">Faik Kavas</option>
-                            <option value="Uğur Morkoç">Uğur Morkoç</option>
-                            <option value="Tolga Keleş">Tolga Keleş</option>
+                            <option value="Orhan Özen">Orhan Özen (106)</option>
+                            <option value="Uğur Morkoç">Uğur Morkoç (107)</option>
+                            <option value="Tolga Keleş">Tolga Keleş (108)</option>
+                            <option value="Faik Kavas">Faik Kavas (113)</option>
+                            <option value="Salih Şahin">Salih Şahin (114)</option>
+                            <option value="Zeki Karadavut">Zeki Karadavut (115)</option>
                         </select>
                     </div>
                     <div>
@@ -856,7 +857,6 @@
 
     <!-- ================= JAVASCRIPT MOTORU ================= -->
     <script>
-        // Renk Metinlerinden Nebim Koduna Akıllı Çevirici Sözlük
         const COLOR_NAME_TO_CODE = {
             "BEYAZ": "1001", "WHITE": "1001",
             "SIYAH": "1002", "SİYAH": "1002", "BLACK": "1002",
@@ -904,7 +904,28 @@
         }
 
         // Güncel Satış Ekibi Listesi
-        const SALES_TEAM = ["Orhan Özen", "Salih Şahin", "Zeki Karadavut", "Faik Kavas", "Uğur Morkoç", "Tolga Keleş"];
+        const SALES_TEAM = ["Orhan Özen", "Uğur Morkoç", "Tolga Keleş", "Faik Kavas", "Salih Şahin", "Zeki Karadavut"];
+
+        // NEBİM V3 RESMİ SATIŞ TEMSİLCİSİ KOD EŞLEŞTİRMESİ
+        const SALES_PERSON_CODE_MAP = {
+            "Orhan Özen": "106",
+            "Uğur Morkoç": "107",
+            "Tolga Keleş": "108",
+            "Faik Kavas": "113",
+            "Salih Şahin": "114",
+            "Zeki Karadavut": "115"
+        };
+
+        function getSalespersonCode(repName) {
+            if (!repName) return "106";
+            const clean = repName.trim();
+            for (let key in SALES_PERSON_CODE_MAP) {
+                if (clean.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(clean.toLowerCase())) {
+                    return SALES_PERSON_CODE_MAP[key];
+                }
+            }
+            return SALES_PERSON_CODE_MAP[clean] || "106";
+        }
 
         const USER_ROLES = {
             satis: {
@@ -1510,17 +1531,7 @@
         function exportIrsaliyeExcel() {
             if (!activeOrder) return;
             const excelRows = [];
-
-            // Satışçı kod eşleşmesi (Nebim V3 Standartları)
-            const salesCodeMap = {
-                "Orhan Özen": "101",
-                "Salih Şahin": "108",
-                "Zeki Karadavut": "111",
-                "Faik Kavas": "112",
-                "Uğur Morkoç": "109",
-                "Tolga Keleş": "110"
-            };
-            const spCode = salesCodeMap[activeOrder.salesRep] || "101";
+            const spCode = getSalespersonCode(activeOrder.salesRep);
 
             (activeOrder.items || []).forEach(item => {
                 const requested = item.requestedQty || 0;
@@ -1653,16 +1664,7 @@
         function exportFinalOrderToExcel() {
             if (!activeOrder) return;
             const excelRows = [];
-
-            const salesCodeMap = {
-                "Orhan Özen": "107",
-                "Salih Şahin": "108",
-                "Zeki Karadavut": "111",
-                "Faik Kavas": "112",
-                "Uğur Morkoç": "109",
-                "Tolga Keleş": "110"
-            };
-            const spCode = salesCodeMap[activeOrder.salesRep] || "107";
+            const spCode = getSalespersonCode(activeOrder.salesRep);
 
             (activeOrder.items || []).forEach(item => {
                 const requested = item.requestedQty || 0;
@@ -1791,7 +1793,7 @@
             showToast("Fişin son hali Nebim V3 formatında Excel (.xlsx) olarak indirildi!");
         }
 
-        // ================= GİRİŞ & ROL İŞLEMLERİ (GÜNCELLENMİŞ ŞİFRELER) =================
+        // ================= GİRİŞ & ROL İŞLEMLERİ =================
         function requestPasswordAndLogin(roleKey) {
             if (roleKey === 'depo') {
                 const pass = prompt("Depocu (Kamber Usta) Giriş Şifresi:");
@@ -1800,6 +1802,14 @@
                     loginAs('depo');
                 } else {
                     alert("Hatalı Depocu şifresi!");
+                }
+            } else if (roleKey === 'saha') {
+                const pass = prompt("Saha Ekibi (Sefa Usta) Giriş Şifresi:");
+                if (pass === null) return;
+                if (pass.trim() === "1") {
+                    loginAs('saha');
+                } else {
+                    alert("Hatalı Saha şifresi!");
                 }
             } else if (roleKey === 'muhasebe') {
                 const pass = prompt("Muhasebe (Gökhan) Giriş Şifresi:");
@@ -2801,9 +2811,10 @@
                     repRev += sub * 1.20;
                 });
 
+                const repCode = getSalespersonCode(repName);
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-                    <td class="p-3 font-bold text-white">${repName}</td>
+                    <td class="p-3 font-bold text-white">${repName} <span class="text-[10px] font-mono text-emerald-300">(${repCode})</span></td>
                     <td class="p-3 text-center font-bold">${repCount} Dosya</td>
                     <td class="p-3 text-center text-emerald-300 font-bold">${repClosed} Kapalı</td>
                     <td class="p-3 text-right font-black text-white text-sm">${repRev.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>
