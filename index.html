@@ -978,7 +978,25 @@
             }
         };
 
-        let orders = [];
+        // ÖRNEK BAŞLANGIÇ VERİLERİ (VERİLERİN KAYBOLMAMASI İÇİN)
+        let orders = [
+            {
+                id: "CNP-2026-916",
+                customer: "Swissotel Balo Salonu",
+                salesRep: "Orhan Özen",
+                date: "2026-09-08",
+                notes: "Acil teslimat",
+                hasApplication: true,
+                currentStep: 1,
+                items: [
+                    { id: "0109024", name: "YUCCA BUSH", color: "1001", requestedQty: 20, dispatchedQty: 20, returnedQty: 0, price: 860, warehouseNote: "", checked: true },
+                    { id: "0109037", name: "MONSTERA", color: "1004", requestedQty: 70, dispatchedQty: 70, returnedQty: 0, price: 624, warehouseNote: "", checked: true }
+                ],
+                extras: [],
+                isClosed: false
+            }
+        ];
+
         let masterProducts = [];
         let currentUser = null;
         let activeOrder = null;
@@ -1025,12 +1043,16 @@
             try {
                 const cachedOrders = localStorage.getItem("cinpa_cached_orders");
                 if (cachedOrders) {
-                    orders = JSON.parse(cachedOrders);
-                    if (currentUser) renderOrderList();
+                    const parsed = JSON.parse(cachedOrders);
+                    if (parsed && parsed.length > 0) orders = parsed;
                 }
             } catch(e) {}
 
-            if (!db) return;
+            if (!db) {
+                if (currentUser) renderOrderList();
+                return;
+            }
+
             try {
                 db.collection("orders").onSnapshot((snapshot) => {
                     const cloudOrders = [];
@@ -1038,7 +1060,6 @@
                         cloudOrders.push(doc.data());
                     });
                     
-                    // EĞER BULUT BOŞSA VE YERELDE ESKİ VERİ VARSA İLK YÜKLEMEDE YÜKLE
                     if (cloudOrders.length === 0 && orders.length > 0) {
                         orders.forEach(async (ord) => {
                             await db.collection("orders").doc(ord.id).set(ord);
@@ -1133,7 +1154,7 @@
             }
         }
 
-        // ================= KALICI INDEXEDDB KATALOG MOTORU =================
+        // ================= INDEXEDDB KATALOG MOTORU =================
         const CATALOG_DB_NAME = "CinpaOfficialCatalog_v2";
         const CATALOG_STORE_NAME = "catalog";
 
@@ -1160,8 +1181,16 @@
 
                 req.onsuccess = () => {
                     masterProducts = req.result || [];
+                    if (masterProducts.length === 0) {
+                        // Varsayılan örnek katalog ürünleri
+                        masterProducts = [
+                            { id: "0109024", name: "YUCCA BUSH", color: "1001", price: 860 },
+                            { id: "0109037", name: "MONSTERA", color: "1004", price: 624 },
+                            { id: "0107029", name: "DRACAENA", color: "1003", price: 70 }
+                        ];
+                    }
                     updateHeaderBadgeCounts();
-                    if (masterProducts.length > 0) populateProductSelects();
+                    populateProductSelects();
                     renderCatalogTable();
                 };
             } catch(e) {
