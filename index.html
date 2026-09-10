@@ -45,8 +45,8 @@
 
     <!-- Dinamik Bildirim Kutusu -->
     <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-950 text-white text-xs sm:text-sm font-bold px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-2.5 no-print border border-emerald-800">
-        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-        <span id="toast-msg"></span>
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base pointer-events-none"></i>
+        <span id="toast-msg" class="pointer-events-none"></span>
     </div>
 
     <!-- ================= 1. GİRİŞ EKRANI ================= -->
@@ -69,7 +69,7 @@
                     
                     <!-- Satış Profili -->
                     <div class="p-3.5 rounded-2xl border border-emerald-100 hover:border-emerald-500 bg-emerald-50/30 transition text-left space-y-2.5">
-                        <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-3 pointer-events-none">
                             <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-base">
                                 <i class="fa-solid fa-file-signature"></i>
                             </div>
@@ -91,14 +91,14 @@
                                 <option value="Zeki Karadavut">Zeki Karadavut (115)</option>
                             </select>
                             <button type="button" onclick="loginAsSalesSelected()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md transition whitespace-nowrap">
-                                Giriş <i class="fa-solid fa-arrow-right ml-1"></i>
+                                Giriş <i class="fa-solid fa-arrow-right ml-1 pointer-events-none"></i>
                             </button>
                         </div>
                     </div>
 
                     <!-- Depo Profili (Şifreli 1981) -->
                     <button type="button" onclick="requestPasswordAndLogin('depo')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full">
-                        <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-3 pointer-events-none">
                             <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
                                 <i class="fa-solid fa-boxes-packing"></i>
                             </div>
@@ -110,12 +110,12 @@
                                 <div class="text-[11px] text-slate-500 font-medium">Sadece Depo Hazırlık & İkame Masasını Görür</div>
                             </div>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs"></i>
+                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs pointer-events-none"></i>
                     </button>
 
                     <!-- Saha Profili (Şifreli 1) -->
                     <button type="button" onclick="requestPasswordAndLogin('saha')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full">
-                        <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-3 pointer-events-none">
                             <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
                                 <i class="fa-solid fa-helmet-safety"></i>
                             </div>
@@ -127,12 +127,12 @@
                                 <div class="text-[11px] text-slate-500 font-medium">Yalnızca montaj/uygulamalı işleri görür</div>
                             </div>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs"></i>
+                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs pointer-events-none"></i>
                     </button>
 
                     <!-- Muhasebe Profili -->
                     <button type="button" onclick="requestPasswordAndLogin('muhasebe')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full">
-                        <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-3 pointer-events-none">
                             <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
                                 <i class="fa-solid fa-receipt"></i>
                             </div>
@@ -144,12 +144,12 @@
                                 <div class="text-[11px] text-slate-500 font-medium">Depo/Saha Onaylı Fişleri Görür & Faturalandırır</div>
                             </div>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs"></i>
+                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs pointer-events-none"></i>
                     </button>
 
                     <!-- Admin Profili -->
                     <button type="button" onclick="requestPasswordAndLogin('admin')" class="flex items-center justify-between p-3.5 rounded-2xl border border-emerald-900 bg-emerald-900 text-white hover:bg-emerald-950 transition group text-left w-full shadow-lg">
-                        <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-3 pointer-events-none">
                             <div class="w-10 h-10 rounded-xl bg-emerald-800 text-emerald-300 flex items-center justify-center font-bold text-base">
                                 <i class="fa-solid fa-crown"></i>
                             </div>
@@ -161,7 +161,7 @@
                                 <div class="text-[11px] text-emerald-200 font-medium">Tam Yetki & Sınırsız Düzenleme</div>
                             </div>
                         </div>
-                        <i class="fa-solid fa-arrow-right-to-bracket text-emerald-300 text-xs"></i>
+                        <i class="fa-solid fa-arrow-right-to-bracket text-emerald-300 text-xs pointer-events-none"></i>
                     </button>
 
                 </div>
@@ -175,11 +175,11 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center space-x-3 cursor-pointer" onclick="returnToDashboard()">
-                        <div class="flex flex-col justify-center">
+                        <div class="flex flex-col justify-center pointer-events-none">
                             <span class="text-xl font-black tracking-[0.18em] text-white leading-none font-serif">CİNPA</span>
                             <span class="text-[6px] font-bold tracking-[0.25em] text-emerald-300 uppercase mt-0.5">PLANTS &amp; FLOWERS</span>
                         </div>
-                        <div class="border-l border-emerald-700 pl-3">
+                        <div class="border-l border-emerald-700 pl-3 pointer-events-none">
                             <div class="flex items-center space-x-2">
                                 <span class="bg-emerald-800 text-emerald-200 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-700" id="header-role-badge">PANEL</span>
                             </div>
@@ -189,28 +189,28 @@
 
                     <div class="flex items-center space-x-2 sm:space-x-3">
                         <button onclick="logout()" title="Giriş Ekranına Dön" class="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl border border-emerald-700 transition flex items-center space-x-1.5 shadow-sm">
-                            <i class="fa-solid fa-arrow-left"></i>
-                            <span class="hidden sm:inline">Kullanıcı Değiştir</span>
+                            <i class="fa-solid fa-arrow-left pointer-events-none"></i>
+                            <span class="hidden sm:inline pointer-events-none">Kullanıcı Değiştir</span>
                         </button>
 
                         <button onclick="openExcelImportModal()" id="btn-header-import-excel" class="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl border border-emerald-700 transition flex items-center space-x-1.5 shadow-sm">
-                            <i class="fa-solid fa-file-excel text-emerald-300"></i>
-                            <span class="hidden sm:inline">Nebim / Excel Fişi Çek</span>
+                            <i class="fa-solid fa-file-excel text-emerald-300 pointer-events-none"></i>
+                            <span class="hidden sm:inline pointer-events-none">Nebim / Excel Fişi Çek</span>
                         </button>
 
                         <button onclick="createNewOrderModal()" id="btn-header-new-order" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center space-x-2">
-                            <i class="fa-solid fa-plus"></i>
-                            <span>Yeni Sipariş</span>
+                            <i class="fa-solid fa-plus pointer-events-none"></i>
+                            <span class="pointer-events-none">Yeni Sipariş</span>
                         </button>
 
                         <button onclick="openCatalogModal()" id="btn-header-catalog" class="px-3 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl border border-emerald-700 transition flex items-center space-x-1.5">
-                            <i class="fa-solid fa-boxes-stacked text-emerald-300"></i>
-                            <span class="hidden md:inline">Katalog (<span id="cat-count-badge">0</span>)</span>
+                            <i class="fa-solid fa-boxes-stacked text-emerald-300 pointer-events-none"></i>
+                            <span class="hidden md:inline pointer-events-none">Katalog (<span id="cat-count-badge" class="pointer-events-none">0</span>)</span>
                         </button>
 
                         <button onclick="logout()" title="Oturumu Kapat" class="px-3 py-2 bg-red-800 hover:bg-red-700 text-white font-bold text-xs rounded-xl border border-red-700 transition flex items-center space-x-1.5">
-                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                            <span class="hidden md:inline">Çıkış</span>
+                            <i class="fa-solid fa-arrow-right-from-bracket pointer-events-none"></i>
+                            <span class="hidden md:inline pointer-events-none">Çıkış</span>
                         </button>
                     </div>
                 </div>
@@ -1051,7 +1051,7 @@
             return subtotal * 1.20;
         }
 
-        // ================= CANLI BULUT SİPARİŞ SENKRONİZASYONU =================
+        // ================= BULUT SENKRONİZASYONU =================
         function listenToOrdersCloud() {
             try {
                 const cachedOrders = localStorage.getItem("cinpa_cached_orders");
@@ -1167,7 +1167,7 @@
             }
         }
 
-        // ================= INDEXEDDB KATALOG MOTORU =================
+        // ================= KATALOG MOTORU =================
         const CATALOG_DB_NAME = "CinpaOfficialCatalog_v2";
         const CATALOG_STORE_NAME = "catalog";
 
@@ -2081,10 +2081,10 @@
                         <div class="inline-flex items-center justify-end space-x-2">
                             ${isItemDeletable ? `
                             <button onclick="deleteOrder('${ord.id}', event)" class="px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 text-xs font-bold hover:bg-red-600 hover:text-white transition flex items-center space-x-1" title="Siparişi Sil">
-                                <i class="fa-solid fa-trash-can"></i>
-                                <span class="hidden sm:inline">Sil</span>
+                                <i class="fa-solid fa-trash-can pointer-events-none"></i>
+                                <span class="hidden sm:inline pointer-events-none">Sil</span>
                             </button>` : ''}
-                            <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-emerald-700 hover:text-white transition">Aç <i class="fa-solid fa-chevron-right ml-1"></i></button>
+                            <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-emerald-700 hover:text-white transition">Aç <i class="fa-solid fa-chevron-right ml-1 pointer-events-none"></i></button>
                         </div>
                     </td>
                 `;
