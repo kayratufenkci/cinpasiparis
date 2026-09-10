@@ -420,7 +420,7 @@
                                         <input type="number" id="step1-catalog-qty" value="1" min="1" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-300 text-center bg-white">
                                     </div>
                                     <div class="sm:col-span-12 flex justify-end">
-                                        <button type="button" onclick="addItemFromCatalog()" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition flex items-center space-x-1.5 shadow-md cursor-pointer">
+                                        <button type="button" onclick="addItemFromCatalog()" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition flex items-center space-x-1.5 shadow-md cursor-pointer">
                                             <i class="fa-solid fa-plus pointer-events-none"></i><span class="pointer-events-none">Katalogdan Fişe Ekle</span>
                                         </button>
                                     </div>
@@ -767,8 +767,8 @@
                         <i class="fa-solid fa-file-excel"></i>
                     </div>
                     <div>
-                        <div class="text-xs font-black text-slate-900">Excel'den Fiyatlı Katalog Yükle (Kalıcı Diske Mühürlenir)</div>
-                        <div class="text-[11px] text-slate-500">Nebim/ERP veya Standart Excel dosyası seçebilirsiniz (Kayıtlı: <span id="master-count-label" class="font-bold text-emerald-700">0</span>)</div>
+                        <div class="text-xs font-black text-slate-900">Excel'den Fiyatlı Katalog Yükle (Buluta Eşitlenir)</div>
+                        <div class="text-[11px] text-slate-500">Tüm cihazlarda ortak görünür (Kayıtlı: <span id="master-count-label" class="font-bold text-emerald-700">0</span>)</div>
                     </div>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
@@ -975,7 +975,6 @@
             }
         };
 
-        // KURTARILMIŞ TÜM GERÇEK SİPARİŞ VERİLERİNİZ
         const HARDCODED_DEFAULT_ORDERS = [
             {
                 id: "CNP-2026-625", customer: "DENEME", salesRep: "Salih Şahin", date: "2026-09-08", notes: "Salih Şahin siparişi",
@@ -1035,6 +1034,77 @@
         let activeOrder = null;
         let activeStepTab = 1;
         let parsedExcelItems = [];
+
+        // ================= BULUT KATALOG SENKRONİZASYONU (ÇOKLU CİHAZ) =================
+        function listenToCatalogCloud() {
+            if (!db) return;
+            try {
+                db.collection("catalog_items").onSnapshot((snapshot) => {
+                    if (snapshot && !snapshot.empty) {
+                        const cloudProds = [];
+                        snapshot.forEach((doc) => {
+                            cloudProds.push(doc.data());
+                        });
+                        masterProducts = cloudProds;
+                        saveCatalogToLocalDBOnly(masterProducts);
+                        renderCatalogTable();
+                        updateHeaderBadgeCounts();
+                        populateProductSelects();
+                    }
+                }, (err) => {
+                    console.warn("Katalog bulut dinleme hatası:", err);
+                });
+            } catch(e) {
+                console.warn("Katalog listener başlatılamadı:", e);
+            }
+        }
+
+        async function syncCatalogToCloudBatch(productsList) {
+            if (!db) return;
+            try {
+                const batchLimit = 400;
+                for (let i = 0; i < productsList.length; i += batchLimit) {
+                    const chunk = productsList.slice(i, i + batchLimit);
+                    const batch = db.batch();
+                    chunk.forEach((p) => {
+                        const safeId = String(p.id).replace(/\//g, "_").trim();
+                        const ref = db.collection("catalog_items").doc(safeId);
+                        batch.set(ref, {
+                            id: String(p.id).trim(),
+                            name: String(p.name || '').trim(),
+                            color: normalizeColorCode(p.color || '-'),
+                            price: parseFloat(p.price) || 0
+                        });
+                    });
+                    await batch.commit();
+                }
+            } catch(e) {
+                console.warn("Katalog buluta yüklenirken hata:", e);
+            }
+        }
+
+        function saveCatalogToLocalDBOnly(productsList) {
+            return new Promise(async (resolve) => {
+                try {
+                    const idb = await openCatalogDB();
+                    const tx = idb.transaction(CATALOG_STORE_NAME, "readwrite");
+                    const store = tx.objectStore(CATALOG_STORE_NAME);
+                    store.clear();
+                    productsList.forEach((p) => {
+                        store.put({
+                            id: String(p.id).trim(),
+                            name: String(p.name || '').trim(),
+                            color: normalizeColorCode(p.color || '-'),
+                            price: parseFloat(p.price) || 0
+                        });
+                    });
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => resolve();
+                } catch(e) {
+                    resolve();
+                }
+            });
+        }
 
         // ================= GLOBAL MODAL AÇMA / KAPAMA =================
         function showModal(elId) {
@@ -1234,8 +1304,9 @@
                 const req = store.getAll();
 
                 req.onsuccess = () => {
-                    masterProducts = req.result || [];
-                    if (masterProducts.length === 0) {
+                    if (req.result && req.result.length > 0) {
+                        masterProducts = req.result;
+                    } else if (masterProducts.length === 0) {
                         masterProducts = [
                             { id: "0109024", name: "YUCCA BUSH", color: "1001", price: 860 },
                             { id: "0109037", name: "MONSTERA", color: "1004", price: 624 },
@@ -1251,50 +1322,9 @@
             }
         }
 
-        function saveCatalogToDB(productsList) {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    const idb = await openCatalogDB();
-                    const tx = idb.transaction(CATALOG_STORE_NAME, "readwrite");
-                    const store = tx.objectStore(CATALOG_STORE_NAME);
-                    store.clear();
-                    productsList.forEach((p, idx) => {
-                        const code = String(p.id || `ÇNP-${idx}`).trim();
-                        store.put({
-                            id: code,
-                            name: String(p.name || '').trim(),
-                            color: normalizeColorCode(p.color || '-'),
-                            price: parseFloat(p.price) || 0
-                        });
-                    });
-                    tx.oncomplete = () => {
-                        syncCatalogToCloud(productsList);
-                        resolve();
-                    };
-                    tx.onerror = () => reject(tx.error);
-                } catch(err) {
-                    reject(err);
-                }
-            });
-        }
-
-        async function syncCatalogToCloud(productsList) {
-            if (!db) return;
-            try {
-                const chunk = productsList.slice(0, 500).map(p => ({
-                    id: String(p.id).trim(),
-                    name: String(p.name || '').trim(),
-                    color: normalizeColorCode(p.color || '-'),
-                    price: parseFloat(p.price) || 0
-                }));
-                await db.collection("catalog").doc("master").set({
-                    products: chunk,
-                    totalCount: productsList.length,
-                    updatedAt: new Date().toISOString()
-                });
-            } catch(e) {
-                console.warn("Bulut katalog senkronizasyonu pas geçildi:", e);
-            }
+        async function saveCatalogToDB(productsList) {
+            await saveCatalogToLocalDBOnly(productsList);
+            await syncCatalogToCloudBatch(productsList);
         }
 
         async function saveProductToMasterCatalog() {
@@ -1405,7 +1435,7 @@
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
                         populateProductSelects();
-                        showToast(`Başarıyla ${newProducts.length} ürün kalıcı olarak yüklendi!`);
+                        showToast(`Başarıyla ${newProducts.length} ürün tüm cihazlar için kaydedildi!`);
                     } else {
                         showToast("Excel'den geçerli ürün satırı okunamadı!", true);
                     }
@@ -1687,48 +1717,16 @@
 
                 if (netQty > 0) {
                     excelRows.push({
-                        "Barcode": "",
-                        "ItemTypeCode": 1,
-                        "ItemCode": String(item.id || '').trim(),
-                        "ColorCode": colorCode,
-                        "ItemDim1Code": "",
-                        "ItemDim2Code": "",
-                        "ItemDim3Code": "",
-                        "Qty1": netQty,
-                        "Qty2": 0,
-                        "LineDescription": "",
-                        "PriceCurrencyCode": "TRY",
-                        "PriceExchangeRate": null,
-                        "Price": unitPrice,
-                        "PriceVI": priceVI,
-                        "DocCurrencyCode": "TRY",
-                        "LDisRate1": 0,
-                        "LDisRate2": 0,
-                        "LDisRate3": 0,
-                        "LDisRate4": 0,
-                        "LDisRate5": 0,
-                        "UnitOfMeasureCode": "AD",
-                        "PaymentPlanCode": "",
-                        "SalespersonCode": spCode,
-                        "CostCenterCode": "",
-                        "ITAtt01": "",
-                        "ITAtt02": "",
-                        "ITAtt03": "",
-                        "ITAtt04": "",
-                        "ITAtt05": "",
-                        "ITAtt06": "",
-                        "ITAtt07": "",
-                        "ITAtt08": "",
-                        "ITAtt09": "",
-                        "ITAtt10": "",
-                        "LineSumID": 0,
-                        "LotCode": null,
-                        "ImportFileNumber": null,
-                        "ExportFileNumber": null,
-                        "ProductSerialNumber": null,
-                        "PurchasePlanCode": null,
-                        "BatchCode": "",
-                        "GLTypeCode": null,
+                        "Barcode": "", "ItemTypeCode": 1, "ItemCode": String(item.id || '').trim(),
+                        "ColorCode": colorCode, "ItemDim1Code": "", "ItemDim2Code": "", "ItemDim3Code": "",
+                        "Qty1": netQty, "Qty2": 0, "LineDescription": "", "PriceCurrencyCode": "TRY",
+                        "PriceExchangeRate": null, "Price": unitPrice, "PriceVI": priceVI, "DocCurrencyCode": "TRY",
+                        "LDisRate1": 0, "LDisRate2": 0, "LDisRate3": 0, "LDisRate4": 0, "LDisRate5": 0,
+                        "UnitOfMeasureCode": "AD", "PaymentPlanCode": "", "SalespersonCode": spCode,
+                        "CostCenterCode": "", "ITAtt01": "", "ITAtt02": "", "ITAtt03": "", "ITAtt04": "",
+                        "ITAtt05": "", "ITAtt06": "", "ITAtt07": "", "ITAtt08": "", "ITAtt09": "", "ITAtt10": "",
+                        "LineSumID": 0, "LotCode": null, "ImportFileNumber": null, "ExportFileNumber": null,
+                        "ProductSerialNumber": null, "PurchasePlanCode": null, "BatchCode": "", "GLTypeCode": null,
                         "ManufactureDate": "00:00:00"
                     });
                 }
@@ -1741,48 +1739,16 @@
                     const colorCode = normalizeColorCode(ext.color);
 
                     excelRows.push({
-                        "Barcode": "",
-                        "ItemTypeCode": 1,
-                        "ItemCode": String(ext.id || '').trim(),
-                        "ColorCode": colorCode,
-                        "ItemDim1Code": "",
-                        "ItemDim2Code": "",
-                        "ItemDim3Code": "",
-                        "Qty1": ext.qty,
-                        "Qty2": 0,
-                        "LineDescription": "",
-                        "PriceCurrencyCode": "TRY",
-                        "PriceExchangeRate": null,
-                        "Price": unitPrice,
-                        "PriceVI": priceVI,
-                        "DocCurrencyCode": "TRY",
-                        "LDisRate1": 0,
-                        "LDisRate2": 0,
-                        "LDisRate3": 0,
-                        "LDisRate4": 0,
-                        "LDisRate5": 0,
-                        "UnitOfMeasureCode": "AD",
-                        "PaymentPlanCode": "",
-                        "SalespersonCode": spCode,
-                        "CostCenterCode": "",
-                        "ITAtt01": "",
-                        "ITAtt02": "",
-                        "ITAtt03": "",
-                        "ITAtt04": "",
-                        "ITAtt05": "",
-                        "ITAtt06": "",
-                        "ITAtt07": "",
-                        "ITAtt08": "",
-                        "ITAtt09": "",
-                        "ITAtt10": "",
-                        "LineSumID": 0,
-                        "LotCode": null,
-                        "ImportFileNumber": null,
-                        "ExportFileNumber": null,
-                        "ProductSerialNumber": null,
-                        "PurchasePlanCode": null,
-                        "BatchCode": "",
-                        "GLTypeCode": null,
+                        "Barcode": "", "ItemTypeCode": 1, "ItemCode": String(ext.id || '').trim(),
+                        "ColorCode": colorCode, "ItemDim1Code": "", "ItemDim2Code": "", "ItemDim3Code": "",
+                        "Qty1": ext.qty, "Qty2": 0, "LineDescription": "", "PriceCurrencyCode": "TRY",
+                        "PriceExchangeRate": null, "Price": unitPrice, "PriceVI": priceVI, "DocCurrencyCode": "TRY",
+                        "LDisRate1": 0, "LDisRate2": 0, "LDisRate3": 0, "LDisRate4": 0, "LDisRate5": 0,
+                        "UnitOfMeasureCode": "AD", "PaymentPlanCode": "", "SalespersonCode": spCode,
+                        "CostCenterCode": "", "ITAtt01": "", "ITAtt02": "", "ITAtt03": "", "ITAtt04": "",
+                        "ITAtt05": "", "ITAtt06": "", "ITAtt07": "", "ITAtt08": "", "ITAtt09": "", "ITAtt10": "",
+                        "LineSumID": 0, "LotCode": null, "ImportFileNumber": null, "ExportFileNumber": null,
+                        "ProductSerialNumber": null, "PurchasePlanCode": null, "BatchCode": "", "GLTypeCode": null,
                         "ManufactureDate": "00:00:00"
                     });
                 }
@@ -1820,48 +1786,16 @@
 
                 if (netQty > 0) {
                     excelRows.push({
-                        "Barcode": "",
-                        "ItemTypeCode": 1,
-                        "ItemCode": String(item.id || '').trim(),
-                        "ColorCode": colorCode,
-                        "ItemDim1Code": "",
-                        "ItemDim2Code": "",
-                        "ItemDim3Code": "",
-                        "Qty1": netQty,
-                        "Qty2": 0,
-                        "LineDescription": "",
-                        "PriceCurrencyCode": "TRY",
-                        "PriceExchangeRate": null,
-                        "Price": unitPrice,
-                        "PriceVI": priceVI,
-                        "DocCurrencyCode": "TRY",
-                        "LDisRate1": 0,
-                        "LDisRate2": 0,
-                        "LDisRate3": 0,
-                        "LDisRate4": 0,
-                        "LDisRate5": 0,
-                        "UnitOfMeasureCode": "AD",
-                        "PaymentPlanCode": "",
-                        "SalespersonCode": spCode,
-                        "CostCenterCode": "",
-                        "ITAtt01": "",
-                        "ITAtt02": "",
-                        "ITAtt03": "",
-                        "ITAtt04": "",
-                        "ITAtt05": "",
-                        "ITAtt06": "",
-                        "ITAtt07": "",
-                        "ITAtt08": "",
-                        "ITAtt09": "",
-                        "ITAtt10": "",
-                        "LineSumID": 0,
-                        "LotCode": null,
-                        "ImportFileNumber": null,
-                        "ExportFileNumber": null,
-                        "ProductSerialNumber": null,
-                        "PurchasePlanCode": null,
-                        "BatchCode": "",
-                        "GLTypeCode": null,
+                        "Barcode": "", "ItemTypeCode": 1, "ItemCode": String(item.id || '').trim(),
+                        "ColorCode": colorCode, "ItemDim1Code": "", "ItemDim2Code": "", "ItemDim3Code": "",
+                        "Qty1": netQty, "Qty2": 0, "LineDescription": "", "PriceCurrencyCode": "TRY",
+                        "PriceExchangeRate": null, "Price": unitPrice, "PriceVI": priceVI, "DocCurrencyCode": "TRY",
+                        "LDisRate1": 0, "LDisRate2": 0, "LDisRate3": 0, "LDisRate4": 0, "LDisRate5": 0,
+                        "UnitOfMeasureCode": "AD", "PaymentPlanCode": "", "SalespersonCode": spCode,
+                        "CostCenterCode": "", "ITAtt01": "", "ITAtt02": "", "ITAtt03": "", "ITAtt04": "",
+                        "ITAtt05": "", "ITAtt06": "", "ITAtt07": "", "ITAtt08": "", "ITAtt09": "", "ITAtt10": "",
+                        "LineSumID": 0, "LotCode": null, "ImportFileNumber": null, "ExportFileNumber": null,
+                        "ProductSerialNumber": null, "PurchasePlanCode": null, "BatchCode": "", "GLTypeCode": null,
                         "ManufactureDate": "00:00:00"
                     });
                 }
@@ -1874,48 +1808,16 @@
                     const colorCode = normalizeColorCode(ext.color);
 
                     excelRows.push({
-                        "Barcode": "",
-                        "ItemTypeCode": 1,
-                        "ItemCode": String(ext.id || '').trim(),
-                        "ColorCode": colorCode,
-                        "ItemDim1Code": "",
-                        "ItemDim2Code": "",
-                        "ItemDim3Code": "",
-                        "Qty1": ext.qty,
-                        "Qty2": 0,
-                        "LineDescription": "",
-                        "PriceCurrencyCode": "TRY",
-                        "PriceExchangeRate": null,
-                        "Price": unitPrice,
-                        "PriceVI": priceVI,
-                        "DocCurrencyCode": "TRY",
-                        "LDisRate1": 0,
-                        "LDisRate2": 0,
-                        "LDisRate3": 0,
-                        "LDisRate4": 0,
-                        "LDisRate5": 0,
-                        "UnitOfMeasureCode": "AD",
-                        "PaymentPlanCode": "",
-                        "SalespersonCode": spCode,
-                        "CostCenterCode": "",
-                        "ITAtt01": "",
-                        "ITAtt02": "",
-                        "ITAtt03": "",
-                        "ITAtt04": "",
-                        "ITAtt05": "",
-                        "ITAtt06": "",
-                        "ITAtt07": "",
-                        "ITAtt08": "",
-                        "ITAtt09": "",
-                        "ITAtt10": "",
-                        "LineSumID": 0,
-                        "LotCode": null,
-                        "ImportFileNumber": null,
-                        "ExportFileNumber": null,
-                        "ProductSerialNumber": null,
-                        "PurchasePlanCode": null,
-                        "BatchCode": "",
-                        "GLTypeCode": null,
+                        "Barcode": "", "ItemTypeCode": 1, "ItemCode": String(ext.id || '').trim(),
+                        "ColorCode": colorCode, "ItemDim1Code": "", "ItemDim2Code": "", "ItemDim3Code": "",
+                        "Qty1": ext.qty, "Qty2": 0, "LineDescription": "", "PriceCurrencyCode": "TRY",
+                        "PriceExchangeRate": null, "Price": unitPrice, "PriceVI": priceVI, "DocCurrencyCode": "TRY",
+                        "LDisRate1": 0, "LDisRate2": 0, "LDisRate3": 0, "LDisRate4": 0, "LDisRate5": 0,
+                        "UnitOfMeasureCode": "AD", "PaymentPlanCode": "", "SalespersonCode": spCode,
+                        "CostCenterCode": "", "ITAtt01": "", "ITAtt02": "", "ITAtt03": "", "ITAtt04": "",
+                        "ITAtt05": "", "ITAtt06": "", "ITAtt07": "", "ITAtt08": "", "ITAtt09": "", "ITAtt10": "",
+                        "LineSumID": 0, "LotCode": null, "ImportFileNumber": null, "ExportFileNumber": null,
+                        "ProductSerialNumber": null, "PurchasePlanCode": null, "BatchCode": "", "GLTypeCode": null,
                         "ManufactureDate": "00:00:00"
                     });
                 }
@@ -2043,7 +1945,6 @@
             document.getElementById("role-avatar-box").className = `w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold ${currentUser.avatarBg}`;
             document.getElementById("role-avatar-icon").className = `fa-solid ${currentUser.avatarIcon}`;
 
-            // Butonların görünürlüğü
             document.getElementById("btn-header-new-order").style.display = currentUser.canCreateOrder ? "flex" : "none";
             document.getElementById("btn-header-import-excel").style.display = currentUser.canCreateOrder ? "flex" : "none";
             document.getElementById("btn-header-catalog").style.display = currentUser.canManageCatalog ? "flex" : "none";
@@ -3047,19 +2948,9 @@
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
         }
 
-        // ================= BAŞLANGIÇ YÜKLEMESİ VE EVENT ATAMALARI =================
+        // ================= BAŞLANGIÇ YÜKLEMESİ =================
         window.addEventListener('DOMContentLoaded', () => {
             loadCatalogFromDB();
-
-            // Buton event listeners (Doğrudan DOM dinleyicileri)
-            const btnImport = document.getElementById("btn-header-import-excel");
-            if (btnImport) btnImport.addEventListener("click", window.openExcelImportModal);
-
-            const btnNewOrder = document.getElementById("btn-header-new-order");
-            if (btnNewOrder) btnNewOrder.addEventListener("click", window.createNewOrderModal);
-
-            const btnCatalog = document.getElementById("btn-header-catalog");
-            if (btnCatalog) btnCatalog.addEventListener("click", window.openCatalogModal);
 
             if (firebase && firebase.auth) {
                 firebase.auth().signInAnonymously()
@@ -3067,10 +2958,12 @@
                         const st = document.getElementById("cloud-status-text");
                         if (st) st.innerText = "Kalıcı & Bulut Canlı Sistem";
                         listenToOrdersCloud();
+                        listenToCatalogCloud();
                     })
                     .catch((err) => {
                         console.warn("Anonim Auth pas geçildi:", err);
                         listenToOrdersCloud();
+                        listenToCatalogCloud();
                     });
             } else {
                 listenToOrdersCloud();
