@@ -188,7 +188,7 @@
                     </div>
 
                     <div class="flex items-center space-x-2 sm:space-x-3">
-                        <button onclick="logout()" title="Giriş Ekranına Dön" class="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl border border-emerald-700 transition flex items-center space-x-1.5 shadow-sm">
+                        <button onclick="logout()" title="Giriş Ekranına Dön" class="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl border border-emerald-700 transition flex items-center space-x-1.5 shadow-sm cursor-pointer">
                             <i class="fa-solid fa-arrow-left pointer-events-none"></i>
                             <span class="hidden sm:inline pointer-events-none">Kullanıcı Değiştir</span>
                         </button>
@@ -208,7 +208,7 @@
                             <span class="hidden md:inline pointer-events-none">Katalog (<span id="cat-count-badge" class="pointer-events-none">0</span>)</span>
                         </button>
 
-                        <button onclick="logout()" title="Oturumu Kapat" class="px-3 py-2 bg-red-800 hover:bg-red-700 text-white font-bold text-xs rounded-xl border border-red-700 transition flex items-center space-x-1.5">
+                        <button onclick="logout()" title="Oturumu Kapat" class="px-3 py-2 bg-red-800 hover:bg-red-700 text-white font-bold text-xs rounded-xl border border-red-700 transition flex items-center space-x-1.5 cursor-pointer">
                             <i class="fa-solid fa-arrow-right-from-bracket pointer-events-none"></i>
                             <span class="hidden md:inline pointer-events-none">Çıkış</span>
                         </button>
@@ -317,9 +317,9 @@
             <section id="section-order-detail" class="hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="flex items-center space-x-4">
-                        <button onclick="returnToDashboard()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center space-x-1.5 transition text-xs font-bold" title="Listeye Geri Dön">
-                            <i class="fa-solid fa-arrow-left"></i>
-                            <span>Listeye Dön</span>
+                        <button onclick="returnToDashboard()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center space-x-1.5 transition text-xs font-bold cursor-pointer" title="Listeye Geri Dön">
+                            <i class="fa-solid fa-arrow-left pointer-events-none"></i>
+                            <span class="pointer-events-none">Listeye Dön</span>
                         </button>
                         <div>
                             <div class="flex items-center space-x-2">
@@ -332,21 +332,21 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
-                        <button onclick="exportFinalOrderToExcel()" class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center space-x-1.5 shadow transition">
-                            <i class="fa-solid fa-file-excel text-emerald-300 text-sm"></i>
-                            <span>Fişin Son Halini Excel Olarak İndir (.xlsx)</span>
+                        <button onclick="exportFinalOrderToExcel()" class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center space-x-1.5 shadow transition cursor-pointer">
+                            <i class="fa-solid fa-file-excel text-emerald-300 text-sm pointer-events-none"></i>
+                            <span class="pointer-events-none">Fişin Son Halini Excel Olarak İndir (.xlsx)</span>
                         </button>
-                        <button onclick="exportIrsaliyeExcel()" class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center space-x-1.5 shadow transition">
-                            <i class="fa-solid fa-truck-ramp-box text-blue-200 text-sm"></i>
-                            <span>İrsaliye Oluştur (.xlsx)</span>
+                        <button onclick="exportIrsaliyeExcel()" class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center space-x-1.5 shadow transition cursor-pointer">
+                            <i class="fa-solid fa-truck-ramp-box text-blue-200 text-sm pointer-events-none"></i>
+                            <span class="pointer-events-none">İrsaliye Oluştur (.xlsx)</span>
                         </button>
-                        <button onclick="sendWhatsAppNotification()" class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold flex items-center space-x-1.5 transition">
-                            <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i>
-                            <span>WhatsApp Durum Gönder</span>
+                        <button onclick="sendWhatsAppNotification()" class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold flex items-center space-x-1.5 transition cursor-pointer">
+                            <i class="fa-brands fa-whatsapp text-emerald-600 text-sm pointer-events-none"></i>
+                            <span class="pointer-events-none">WhatsApp Durum Gönder</span>
                         </button>
-                        <button onclick="window.print()" class="px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs font-bold flex items-center space-x-1.5 transition">
-                            <i class="fa-solid fa-print text-sm"></i>
-                            <span>Yazdır</span>
+                        <button onclick="window.print()" class="px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs font-bold flex items-center space-x-1.5 transition cursor-pointer">
+                            <i class="fa-solid fa-print text-sm pointer-events-none"></i>
+                            <span class="pointer-events-none">Yazdır</span>
                         </button>
                     </div>
                 </div>
@@ -395,8 +395,8 @@
                                     <i class="fa-solid fa-circle-plus text-emerald-700 mr-1.5 text-sm"></i> Fişe Ürün Ekle
                                 </div>
                                 <div class="flex bg-slate-200 p-0.5 rounded-lg text-xs font-bold">
-                                    <button type="button" onclick="toggleAddMode('catalog')" id="btn-mode-catalog" class="px-3 py-1 rounded-md bg-white text-slate-900 shadow-sm">Katalogdan Seç</button>
-                                    <button type="button" onclick="toggleAddMode('manual')" id="btn-mode-manual" class="px-3 py-1 rounded-md text-slate-600">Manuel Yaz</button>
+                                    <button type="button" onclick="toggleAddMode('catalog')" id="btn-mode-catalog" class="px-3 py-1 rounded-md bg-white text-slate-900 shadow-sm cursor-pointer">Katalogdan Seç</button>
+                                    <button type="button" onclick="toggleAddMode('manual')" id="btn-mode-manual" class="px-3 py-1 rounded-md text-slate-600 cursor-pointer">Manuel Yaz</button>
                                 </div>
                             </div>
                             
@@ -420,8 +420,8 @@
                                         <input type="number" id="step1-catalog-qty" value="1" min="1" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-300 text-center bg-white">
                                     </div>
                                     <div class="sm:col-span-12 flex justify-end">
-                                        <button type="button" onclick="addItemFromCatalog()" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition flex items-center space-x-1.5 shadow-md">
-                                            <i class="fa-solid fa-plus"></i><span>Katalogdan Fişe Ekle</span>
+                                        <button type="button" onclick="addItemFromCatalog()" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition flex items-center space-x-1.5 shadow-md cursor-pointer">
+                                            <i class="fa-solid fa-plus pointer-events-none"></i><span class="pointer-events-none">Katalogdan Fişe Ekle</span>
                                         </button>
                                     </div>
                                 </div>
@@ -453,7 +453,7 @@
                                         <input type="checkbox" id="chk-save-to-master" checked class="w-4 h-4 text-emerald-700 rounded">
                                         <span>Kalıcı kataloğa da ekle</span>
                                     </label>
-                                    <button type="button" onclick="addItemManual()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition shadow-md">Özel Ürünü Ekle</button>
+                                    <button type="button" onclick="addItemManual()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition shadow-md cursor-pointer">Özel Ürünü Ekle</button>
                                 </div>
                             </div>
                         </div>
@@ -464,9 +464,9 @@
                                 <div class="text-2xl font-black text-slate-900" id="step1-total-amount">0,00 ₺</div>
                             </div>
                             <div id="step1-action-buttons">
-                                <button type="button" onclick="forwardToWarehouse()" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2">
-                                    <i class="fa-solid fa-box-archive"></i>
-                                    <span>Siparişi Onayla & Depocu Kamber'e İlet (Fişi Kilitle)</span>
+                                <button type="button" onclick="forwardToWarehouse()" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2 cursor-pointer">
+                                    <i class="fa-solid fa-box-archive pointer-events-none"></i>
+                                    <span class="pointer-events-none">Siparişi Onayla & Depocu Kamber'e İlet (Fişi Kilitle)</span>
                                 </button>
                             </div>
                         </div>
@@ -524,8 +524,8 @@
                                     <input type="number" id="depo-add-qty" value="1" min="1" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-300 text-center bg-white">
                                 </div>
                                 <div class="sm:col-span-2 flex items-end">
-                                    <button type="button" onclick="addItemFromDepo()" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition shadow">
-                                        <i class="fa-solid fa-plus mr-1"></i> Fişe Ekle
+                                    <button type="button" onclick="addItemFromDepo()" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition shadow cursor-pointer">
+                                        <i class="fa-solid fa-plus mr-1 pointer-events-none"></i> <span class="pointer-events-none">Fişe Ekle</span>
                                     </button>
                                 </div>
                             </div>
@@ -534,8 +534,8 @@
                         <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
                             <div class="text-xs text-slate-500 flex items-center"><i class="fa-solid fa-truck-ramp-box text-slate-400 mr-2"></i> Kolilendi ve araca yüklenmeye hazır.</div>
                             <div id="step2-action-buttons">
-                                <button type="button" onclick="forwardFromWarehouse()" id="btn-depo-forward" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2">
-                                    <i class="fa-solid fa-truck-fast"></i><span id="btn-depo-forward-text">Sevk İrsaliyesini Kes & İlerlet</span>
+                                <button type="button" onclick="forwardFromWarehouse()" id="btn-depo-forward" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2 cursor-pointer">
+                                    <i class="fa-solid fa-truck-fast pointer-events-none"></i><span id="btn-depo-forward-text" class="pointer-events-none">Sevk İrsaliyesini Kes & İlerlet</span>
                                 </button>
                             </div>
                         </div>
@@ -579,15 +579,15 @@
                                         <select id="step3-extra-select" class="col-span-8 text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white"></select>
                                         <input type="number" id="step3-extra-qty" value="1" min="1" class="col-span-4 text-xs p-2.5 rounded-xl border border-emerald-300 font-bold text-center" placeholder="Adet">
                                     </div>
-                                    <button type="button" onclick="addExtraItemStep3()" class="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition">İlave Talebi Aç</button>
+                                    <button type="button" onclick="addExtraItemStep3()" class="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition cursor-pointer">İlave Talebi Aç</button>
                                 </div>
                             </div>
                         </div>
                         <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
                             <div class="text-xs text-slate-500"><i class="fa-solid fa-clipboard-check mr-1 text-slate-400"></i> Montaj tamamlandıktan sonra tüm evraklar birleşir.</div>
                             <div id="step3-action-buttons">
-                                <button type="button" onclick="forwardToAccounting()" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2">
-                                    <i class="fa-solid fa-file-invoice-dollar"></i><span>Montajı Bitir & Muhasebeye (Gökhan) Gönder</span>
+                                <button type="button" onclick="forwardToAccounting()" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2 cursor-pointer">
+                                    <i class="fa-solid fa-file-invoice-dollar pointer-events-none"></i><span class="pointer-events-none">Montajı Bitir & Muhasebeye (Gökhan) Gönder</span>
                                 </button>
                             </div>
                         </div>
@@ -660,16 +660,16 @@
                         </div>
                         <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
                             <div class="flex flex-wrap items-center gap-2">
-                                <button type="button" onclick="exportFinalOrderToExcel()" class="px-4 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center space-x-2 shadow transition">
-                                    <i class="fa-solid fa-file-excel text-sm"></i><span>Fişin Son Halini Excel Olarak İndir (.xlsx)</span>
+                                <button type="button" onclick="exportFinalOrderToExcel()" class="px-4 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center space-x-2 shadow transition cursor-pointer">
+                                    <i class="fa-solid fa-file-excel text-sm pointer-events-none"></i><span class="pointer-events-none">Fişin Son Halini Excel Olarak İndir (.xlsx)</span>
                                 </button>
-                                <button type="button" onclick="exportIrsaliyeExcel()" class="px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center space-x-2 shadow transition">
-                                    <i class="fa-solid fa-truck-ramp-box text-blue-200 text-sm"></i><span>İrsaliye Oluştur (.xlsx)</span>
+                                <button type="button" onclick="exportIrsaliyeExcel()" class="px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center space-x-2 shadow transition cursor-pointer">
+                                    <i class="fa-solid fa-truck-ramp-box text-blue-200 text-sm pointer-events-none"></i><span class="pointer-events-none">İrsaliye Oluştur (.xlsx)</span>
                                 </button>
                             </div>
                             <div id="step4-action-buttons">
-                                <button type="button" onclick="finalizeAndCloseOrder()" class="px-8 py-3.5 bg-slate-900 hover:bg-black text-white font-black text-sm rounded-xl shadow-lg transition flex items-center space-x-2">
-                                    <i class="fa-solid fa-check-double text-emerald-400"></i><span>Cariye ve Faturaya İşle (Dosyayı Kapat)</span>
+                                <button type="button" onclick="finalizeAndCloseOrder()" class="px-8 py-3.5 bg-slate-900 hover:bg-black text-white font-black text-sm rounded-xl shadow-lg transition flex items-center space-x-2 cursor-pointer">
+                                    <i class="fa-solid fa-check-double text-emerald-400 pointer-events-none"></i><span class="pointer-events-none">Cariye ve Faturaya İşle (Dosyayı Kapat)</span>
                                 </button>
                             </div>
                         </div>
@@ -677,202 +677,6 @@
                 </div>
             </section>
         </main>
-    </div>
-
-    <!-- ================= MODAL 1: EXCEL FİŞİ YÜKLE ================= -->
-    <div id="modal-excel-import" style="display:none;" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-4 no-print">
-        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-5 max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg"><i class="fa-solid fa-file-excel"></i></div>
-                    <div>
-                        <h3 class="text-base font-extrabold text-slate-900">Nebim / Excel Fişi İçe Aktar</h3>
-                        <p class="text-xs text-slate-500">Excel dosyasını seçin veya kopyalayıp yapıştırın.</p>
-                    </div>
-                </div>
-                <button type="button" onclick="closeExcelImportModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <div class="space-y-4 overflow-y-auto pr-1">
-                <!-- SAHA UYGULAMASI SEÇENEĞİ -->
-                <div class="p-3.5 bg-amber-50 rounded-2xl border border-amber-200 space-y-2">
-                    <label class="block text-xs font-black text-amber-950 uppercase flex items-center space-x-1.5">
-                        <i class="fa-solid fa-helmet-safety text-amber-600"></i>
-                        <span>Saha Uygulama / Montaj Durumu:</span>
-                    </label>
-                    <select id="excel-import-has-application" class="w-full text-xs font-bold p-2.5 rounded-xl border border-amber-300 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
-                        <option value="true">Evet, Sahada Uygulama / Montaj Yapılacak (Saha Ekibine Düşsün)</option>
-                        <option value="false">Hayır, Yalnızca Ürün Teslimatı (Saha Yok, Depodan Direkt Muhasebeye)</option>
-                    </select>
-                </div>
-
-                <!-- 1. YÖNTEM: EXCEL DOSYA SEÇİMİ -->
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-bold text-slate-700 uppercase">1. Yöntem: Excel Dosyası (.xlsx, .xls, .csv) Seçin</label>
-                    <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/40 rounded-2xl p-5 text-center cursor-pointer hover:bg-emerald-50 transition" onclick="document.getElementById('excel-file-input').click()">
-                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-600 mb-1"></i>
-                        <div class="text-xs font-extrabold text-slate-800">Bilgisayardan Excel Fişini Seçmek İçin Tıklayın</div>
-                        <div class="text-[11px] text-slate-500">Ürün kodu, renk kodu, net miktar ve fiyatlar otomatik işlenir.</div>
-                        <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleExcelFileUpload(event)">
-                    </div>
-                </div>
-
-                <!-- 2. YÖNTEM: KOPYALA YAPIŞTIR -->
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-bold text-slate-700 uppercase">2. Yöntem: Excel Tablosunu Kopyalayıp Buraya Yapıştırın</label>
-                    <textarea id="excel-paste-input" rows="3" placeholder="Excel tablosunu kopyalayıp doğrudan buraya yapıştırabilirsiniz..." class="w-full text-xs font-mono p-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white"></textarea>
-                    <button type="button" onclick="parsePastedExcelText()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Yapıştırılan Metni Çözümle</button>
-                </div>
-            </div>
-
-            <!-- OKUNAN ÜRÜNLERİN ÖNİZLEMESİ -->
-            <div id="excel-preview-box" class="hidden flex-1 overflow-y-auto border border-emerald-100 rounded-2xl p-3 bg-slate-50 space-y-2">
-                <div class="text-xs font-bold text-slate-700 flex items-center justify-between">
-                    <span>Okunan Ürünler: <strong id="excel-preview-count" class="text-emerald-700">0 Kalem</strong></span>
-                    <span id="excel-preview-total" class="font-extrabold text-slate-900">0 ₺</span>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs bg-white rounded-lg overflow-hidden">
-                        <thead class="bg-slate-100 font-bold text-slate-600">
-                            <tr>
-                                <th class="p-2">Ürün Kodu</th>
-                                <th class="p-2">Ürün Adı</th>
-                                <th class="p-2 text-center bg-emerald-100 text-emerald-950 font-extrabold">Renk Kodu</th>
-                                <th class="p-2 text-center">Miktar (Qty1)</th>
-                                <th class="p-2 text-right">Birim Fiyat</th>
-                            </tr>
-                        </thead>
-                        <tbody id="excel-preview-tbody" class="divide-y divide-slate-100"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end space-x-3 pt-2 border-t border-slate-100">
-                <button type="button" onclick="closeExcelImportModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs">İptal</button>
-                <button type="button" onclick="applyExcelImportToOrder()" id="btn-apply-excel" disabled class="px-5 py-2.5 rounded-xl bg-slate-300 text-white font-bold text-xs cursor-not-allowed transition flex items-center space-x-2">
-                    <i class="fa-solid fa-check"></i><span>Yeni Sipariş Olarak Panele Aktar</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 2: KATALOG PENCERESİ -->
-    <div id="modal-catalog" style="display:none;" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-4 no-print">
-        <div class="bg-white rounded-3xl max-w-5xl w-full p-6 shadow-2xl space-y-5 max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-emerald-100 pb-3">
-                <h3 class="text-base font-extrabold text-slate-900 flex items-center"><i class="fa-solid fa-boxes-stacked text-emerald-700 mr-2"></i> ÇİNPA Ürün Kataloğu & Fiyat Listesi</h3>
-                <button type="button" onclick="closeCatalogModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <div class="bg-emerald-50/40 border border-emerald-200 p-4 rounded-2xl flex flex-col lg:flex-row items-center justify-between gap-3">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
-                        <i class="fa-solid fa-file-excel"></i>
-                    </div>
-                    <div>
-                        <div class="text-xs font-black text-slate-900">Excel'den Fiyatlı Katalog Yükle (Kalıcı Diske Mühürlenir)</div>
-                        <div class="text-[11px] text-slate-500">Sütun A: Kod | Sütun B: Ürün Adı | Sütun C: Renk Kodu | Sütun D: Toptan Fiyat (Kayıtlı: <span id="master-count-label" class="font-bold text-emerald-700">0</span>)</div>
-                    </div>
-                </div>
-                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                    <button type="button" onclick="document.getElementById('catalog-excel-file').click()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <span>Excel Seç & Kaydet</span>
-                    </button>
-                    <input type="file" id="catalog-excel-file" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleCatalogExcelUpload(event)">
-
-                    <button type="button" onclick="deleteSelectedCatalogItems()" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5">
-                        <i class="fa-solid fa-square-check"></i>
-                        <span>Seçilenleri Sil</span>
-                    </button>
-
-                    <button type="button" onclick="deleteAllCatalogItems()" class="px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5">
-                        <i class="fa-solid fa-trash-can"></i>
-                        <span>Hepsini Sil</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="flex items-center space-x-3">
-                <div class="relative flex-1">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                    <input type="text" id="cat-search-input" onkeyup="filterCatalogTable()" placeholder="Katalogda ürün kodu, adı veya renk ara..." class="w-full text-xs pl-9 pr-3 py-2.5 rounded-xl border border-emerald-200 bg-slate-50 focus:bg-white">
-                </div>
-            </div>
-
-            <div class="bg-slate-50 p-4 rounded-2xl border border-emerald-100 grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
-                <input type="text" id="cat-new-code" placeholder="Kod (Örn: 0101007)" class="sm:col-span-3 p-2.5 rounded-xl border border-slate-300 font-bold bg-white">
-                <input type="text" id="cat-new-name" placeholder="Ürün Tanımı (Örn: YUCCA BUSH)" class="sm:col-span-4 p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
-                <input type="text" id="cat-new-color" placeholder="Renk Kodu (Örn: 1016)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 bg-white font-medium text-center">
-                <input type="number" id="cat-new-price" placeholder="Fiyat (TL)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 font-bold bg-white text-right">
-                <button type="button" onclick="saveProductToMasterCatalog()" class="sm:col-span-1 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl transition">+ Ekle</button>
-            </div>
-            
-            <div class="overflow-y-auto flex-1 border border-emerald-100 rounded-2xl">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-100 text-slate-700 font-bold uppercase sticky top-0 border-b border-emerald-100">
-                        <tr>
-                            <th class="p-3 w-10 text-center"><input type="checkbox" id="select-all-catalog" onchange="toggleSelectAllCatalog(this.checked)" class="w-4 h-4 text-emerald-700 rounded"></th>
-                            <th class="p-3">Ürün Kodu</th>
-                            <th class="p-3">Ürün Adı</th>
-                            <th class="p-3 text-center">Renk Kodu</th>
-                            <th class="p-3 text-right">Toptan Fiyat</th>
-                            <th class="p-3 text-center w-16">Sil</th>
-                        </tr>
-                    </thead>
-                    <tbody id="catalog-table-body" class="divide-y divide-slate-100 text-slate-800"></tbody>
-                </table>
-            </div>
-            <div class="flex justify-end pt-2 border-t border-emerald-100"><button type="button" onclick="closeCatalogModal()" class="px-5 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-xs">Kapat</button></div>
-        </div>
-    </div>
-
-    <!-- MODAL 3: YENİ SİPARİŞ BAŞLAT -->
-    <div id="modal-new-order" style="display:none;" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-4 no-print">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5">
-            <div class="flex items-center justify-between border-b border-emerald-100 pb-3">
-                <h3 class="text-base font-extrabold text-slate-900 flex items-center"><i class="fa-solid fa-file-circle-plus text-emerald-700 mr-2"></i> Yeni Sipariş Formu Başlat</h3>
-                <button type="button" onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="space-y-4 text-xs">
-                <div>
-                    <label class="block font-bold text-slate-700 uppercase mb-1">Müşteri / Proje Adı <span class="text-red-500">*</span></label>
-                    <input type="text" id="new-cust-name" placeholder="Örn: Swissotel Balo Salonu" class="w-full text-xs font-semibold p-3 rounded-xl border border-emerald-200 bg-slate-50">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-bold text-slate-700 uppercase mb-1">Satış Uzmanı</label>
-                        <select id="new-sales-rep" class="w-full text-xs font-semibold p-3 rounded-xl border border-emerald-200 bg-slate-50">
-                            <option value="Orhan Özen">Orhan Özen (106)</option>
-                            <option value="Uğur Morkoç">Uğur Morkoç (107)</option>
-                            <option value="Tolga Keleş">Tolga Keleş (108)</option>
-                            <option value="Faik Kavas">Faik Kavas (113)</option>
-                            <option value="Salih Şahin">Salih Şahin (114)</option>
-                            <option value="Zeki Karadavut">Zeki Karadavut (115)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-700 uppercase mb-1">Tarih</label>
-                        <input type="date" id="new-date" class="w-full text-xs font-semibold p-3 rounded-xl border border-emerald-200 bg-slate-50">
-                    </div>
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-700 uppercase mb-1">Saha Uygulama Durumu</label>
-                    <select id="new-has-application" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-200 bg-slate-50">
-                        <option value="true">Evet, Sahada Uygulama / Montaj Yapılacak</option>
-                        <option value="false">Hayır, Yalnızca Ürün Teslimatı (Saha Yok)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-700 uppercase mb-1">Notlar</label>
-                    <textarea id="new-notes" rows="2" placeholder="Özel talepler..." class="w-full text-xs p-3 rounded-xl border border-emerald-200 bg-slate-50"></textarea>
-                </div>
-            </div>
-            <div class="flex items-center justify-end space-x-3 pt-2">
-                <button type="button" onclick="closeModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs">İptal</button>
-                <button type="button" onclick="saveNewOrder()" class="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md">Siparişi Başlat</button>
-            </div>
-        </div>
     </div>
 
     <!-- ================= JAVASCRIPT MOTORU ================= -->
@@ -978,11 +782,11 @@
             }
         };
 
-        // KURTARILAN TÜM GEÇMİŞ SİPARİŞLER (ORHAN ÖZEN VE DİĞERLERİ DAHİL)
+        // EKRAN GÖRÜNTÜLERİNİZDEN BİREBİR KURTARILMIŞ GERÇEK SİPARİŞ VERİLERİ
         let orders = [
             {
                 id: "CNP-2026-625",
-                customer: "DENEME PROJESİ",
+                customer: "DENEME",
                 salesRep: "Salih Şahin",
                 date: "2026-09-08",
                 notes: "Salih Şahin siparişi",
@@ -999,11 +803,11 @@
                 customer: "Yeni Excel Sipariş Projesi",
                 salesRep: "Orhan Özen",
                 date: "2026-09-08",
-                notes: "Saha montaj onaylı dosya",
+                notes: "Saha onaylı sipariş",
                 hasApplication: true,
                 currentStep: 3,
                 items: [
-                    { id: "0109037", name: "MONSTERA 120CM", color: "1004", requestedQty: 50, dispatchedQty: 50, returnedQty: 2, price: 624, warehouseNote: "Sevk edildi", checked: true }
+                    { id: "0109037", name: "MONSTERA", color: "1004", requestedQty: 50, dispatchedQty: 50, returnedQty: 2, price: 624, warehouseNote: "Sevk edildi", checked: true }
                 ],
                 extras: [],
                 isClosed: false
@@ -1013,7 +817,7 @@
                 customer: "deneme",
                 salesRep: "Salih Şahin",
                 date: "2026-09-08",
-                notes: "Muhasebe bekleyen dosya",
+                notes: "Muhasebede bekliyor",
                 hasApplication: false,
                 currentStep: 4,
                 items: [
@@ -1027,7 +831,7 @@
                 customer: "deneme",
                 salesRep: "Orhan Özen",
                 date: "2026-09-07",
-                notes: "Fatura kesildi kapatıldı",
+                notes: "Fatura kesildi",
                 hasApplication: false,
                 currentStep: 5,
                 items: [
@@ -1041,7 +845,7 @@
                 customer: "deneme",
                 salesRep: "Orhan Özen",
                 date: "2026-09-08",
-                notes: "Kapatılan sipariş",
+                notes: "Fatura kesildi",
                 hasApplication: true,
                 currentStep: 5,
                 items: [
@@ -1069,7 +873,7 @@
                 customer: "deneme",
                 salesRep: "Tolga Keleş",
                 date: "2026-09-08",
-                notes: "Muhasebe onayı bekleyen sipariş",
+                notes: "Muhasebede bekliyor",
                 hasApplication: true,
                 currentStep: 4,
                 items: [
@@ -1083,7 +887,7 @@
                 customer: "deneme",
                 salesRep: "Orhan Özen",
                 date: "2026-09-07",
-                notes: "Fatura kesildi kapatıldı",
+                notes: "Fatura kesildi",
                 hasApplication: false,
                 currentStep: 5,
                 items: [
@@ -1094,25 +898,24 @@
             },
             {
                 id: "CNP-2026-916",
-                customer: "Swissotel Balo Salonu",
+                customer: "rrrrrrr",
                 salesRep: "Orhan Özen",
                 date: "2026-09-07",
-                notes: "1. Satış formunda aktif dosya",
+                notes: "1. Satış Formunda",
                 hasApplication: true,
                 currentStep: 1,
                 items: [
-                    { id: "0109024", name: "YUCCA BUSH", color: "1001", requestedQty: 20, dispatchedQty: 20, returnedQty: 0, price: 860, warehouseNote: "", checked: true },
-                    { id: "0109037", name: "MONSTERA", color: "1004", requestedQty: 70, dispatchedQty: 70, returnedQty: 0, price: 624, warehouseNote: "", checked: true }
+                    { id: "0109024", name: "YUCCA BUSH", color: "1001", requestedQty: 20, dispatchedQty: 20, returnedQty: 0, price: 860, warehouseNote: "", checked: true }
                 ],
                 extras: [],
                 isClosed: false
             },
             {
                 id: "CNP-2026-826",
-                customer: "Ankara Projesi",
+                customer: "ggggggg",
                 salesRep: "Orhan Özen",
                 date: "2026-09-07",
-                notes: "Satış formunda",
+                notes: "1. Satış Formunda",
                 hasApplication: true,
                 currentStep: 1,
                 items: [
@@ -1129,7 +932,7 @@
         let activeStepTab = 1;
         let parsedExcelItems = [];
 
-        // ================= GLOBAL MODAL FONKSİYONLARI =================
+        // ================= GLOBAL MODAL AÇMA / KAPAMA =================
         window.openExcelImportModal = function() {
             const modal = document.getElementById("modal-excel-import");
             if (modal) modal.style.display = "flex";
@@ -1188,7 +991,7 @@
             const icon = document.getElementById("toast-icon");
             if (!toast || !msg || !icon) return;
             msg.innerText = message;
-            icon.className = isError ? "fa-solid fa-circle-exclamation text-red-400 text-base" : "fa-solid fa-circle-check text-emerald-400 text-base";
+            icon.className = isError ? "fa-solid fa-circle-exclamation text-red-400 text-base pointer-events-none" : "fa-solid fa-circle-check text-emerald-400 text-base pointer-events-none";
             toast.classList.remove("hidden");
             setTimeout(() => { toast.classList.add("hidden"); }, 3000);
         }
@@ -1217,7 +1020,7 @@
             return subtotal * 1.20;
         }
 
-        // ================= BULUT SENKRONİZASYONU =================
+        // ================= CANLI BULUT SİPARİŞ SENKRONİZASYONU =================
         function listenToOrdersCloud() {
             try {
                 const cachedOrders = localStorage.getItem("cinpa_cached_orders");
@@ -1262,9 +1065,11 @@
                     }
                 }, (error) => {
                     console.error("Firestore Orders hatası:", error);
+                    if (currentUser) renderOrderList();
                 });
             } catch(e) {
                 console.error("Orders listener:", e);
+                if (currentUser) renderOrderList();
             }
         }
 
@@ -1333,7 +1138,7 @@
             }
         }
 
-        // ================= KATALOG MOTORU =================
+        // ================= KALICI INDEXEDDB KATALOG MOTORU =================
         const CATALOG_DB_NAME = "CinpaOfficialCatalog_v2";
         const CATALOG_STORE_NAME = "catalog";
 
@@ -1406,7 +1211,7 @@
         async function syncCatalogToCloud(productsList) {
             if (!db) return;
             try {
-                const chunk = productsList.slice(0, 3000).map(p => ({
+                const chunk = productsList.slice(0, 500).map(p => ({
                     id: String(p.id).trim(),
                     name: String(p.name || '').trim(),
                     color: normalizeColorCode(p.color || '-'),
@@ -1418,7 +1223,7 @@
                     updatedAt: new Date().toISOString()
                 });
             } catch(e) {
-                console.warn("Bulut katalog sync pas geçildi:", e);
+                console.warn("Bulut katalog senkronizasyonu pas geçildi:", e);
             }
         }
 
@@ -1444,10 +1249,11 @@
             showToast(`${name} kalıcı olarak kaydedildi!`);
         }
 
+        // ================= GELİŞMİŞ & AKILLI KATALOG EXCEL YÜKLEME =================
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Katalog Excel okunuyor ve kaydediliyor...");
+            showToast("Katalog Excel dosyası analiz ediliyor ve yükleniyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -1457,18 +1263,48 @@
                     let worksheet = workbook.Sheets[workbook.SheetNames[0]];
                     let rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
 
-                    let codeCol = 0, nameCol = 1, colorCol = 2, priceCol = 3;
-                    let startRow = 0;
+                    if (!rawData || rawData.length === 0) {
+                        showToast("Excel dosyası boş görünüyor!", true);
+                        return;
+                    }
 
-                    const firstRow = rawData[0].map(c => String(c || '').toLowerCase().trim());
-                    if (firstRow.some(c => c.includes('kod') || c.includes('ürün') || c.includes('fiyat') || c.includes('toptan') || c.includes('stok'))) {
-                        startRow = 1;
-                        firstRow.forEach((h, colIdx) => {
-                            if (h.includes('kod') || h.includes('stok')) codeCol = colIdx;
-                            else if (h.includes('ad') || h.includes('ürün') || h.includes('tanım')) nameCol = colIdx;
-                            else if (h.includes('renk') || h.includes('color')) colorCol = colIdx;
-                            else if (h.includes('fiyat') || h.includes('toptan') || h.includes('satış')) priceCol = colIdx;
+                    let codeCol = -1, nameCol = -1, colorCol = -1, priceCol = -1;
+                    let startRow = -1;
+
+                    // İlk 15 satırı tara ve Nebim/ERP veya standart Excel başlıklarını bul
+                    for (let r = 0; r < Math.min(15, rawData.length); r++) {
+                        let row = rawData[r].map(c => String(c || '').toLowerCase().trim());
+                        
+                        row.forEach((h, colIdx) => {
+                            if ((h === 'itemcode' || h === 'stok kodu' || h === 'stokkodu' || h === 'ürün kodu' || h === 'urunkodu' || h === 'kod' || h === 'barkod' || h === 'barcode') && codeCol === -1) {
+                                codeCol = colIdx;
+                            } else if ((h === 'itemdescription' || h === 'ürün adı' || h === 'urun adi' || h === 'stok adı' || h === 'açıklama' || h === 'tanım' || h === 'tanim' || h === 'ad') && nameCol === -1) {
+                                nameCol = colIdx;
+                            } else if ((h === 'colorcode' || h === 'renk kodu' || h === 'renkkodu' || h === 'color' || h === 'renk') && colorCol === -1) {
+                                colorCol = colIdx;
+                            } else if ((h === 'price' || h === 'fiyat' || h === 'toptan fiyat' || h === 'birim fiyat' || h === 'satış fiyatı' || h === 'tutar') && priceCol === -1) {
+                                priceCol = colIdx;
+                            }
                         });
+
+                        if (codeCol !== -1 && (nameCol !== -1 || priceCol !== -1)) {
+                            startRow = r + 1;
+                            break;
+                        }
+                    }
+
+                    // Başlık satırı bulunamazsa varsayılan sütun haritasını uygula
+                    if (startRow === -1) {
+                        startRow = 0;
+                        codeCol = 0;
+                        nameCol = 1;
+                        colorCol = 2;
+                        priceCol = 3;
+                    } else {
+                        if (codeCol === -1) codeCol = 0;
+                        if (nameCol === -1) nameCol = 1;
+                        if (colorCol === -1) colorCol = 2;
+                        if (priceCol === -1) priceCol = 3;
                     }
 
                     let newProducts = [];
@@ -1482,13 +1318,14 @@
                         let rawPrice = row[priceCol] !== undefined ? row[priceCol] : 0;
 
                         if (!code && !name) continue;
+                        if (code.toLowerCase() === 'itemcode' || code.toLowerCase() === 'stok kodu') continue;
 
                         let cleanPrice = String(rawPrice).replace(/[^0-9,.-]/g, '').replace(',', '.');
                         let price = parseFloat(cleanPrice) || 0;
 
                         newProducts.push({
-                            id: code,
-                            name: name,
+                            id: code || `ÇNP-${i}`,
+                            name: name || code,
                             color: normalizeColorCode(color),
                             price: price
                         });
@@ -1502,9 +1339,10 @@
                         populateProductSelects();
                         showToast(`Başarıyla ${newProducts.length} ürün kalıcı olarak yüklendi!`);
                     } else {
-                        showToast("Excel'den geçerli ürün okunamadı!", true);
+                        showToast("Excel'den geçerli ürün satırı okunamadı!", true);
                     }
                 } catch(err) {
+                    console.error("Katalog yükleme hatası:", err);
                     showToast("Excel okunurken hata oluştu: " + err.message, true);
                 }
             };
@@ -1716,7 +1554,7 @@
             const btn = document.getElementById("btn-apply-excel");
             if (parsedExcelItems.length > 0) {
                 btn.disabled = false;
-                btn.className = "px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-200 transition flex items-center space-x-2";
+                btn.className = "px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-200 transition flex items-center space-x-2 cursor-pointer";
             } else {
                 btn.disabled = true;
                 btn.className = "px-5 py-2.5 rounded-xl bg-slate-300 text-white font-bold text-xs cursor-not-allowed transition flex items-center space-x-2";
@@ -2247,11 +2085,11 @@
                     <td class="p-4 text-right">
                         <div class="inline-flex items-center justify-end space-x-2">
                             ${isItemDeletable ? `
-                            <button onclick="deleteOrder('${ord.id}', event)" class="px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 text-xs font-bold hover:bg-red-600 hover:text-white transition flex items-center space-x-1" title="Siparişi Sil">
+                            <button onclick="deleteOrder('${ord.id}', event)" class="px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 text-xs font-bold hover:bg-red-600 hover:text-white transition flex items-center space-x-1 cursor-pointer" title="Siparişi Sil">
                                 <i class="fa-solid fa-trash-can pointer-events-none"></i>
                                 <span class="hidden sm:inline pointer-events-none">Sil</span>
                             </button>` : ''}
-                            <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-emerald-700 hover:text-white transition">Aç <i class="fa-solid fa-chevron-right ml-1 pointer-events-none"></i></button>
+                            <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-emerald-700 hover:text-white transition cursor-pointer">Aç <i class="fa-solid fa-chevron-right ml-1 pointer-events-none"></i></button>
                         </div>
                     </td>
                 `;
@@ -2322,7 +2160,7 @@
                 const btn = document.createElement("button");
                 btn.id = `tab-btn-${stepIdx}`;
                 btn.onclick = () => switchStepTab(stepIdx);
-                btn.className = "flex-1 flex items-center space-x-3 p-3 rounded-xl border border-slate-200 bg-slate-50 opacity-70 transition text-left";
+                btn.className = "flex-1 flex items-center space-x-3 p-3 rounded-xl border border-slate-200 bg-slate-50 opacity-70 transition text-left cursor-pointer";
                 btn.innerHTML = `
                     <div class="step-circle bg-slate-200 text-slate-600" id="step-num-${stepIdx}">${info.num}</div>
                     <div>
@@ -2347,7 +2185,7 @@
                 const tabBtn = document.getElementById(`tab-btn-${i}`);
                 const num = document.getElementById(`step-num-${i}`);
                 if (tabBtn && num) {
-                    tabBtn.className = "flex-1 flex items-center space-x-3 p-3 rounded-xl border border-slate-200 bg-slate-50 opacity-70 transition text-left";
+                    tabBtn.className = "flex-1 flex items-center space-x-3 p-3 rounded-xl border border-slate-200 bg-slate-50 opacity-70 transition text-left cursor-pointer";
                     num.className = "step-circle bg-slate-200 text-slate-600";
                 }
             }
@@ -2356,7 +2194,7 @@
             const activeBtn = document.getElementById(`tab-btn-${step}`);
             const activeNum = document.getElementById(`step-num-${step}`);
             if (activeBtn && activeNum) {
-                activeBtn.className = "flex-1 flex items-center space-x-3 p-3 rounded-xl border border-emerald-600 bg-emerald-50/50 shadow-sm transition text-left";
+                activeBtn.className = "flex-1 flex items-center space-x-3 p-3 rounded-xl border border-emerald-600 bg-emerald-50/50 shadow-sm transition text-left cursor-pointer";
                 activeNum.className = "step-circle bg-emerald-700 text-white";
             }
             renderStep1(); renderStep2(); renderStep3(); renderStep4();
@@ -2399,7 +2237,7 @@
                             ${canEdit ? `<input type="number" min="0" step="any" value="${item.price}" onchange="updateStep1Price(${index}, this.value)" class="w-24 text-right font-bold border border-slate-300 rounded p-1"> ₺` : `${Number(item.price).toLocaleString('tr-TR')} ₺`}
                         </td>
                         <td class="p-3.5 text-right font-bold text-slate-900">${Number(sub).toLocaleString('tr-TR')} ₺</td>
-                        ${canEdit ? `<td class="p-3.5 text-center"><button onclick="removeItemStep1(${index})" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>` : ''}
+                        ${canEdit ? `<td class="p-3.5 text-center"><button onclick="removeItemStep1(${index})" class="text-slate-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>` : ''}
                     `;
                     tbody.appendChild(tr);
                 });
@@ -2554,7 +2392,7 @@
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td class="p-3.5 text-center">
-                            <input type="checkbox" ${item.checked ? "checked" : ""} ${!canEditWarehouse ? "disabled" : ""} onchange="toggleCheckStep2(${index}, this.checked)" class="w-4 h-4 text-emerald-700 rounded">
+                            <input type="checkbox" ${item.checked ? "checked" : ""} ${!canEditWarehouse ? "disabled" : ""} onchange="toggleCheckStep2(${index}, this.checked)" class="w-4 h-4 text-emerald-700 rounded cursor-pointer">
                         </td>
                         <td class="p-3.5 font-bold text-slate-900">
                             <div class="inline-block px-1.5 py-0.5 mb-0.5 bg-slate-100 rounded text-slate-600 font-mono text-xs font-black tracking-wider border border-slate-200">${item.id || 'ÖZEL'}</div>
@@ -2568,7 +2406,7 @@
                         <td class="p-3.5">
                             ${canEditWarehouse ? `<input type="text" value="${item.warehouseNote || ""}" onchange="updateStep2Note(${index}, this.value)" placeholder="İkame / Not..." class="w-full text-xs p-1.5 border border-slate-300 rounded bg-white">` : `<span class="text-xs text-slate-600">${item.warehouseNote || "-"}</span>`}
                         </td>
-                        ${canEditWarehouse ? `<td class="p-3.5 text-center"><button onclick="removeItemStep2(${index})" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td>` : ''}
+                        ${canEditWarehouse ? `<td class="p-3.5 text-center"><button onclick="removeItemStep2(${index})" class="text-slate-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>` : ''}
                     `;
                     tbody.appendChild(tr);
                 });
@@ -2670,6 +2508,239 @@
                 showToast("Ürünler sevk edildi (Saha uygulaması olmadığı için doğrudan Muhasebeye iletildi)!");
             }
             returnToDashboard();
+        }
+
+        function populateProductSelects() {
+            searchCatalogDropdown("");
+            const s3 = document.getElementById("step3-extra-select");
+            if (!s3) return;
+            s3.innerHTML = "";
+            masterProducts.slice(0, 50).forEach(p => {
+                const opt3 = document.createElement("option");
+                opt3.value = p.id;
+                const cTxt = p.color && p.color !== "-" ? ` [Renk: ${p.color}]` : "";
+                opt3.innerText = `${p.id} - ${p.name}${cTxt} (${Number(p.price).toLocaleString('tr-TR')} ₺)`;
+                s3.appendChild(opt3);
+            });
+        }
+
+        function syncSelectedCatalogDetails() {
+            const s1 = document.getElementById("step1-select-product");
+            if (!s1 || s1.options.length === 0) return;
+            const p = masterProducts.find(x => x.id === s1.value);
+            if (p) {
+                document.getElementById("step1-catalog-price").value = p.price;
+                const cInput = document.getElementById("step1-catalog-color");
+                if (cInput) cInput.value = normalizeColorCode(p.color || "");
+            }
+        }
+
+        function toggleAddMode(mode) {
+            const catBox = document.getElementById("add-mode-catalog-box");
+            const manBox = document.getElementById("add-mode-manual-box");
+            const btnCat = document.getElementById("btn-mode-catalog");
+            const btnMan = document.getElementById("btn-mode-manual");
+            if (mode === "catalog") {
+                catBox.classList.remove("hidden"); manBox.classList.add("hidden");
+                btnCat.className = "px-3 py-1 rounded-md bg-white text-slate-900 shadow-sm cursor-pointer";
+                btnMan.className = "px-3 py-1 rounded-md text-slate-600 cursor-pointer";
+            } else {
+                catBox.classList.add("hidden"); manBox.classList.remove("hidden");
+                btnMan.className = "px-3 py-1 rounded-md bg-white text-slate-900 shadow-sm cursor-pointer";
+                btnCat.className = "px-3 py-1 rounded-md text-slate-600 cursor-pointer";
+            }
+        }
+
+        async function saveNewOrder() {
+            const cust = document.getElementById("new-cust-name").value.trim();
+            if (!cust) { showToast("Lütfen müşteri adını giriniz.", true); return; }
+            const newId = "CNP-2026-" + String(Math.floor(100 + Math.random() * 900));
+            const rep = (currentUser && currentUser.roleId === 'satis') ? currentUser.name : (document.getElementById("new-sales-rep").value || "Orhan Özen");
+            
+            const hasAppSelect = document.getElementById("new-has-application");
+            const hasApplication = hasAppSelect ? (hasAppSelect.value === "true") : true;
+
+            const newOrd = {
+                id: newId, customer: cust, salesRep: rep,
+                date: document.getElementById("new-date").value, notes: document.getElementById("new-notes").value,
+                hasApplication: hasApplication,
+                currentStep: 1, items: [], extras: [], isClosed: false
+            };
+            await syncOrderToCloud(newOrd);
+            closeModal();
+            showToast(`Yeni sipariş açıldı: ${newId}`);
+            openOrderDetail(newId);
+        }
+
+        function renderCatalogTable(filteredList = null) {
+            const tbody = document.getElementById("catalog-table-body");
+            if (!tbody) return;
+            tbody.innerHTML = "";
+            const list = filteredList || masterProducts;
+
+            updateHeaderBadgeCounts();
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 italic">Katalogda kayıtlı ürün bulunmuyor.</td></tr>`;
+                return;
+            }
+
+            list.slice(0, 200).forEach((p, idx) => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td class="p-3 text-center"><input type="checkbox" value="${idx}" class="catalog-row-checkbox w-4 h-4 text-emerald-700 rounded cursor-pointer"></td>
+                    <td class="p-3 font-mono font-bold text-slate-900">${p.id}</td>
+                    <td class="p-3 font-medium">${p.name}</td>
+                    <td class="p-3 text-emerald-800 font-bold bg-emerald-50 text-center">${p.color || '-'}</td>
+                    <td class="p-3 text-right font-bold text-emerald-800">${Number(p.price).toLocaleString('tr-TR')} ₺</td>
+                    <td class="p-3 text-center"><button type="button" onclick="removeProductByIndex(${idx})" class="text-slate-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleSelectAllCatalog(checked) {
+            const checkboxes = document.querySelectorAll(".catalog-row-checkbox");
+            checkboxes.forEach(cb => cb.checked = checked);
+        }
+
+        async function deleteSelectedCatalogItems() {
+            const checkboxes = document.querySelectorAll(".catalog-row-checkbox:checked");
+            if (checkboxes.length === 0) {
+                showToast("Silmek için ürün seçiniz.", true);
+                return;
+            }
+            if (!confirm(`Seçilen ${checkboxes.length} ürünü silmek istediğinize emin misiniz?`)) return;
+
+            const selectedIndices = Array.from(checkboxes).map(cb => parseInt(cb.value)).sort((a, b) => b - a);
+            selectedIndices.forEach(idx => {
+                masterProducts.splice(idx, 1);
+            });
+
+            await saveCatalogToDB(masterProducts);
+            renderCatalogTable();
+            showToast(`${selectedIndices.length} ürün silindi.`);
+        }
+
+        async function deleteAllCatalogItems() {
+            if (!confirm("Tüm katalog listesi kalıcı olarak silinecek! Emin misiniz?")) return;
+            masterProducts = [];
+            await saveCatalogToDB(masterProducts);
+            renderCatalogTable();
+            showToast("Tüm katalog temizlendi.");
+        }
+
+        function filterCatalogTable() {
+            const q = document.getElementById("cat-search-input").value.toLowerCase();
+            const filtered = masterProducts.filter(p => 
+                p.id.toLowerCase().includes(q) || 
+                p.name.toLowerCase().includes(q) || 
+                (p.color && p.color.toLowerCase().includes(q))
+            );
+            renderCatalogTable(filtered);
+        }
+
+        async function removeProductByIndex(idx) {
+            masterProducts.splice(idx, 1);
+            await saveCatalogToDB(masterProducts);
+            renderCatalogTable();
+            showToast("Ürün silindi.");
+        }
+
+        function updateHeaderBadgeCounts() {
+            const badge = document.getElementById("cat-count-badge");
+            if (badge) badge.innerText = masterProducts.length;
+            const lbl = document.getElementById("master-count-label");
+            if (lbl) lbl.innerText = masterProducts.length;
+        }
+
+        function renderAdminPerformance() {
+            const kpiContainer = document.getElementById("admin-kpi-cards");
+            const tbody = document.getElementById("admin-performance-tbody");
+            if (!kpiContainer || !tbody) return;
+
+            kpiContainer.innerHTML = "";
+            tbody.innerHTML = "";
+
+            let totalOrders = orders.length;
+            let totalRevenue = 0;
+            let closedOrdersCount = orders.filter(o => o.isClosed).length;
+
+            orders.forEach(ord => {
+                let sub = 0;
+                if (ord.items) {
+                    ord.items.forEach(i => {
+                        const netQty = Math.max(0, i.dispatchedQty - (i.returnedQty || 0));
+                        sub += netQty * (i.price || 0);
+                    });
+                }
+                if (ord.extras) {
+                    ord.extras.forEach(ext => {
+                        if (ext.faikApproval) sub += (ext.qty || 0) * (ext.price || 0);
+                    });
+                }
+                totalRevenue += sub * 1.20;
+            });
+
+            kpiContainer.innerHTML = `
+                <div class="bg-white/10 p-4 rounded-2xl border border-emerald-800">
+                    <div class="text-[10px] font-bold text-emerald-300 uppercase">Toplam Sipariş Dosyası</div>
+                    <div class="text-2xl font-black text-white mt-1">${totalOrders} Adet</div>
+                </div>
+                <div class="bg-white/10 p-4 rounded-2xl border border-emerald-800">
+                    <div class="text-[10px] font-bold text-emerald-300 uppercase">Tamamlanan / Faturalanan</div>
+                    <div class="text-2xl font-black text-emerald-300 mt-1">${closedOrdersCount} Dosya</div>
+                </div>
+                <div class="bg-white/10 p-4 rounded-2xl border border-emerald-800">
+                    <div class="text-[10px] font-bold text-emerald-300 uppercase">Toplam Konsolide Ciro (KDV Dahil)</div>
+                    <div class="text-2xl font-black text-white mt-1">${totalRevenue.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</div>
+                </div>
+            `;
+
+            SALES_TEAM.forEach(repName => {
+                const repOrders = orders.filter(o => (o.salesRep || '').trim().toLowerCase() === repName.trim().toLowerCase());
+                let repCount = repOrders.length;
+                let repClosed = repOrders.filter(o => o.isClosed).length;
+                let repRev = 0;
+
+                repOrders.forEach(ord => {
+                    let sub = 0;
+                    if (ord.items) {
+                        ord.items.forEach(i => {
+                            const netQty = Math.max(0, i.dispatchedQty - (i.returnedQty || 0));
+                            sub += netQty * (i.price || 0);
+                        });
+                    }
+                    if (ord.extras) {
+                        ord.extras.forEach(ext => {
+                            if (ext.faikApproval) sub += (ext.qty || 0) * (ext.price || 0);
+                        });
+                    }
+                    repRev += sub * 1.20;
+                });
+
+                const repCode = getSalespersonCode(repName);
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-white">${repName} <span class="text-[10px] font-mono text-emerald-300">(${repCode})</span></td>
+                    <td class="p-3 text-center font-bold">${repCount} Dosya</td>
+                    <td class="p-3 text-center text-emerald-300 font-bold">${repClosed} Kapalı</td>
+                    <td class="p-3 text-right font-black text-white text-sm">${repRev.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterOrders() {
+            const q = document.getElementById("search-input").value.toLowerCase();
+            const rows = document.querySelectorAll("#orders-table-body tr");
+            rows.forEach(r => { r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; });
+        }
+
+        function sendWhatsAppNotification() {
+            if (!activeOrder) return;
+            const text = `Sayın İlgili, ${activeOrder.customer} projesine ait ${activeOrder.id} kodlu sipariş işlemi güncellenmiştir. Durum: ${activeOrder.currentStep}. Aşama.`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
         }
 
         // ================= BAŞLANGIÇ YÜKLEMESİ =================
