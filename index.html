@@ -304,7 +304,7 @@
                                     <th class="p-4">Uygulama Durumu</th>
                                     <th class="p-4">Aşama / Durum</th>
                                     <th class="p-4 text-right" id="th-order-price">Toplam Tutar</th>
-                                    <th class="p-4 text-right">İşlem</th>
+                                    <th class="p-4 text-right">Detay</th>
                                 </tr>
                             </thead>
                             <tbody id="orders-table-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
@@ -334,7 +334,7 @@
                     <div class="flex flex-wrap items-center gap-2">
                         <button onclick="exportFinalOrderToExcel()" class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center space-x-1.5 shadow transition cursor-pointer">
                             <i class="fa-solid fa-file-excel text-emerald-300 text-sm pointer-events-none"></i>
-                            <span class="pointer-events-none">Fişin Son Halini Excel Olarak İndir (.xlsx)</span>
+                            <span class="pointer-events-none">Sipariş Oluştur (.xlsx)</span>
                         </button>
                         <button onclick="exportIrsaliyeExcel()" class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center space-x-1.5 shadow transition cursor-pointer">
                             <i class="fa-solid fa-truck-ramp-box text-blue-200 text-sm pointer-events-none"></i>
@@ -639,20 +639,21 @@
                                         <th class="p-3.5 text-center bg-emerald-800 font-extrabold">Net Faturalanacak</th>
                                         <th class="p-3.5 text-right">Birim Fiyat</th>
                                         <th class="p-3.5 text-right">Toplam Tutar</th>
+                                        <th class="p-3.5 text-center w-20 bg-emerald-950 text-red-300">Satır Sil</th>
                                     </tr>
                                 </thead>
                                 <tbody id="step4-items-tbody" class="divide-y divide-slate-200 font-medium text-slate-800"></tbody>
                                 <tfoot class="bg-slate-50 border-t-2 border-slate-300 font-bold text-slate-900">
                                     <tr>
-                                        <td colspan="6" class="p-3 text-right uppercase text-xs text-slate-500">Ara Toplam:</td>
+                                        <td colspan="7" class="p-3 text-right uppercase text-xs text-slate-500">Ara Toplam:</td>
                                         <td colspan="3" class="p-3 text-right font-bold text-base" id="final-subtotal">0,00 ₺</td>
                                     </tr>
                                     <tr>
-                                        <td colspan="6" class="p-3 text-right uppercase text-xs text-slate-500">KDV (%20):</td>
+                                        <td colspan="7" class="p-3 text-right uppercase text-xs text-slate-500">KDV (%20):</td>
                                         <td colspan="3" class="p-3 text-right font-bold text-base text-slate-700" id="final-tax">0,00 ₺</td>
                                     </tr>
                                     <tr class="bg-emerald-100/70 text-emerald-950">
-                                        <td colspan="6" class="p-4 text-right uppercase text-sm font-black">Genel Fatura Toplamı:</td>
+                                        <td colspan="7" class="p-4 text-right uppercase text-sm font-black">Genel Fatura Toplamı:</td>
                                         <td colspan="3" class="p-4 text-right font-black text-2xl text-emerald-800" id="final-grandtotal">0,00 ₺</td>
                                     </tr>
                                 </tfoot>
@@ -661,7 +662,7 @@
                         <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
                             <div class="flex flex-wrap items-center gap-2">
                                 <button type="button" onclick="exportFinalOrderToExcel()" class="px-4 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center space-x-2 shadow transition cursor-pointer">
-                                    <i class="fa-solid fa-file-excel text-sm pointer-events-none"></i><span class="pointer-events-none">Fişin Son Halini Excel Olarak İndir (.xlsx)</span>
+                                    <i class="fa-solid fa-file-excel text-sm pointer-events-none"></i><span class="pointer-events-none">Sipariş Oluştur (.xlsx)</span>
                                 </button>
                                 <button type="button" onclick="exportIrsaliyeExcel()" class="px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center space-x-2 shadow transition cursor-pointer">
                                     <i class="fa-solid fa-truck-ramp-box text-blue-200 text-sm pointer-events-none"></i><span class="pointer-events-none">İrsaliye Oluştur (.xlsx)</span>
@@ -950,7 +951,7 @@
                 roleId: 'satis', name: 'Orhan Özen', title: 'Satış Uzmanı', badgeText: 'SATIŞ PANELİ',
                 dutyText: 'Sadece KENDİ siparişlerinizi görürsünüz. Fiş depoya iletildikten sonra değişiklik yapamazsınız.',
                 colorClass: 'bg-blue-50 text-blue-700 border-blue-200', avatarBg: 'bg-emerald-100 text-emerald-800', avatarIcon: 'fa-file-signature',
-                visibleSteps: [1], canCreateOrder: true, canManageCatalog: true, canDeleteOrder: true, canSeePrices: true
+                visibleSteps: [1], canCreateOrder: true, canManageCatalog: true, canDeleteOrder: false, canSeePrices: true
             },
             depo: {
                 roleId: 'depo', name: 'Kamber Usta', title: 'Depo Sorumlusu', badgeText: 'DEPO PANELİ',
@@ -966,19 +967,18 @@
             },
             muhasebe: {
                 roleId: 'muhasebe', name: 'Gökhan', title: 'Muhasebe Uzmanı', badgeText: 'MUHASEBE PANELİ',
-                dutyText: 'Depo veya Saha onayı tamamlanmış fişleri inceler, faturalandırır ve kapatırsınız.',
+                dutyText: 'Depo veya Saha onayı tamamlanmış fişleri inceler, satırları düzenler ve faturalandırır.',
                 colorClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', avatarBg: 'bg-emerald-100 text-emerald-700', avatarIcon: 'fa-receipt',
                 visibleSteps: [4], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false, canSeePrices: true
             },
             admin: {
                 roleId: 'admin', name: 'Sistem Yöneticisi', title: 'Admin (Tam Yetki)', badgeText: 'TAM YETKİLİ ADMIN',
-                dutyText: 'Tüm aşamaları görür ve her aşamada sınırsız düzenleme / değiştirme yetkisine sahiptir.',
+                dutyText: 'Tüm aşamaları görür ve her aşamada sınırsız düzenleme / satır silme yetkisine sahiptir.',
                 colorClass: 'bg-emerald-950 text-white border-emerald-900', avatarBg: 'bg-emerald-900 text-emerald-200', avatarIcon: 'fa-crown',
-                visibleSteps: [1, 2, 3, 4], canCreateOrder: true, canManageCatalog: true, canDeleteOrder: true, canSeePrices: true
+                visibleSteps: [1, 2, 3, 4], canCreateOrder: true, canManageCatalog: true, canDeleteOrder: false, canSeePrices: true
             }
         };
 
-        // KURTARILMIŞ TÜM GERÇEK SİPARİŞ VERİLERİNİZ
         let orders = [
             {
                 id: "CNP-2026-625",
@@ -1287,50 +1287,6 @@
                 } catch(e) {
                     console.error("Bulut sipariş kaydetme:", e);
                 }
-            }
-        }
-
-        // ================= SİPARİŞ SİLME =================
-        async function deleteOrder(orderId, event) {
-            if (event) event.stopPropagation();
-
-            if (!currentUser) return;
-
-            const targetOrder = orders.find(o => o.id === orderId);
-            if (!targetOrder) return;
-
-            const isAdmin = currentUser.roleId === 'admin';
-            const isOwnSalesOrder = currentUser.roleId === 'satis' && (targetOrder.salesRep || '').trim().toLowerCase() === currentUser.name.trim().toLowerCase();
-
-            if (!isAdmin && !isOwnSalesOrder) {
-                showToast("YETKİSİZ İŞLEM: Bu sipariş dosyasını silme yetkiniz bulunmamaktadır!", true);
-                return;
-            }
-
-            const orderLabel = `${targetOrder.id} - ${targetOrder.customer}`;
-
-            if (!confirm(`"${orderLabel}" sipariş dosyasını kalıcı olarak silmek istediğinize emin misiniz?`)) {
-                return;
-            }
-
-            try {
-                orders = orders.filter(o => o.id !== orderId);
-                try { localStorage.setItem("cinpa_cached_orders", JSON.stringify(orders)); } catch(e) {}
-                renderOrderList();
-                if (currentUser && currentUser.roleId === 'admin') renderAdminPerformance();
-
-                if (db) {
-                    await db.collection("orders").doc(orderId).delete();
-                }
-
-                showToast(`Sipariş #${orderId} başarıyla silindi.`);
-
-                if (activeOrder && activeOrder.id === orderId) {
-                    returnToDashboard();
-                }
-            } catch (err) {
-                console.error("Sipariş silinirken hata:", err);
-                showToast("Sipariş silinirken hata oluştu: " + err.message, true);
             }
         }
 
@@ -1929,7 +1885,7 @@
             showToast("İrsaliye Excel (.xlsx) dosyası başarıyla oluşturuldu ve indirildi!");
         }
 
-        // ================= NEBİM V3 FORMATINDA EXCEL AKTAR (.XLSX) =================
+        // ================= NEBİM V3 FORMATINDA SİPARİŞ OLUŞTUR (.XLSX) =================
         function exportFinalOrderToExcel() {
             if (!activeOrder) return;
             const excelRows = [];
@@ -2057,9 +2013,9 @@
             XLSX.utils.book_append_sheet(workbook, worksheet, "Excel");
 
             const safeName = activeOrder.customer.replace(/[^a-zA-Z0-9_-]/g, "_");
-            const fileName = `NEBIM_V3_FIS_${activeOrder.id}_${safeName}.xlsx`;
+            const fileName = `SIPARIS_${activeOrder.id}_${safeName}.xlsx`;
             XLSX.writeFile(workbook, fileName);
-            showToast("Fişin son hali Nebim V3 formatında Excel (.xlsx) olarak indirildi!");
+            showToast("Sipariş Excel (.xlsx) dosyası başarıyla oluşturuldu ve indirildi!");
         }
 
         // ================= GİRİŞ & ROL İŞLEMLERİ =================
@@ -2169,6 +2125,7 @@
             document.getElementById("role-avatar-box").className = `w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold ${currentUser.avatarBg}`;
             document.getElementById("role-avatar-icon").className = `fa-solid ${currentUser.avatarIcon}`;
 
+            // Butonların görünürlüğü
             document.getElementById("btn-header-new-order").style.display = currentUser.canCreateOrder ? "flex" : "none";
             document.getElementById("btn-header-import-excel").style.display = currentUser.canCreateOrder ? "flex" : "none";
             document.getElementById("btn-header-catalog").style.display = currentUser.canManageCatalog ? "flex" : "none";
@@ -2247,8 +2204,6 @@
                 return;
             }
 
-            const userCanDelete = currentUser.canDeleteOrder === true;
-
             visibleOrders.forEach(ord => {
                 const tr = document.createElement("tr");
                 tr.className = "hover:bg-slate-50 transition cursor-pointer";
@@ -2264,7 +2219,6 @@
                     ? `<span class="bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-extrabold px-2 py-0.5 rounded-md"><i class="fa-solid fa-helmet-safety mr-1"></i> Uygulama Var</span>` 
                     : `<span class="bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-bold px-2 py-0.5 rounded-md"><i class="fa-solid fa-truck mr-1"></i> Sadece Teslimat</span>`;
 
-                const isItemDeletable = userCanDelete && (currentUser.roleId === 'admin' || (ord.salesRep || '').trim().toLowerCase() === currentUser.name.trim().toLowerCase());
                 const totalAmount = calculateOrderTotal(ord);
 
                 tr.innerHTML = `
@@ -2276,14 +2230,7 @@
                     <td class="p-4">${badge}</td>
                     ${showPrices ? `<td class="p-4 text-right font-black text-emerald-800 whitespace-nowrap">${Number(totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>` : ''}
                     <td class="p-4 text-right">
-                        <div class="inline-flex items-center justify-end space-x-2">
-                            ${isItemDeletable ? `
-                            <button onclick="deleteOrder('${ord.id}', event)" class="px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 text-xs font-bold hover:bg-red-600 hover:text-white transition flex items-center space-x-1 cursor-pointer" title="Siparişi Sil">
-                                <i class="fa-solid fa-trash-can pointer-events-none"></i>
-                                <span class="hidden sm:inline pointer-events-none">Sil</span>
-                            </button>` : ''}
-                            <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-emerald-700 hover:text-white transition cursor-pointer">Aç <i class="fa-solid fa-chevron-right ml-1 pointer-events-none"></i></button>
-                        </div>
+                        <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-emerald-700 hover:text-white transition cursor-pointer">Aç <i class="fa-solid fa-chevron-right ml-1 pointer-events-none"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -2703,7 +2650,7 @@
             returnToDashboard();
         }
 
-        // ================= 3. ADIM: SAHA (ONARILMIŞ VE EKSİKSİZ) =================
+        // ================= 3. ADIM: SAHA =================
         function renderStep3() {
             const retContainer = document.getElementById("step3-returns-container");
             const extContainer = document.getElementById("step3-extras-container");
@@ -2819,7 +2766,7 @@
             returnToDashboard();
         }
 
-        // ================= 4. ADIM: MUHASEBE (ONARILMIŞ VE EKSİKSİZ) =================
+        // ================= 4. ADIM: MUHASEBE & SATIR SİL =================
         function renderStep4() {
             const tbody = document.getElementById("step4-items-tbody");
             if (!tbody || !activeOrder) return;
@@ -2828,8 +2775,12 @@
             let subtotal = 0;
             let sumEvrak1 = 0, sumEvrak2 = 0, sumEvrak3 = 0, sumEvrak4 = 0;
 
+            const isAdmin = currentUser && currentUser.roleId === 'admin';
+            const isMuhasebe = currentUser && currentUser.roleId === 'muhasebe';
+            const canDeleteRow = isAdmin || isMuhasebe;
+
             if (activeOrder.items) {
-                activeOrder.items.forEach(item => {
+                activeOrder.items.forEach((item, index) => {
                     const req = parseFloat(item.requestedQty) || 0;
                     const disp = item.dispatchedQty !== undefined ? (parseFloat(item.dispatchedQty) || 0) : req;
                     const ret = parseFloat(item.returnedQty) || 0;
@@ -2856,13 +2807,16 @@
                         <td class="p-3.5 text-center font-black bg-emerald-50 text-emerald-900">${net}</td>
                         <td class="p-3.5 text-right font-medium">${Number(pr).toLocaleString('tr-TR')} ₺</td>
                         <td class="p-3.5 text-right font-bold text-slate-900">${Number(lineTotal).toLocaleString('tr-TR')} ₺</td>
+                        <td class="p-3.5 text-center">
+                            ${canDeleteRow ? `<button onclick="removeStep4Item(${index})" class="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition cursor-pointer" title="Bu Satırı Fişten Sil"><i class="fa-solid fa-trash-can"></i></button>` : `<span class="text-slate-300">-</span>`}
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
             if (activeOrder.extras) {
-                activeOrder.extras.forEach(ext => {
+                activeOrder.extras.forEach((ext, extIndex) => {
                     if (ext.faikApproval) {
                         const qty = parseFloat(ext.qty) || 0;
                         const pr = parseFloat(ext.price) || 0;
@@ -2885,6 +2839,9 @@
                             <td class="p-3.5 text-center font-black bg-emerald-100 text-emerald-950">${qty}</td>
                             <td class="p-3.5 text-right font-medium">${Number(pr).toLocaleString('tr-TR')} ₺</td>
                             <td class="p-3.5 text-right font-bold text-emerald-900">${Number(lineTotal).toLocaleString('tr-TR')} ₺</td>
+                            <td class="p-3.5 text-center">
+                                ${canDeleteRow ? `<button onclick="removeStep4Extra(${extIndex})" class="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition cursor-pointer" title="Bu İlave Satırı Sil"><i class="fa-solid fa-trash-can"></i></button>` : `<span class="text-slate-300">-</span>`}
+                            </td>
                         `;
                         tbody.appendChild(tr);
                     }
@@ -2903,10 +2860,30 @@
             document.getElementById("final-tax").innerText = tax.toLocaleString('tr-TR', {minimumFractionDigits: 2}) + " ₺";
             document.getElementById("final-grandtotal").innerText = grand.toLocaleString('tr-TR', {minimumFractionDigits: 2}) + " ₺";
 
-            const isAdmin = currentUser && currentUser.roleId === 'admin';
-            const isMuhasebe = currentUser && currentUser.roleId === 'muhasebe';
             const actionBtns = document.getElementById("step4-action-buttons");
             if (actionBtns) actionBtns.style.display = (isAdmin || isMuhasebe) ? "block" : "none";
+        }
+
+        async function removeStep4Item(index) {
+            if (!activeOrder || !activeOrder.items || !activeOrder.items[index]) return;
+            const item = activeOrder.items[index];
+            if (!confirm(`"${item.name}" satırını bu fişten tamamen çıkarmak istediğinize emin misiniz?`)) return;
+
+            activeOrder.items.splice(index, 1);
+            await syncOrderToCloud(activeOrder);
+            renderStep4();
+            showToast(`Satır silindi: ${item.name}`);
+        }
+
+        async function removeStep4Extra(extIndex) {
+            if (!activeOrder || !activeOrder.extras || !activeOrder.extras[extIndex]) return;
+            const ext = activeOrder.extras[extIndex];
+            if (!confirm(`"${ext.name}" ilave ürün satırını silmek istediğinize emin misiniz?`)) return;
+
+            activeOrder.extras.splice(extIndex, 1);
+            await syncOrderToCloud(activeOrder);
+            renderStep4();
+            showToast(`İlave satır silindi: ${ext.name}`);
         }
 
         async function finalizeAndCloseOrder() {
