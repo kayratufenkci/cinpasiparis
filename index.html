@@ -141,7 +141,7 @@
                                     <span>Muhasebe (Gökhan)</span>
                                     <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
                                 </div>
-                                <div class="text-[11px] text-slate-500 font-medium">Depo/Saha Onaylı Fişleri Görür & Faturalandırır</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Depo/Saha Onaylı Fişleri Görür, Düzenler & Silebilir</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs pointer-events-none"></i>
@@ -158,7 +158,7 @@
                                     <span>Sistem Yöneticisi (Admin)</span>
                                     <i class="fa-solid fa-lock text-[10px] text-emerald-300"></i>
                                 </div>
-                                <div class="text-[11px] text-emerald-200 font-medium">Tam Yetki & Sınırsız Düzenleme</div>
+                                <div class="text-[11px] text-emerald-200 font-medium">Tam Yetki, Düzenleme & Silme</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-arrow-right-to-bracket text-emerald-300 text-xs pointer-events-none"></i>
@@ -304,7 +304,7 @@
                                     <th class="p-4">Uygulama Durumu</th>
                                     <th class="p-4">Aşama / Durum</th>
                                     <th class="p-4 text-right" id="th-order-price">Toplam Tutar</th>
-                                    <th class="p-4 text-right">Detay</th>
+                                    <th class="p-4 text-right">İşlemler</th>
                                 </tr>
                             </thead>
                             <tbody id="orders-table-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
@@ -976,15 +976,15 @@
             },
             muhasebe: {
                 roleId: 'muhasebe', name: 'Gökhan', title: 'Muhasebe Uzmanı', badgeText: 'MUHASEBE PANELİ',
-                dutyText: 'Depo veya Saha onayı tamamlanmış fişleri inceler, satırları düzenler ve faturalandırır.',
+                dutyText: 'Depo veya Saha onayı tamamlanmış fişleri inceler, satırları düzenler, siler ve faturalandırır.',
                 colorClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', avatarBg: 'bg-emerald-100 text-emerald-700', avatarIcon: 'fa-receipt',
-                visibleSteps: [4], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false, canSeePrices: true
+                visibleSteps: [4], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: true, canSeePrices: true
             },
             admin: {
                 roleId: 'admin', name: 'Sistem Yöneticisi', title: 'Admin (Tam Yetki)', badgeText: 'TAM YETKİLİ ADMIN',
-                dutyText: 'Tüm aşamaları görür ve her aşamada sınırsız düzenleme / satır silme yetkisine sahiptir.',
+                dutyText: 'Tüm aşamaları görür; satır ve fiş silme dahil tam yetkiye sahiptir.',
                 colorClass: 'bg-emerald-950 text-white border-emerald-900', avatarBg: 'bg-emerald-900 text-emerald-200', avatarIcon: 'fa-crown',
-                visibleSteps: [1, 2, 3, 4], canCreateOrder: true, canManageCatalog: true, canDeleteOrder: false, canSeePrices: true
+                visibleSteps: [1, 2, 3, 4], canCreateOrder: true, canManageCatalog: true, canDeleteOrder: true, canSeePrices: true
             }
         };
 
@@ -1048,7 +1048,52 @@
         let activeStepTab = 1;
         let parsedExcelItems = [];
 
-        // ================= BULUT KATALOG SENKRONİZASYONU =================
+        // ================= ÇİFT ONAYLI FİŞ SİLME (ADMİN & MUHASEBE) =================
+        async function deleteOrderWithDoubleConfirm(orderId, event) {
+            if (event) event.stopPropagation();
+
+            if (!currentUser) return;
+            const canDelete = currentUser.roleId === 'admin' || currentUser.roleId === 'muhasebe';
+            if (!canDelete) {
+                showToast("YETKİSİZ İŞLEM: Fiş silme yetkisi yalnızca Muhasebe ve Admin'e aittir!", true);
+                return;
+            }
+
+            const targetOrder = orders.find(o => o.id === orderId);
+            if (!targetOrder) return;
+
+            const orderLabel = `${targetOrder.id} - ${targetOrder.customer}`;
+
+            // 1. ONAY
+            const confirm1 = confirm(`1. ONAY:\n\n"${orderLabel}" fişini sistemden silmek istediğinize emin misiniz?`);
+            if (!confirm1) return;
+
+            // 2. KESİN ONAY
+            const confirm2 = confirm(`2. KESİN ONAY:\n\nBu işlem GERİ ALINAMAZ!\n\n"${targetOrder.id}" nolu fiş ve tüm hareketleri buluttan kalıcı olarak silinecektir. Onaylıyor musunuz?`);
+            if (!confirm2) return;
+
+            try {
+                orders = orders.filter(o => o.id !== orderId);
+                try { localStorage.setItem("cinpa_cached_orders", JSON.stringify(orders)); } catch(e) {}
+                renderOrderList();
+                if (currentUser && currentUser.roleId === 'admin') renderAdminPerformance();
+
+                if (db) {
+                    await db.collection("orders").doc(orderId).delete();
+                }
+
+                showToast(`Sipariş #${orderId} kalıcı olarak silindi.`);
+
+                if (activeOrder && activeOrder.id === orderId) {
+                    returnToDashboard();
+                }
+            } catch (err) {
+                console.error("Sipariş silinirken hata:", err);
+                showToast("Sipariş silinirken hata oluştu: " + err.message, true);
+            }
+        }
+
+        // ================= CANLI BULUT KATALOG SENKRONİZASYONU =================
         function listenToCatalogCloud() {
             if (!db) return;
             try {
@@ -2067,6 +2112,8 @@
                 return;
             }
 
+            const canDeleteOrder = currentUser.canDeleteOrder === true;
+
             visibleOrders.forEach(ord => {
                 const tr = document.createElement("tr");
                 tr.className = "hover:bg-slate-50 transition cursor-pointer";
@@ -2093,7 +2140,14 @@
                     <td class="p-4">${badge}</td>
                     ${showPrices ? `<td class="p-4 text-right font-black text-emerald-800 whitespace-nowrap">${Number(totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>` : ''}
                     <td class="p-4 text-right">
-                        <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-emerald-700 hover:text-white transition cursor-pointer">Aç <i class="fa-solid fa-chevron-right ml-1 pointer-events-none"></i></button>
+                        <div class="inline-flex items-center space-x-1.5">
+                            <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-emerald-700 hover:text-white transition cursor-pointer">Aç <i class="fa-solid fa-chevron-right ml-1 pointer-events-none"></i></button>
+                            ${canDeleteOrder ? `
+                            <button type="button" onclick="deleteOrderWithDoubleConfirm('${ord.id}', event)" class="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition cursor-pointer" title="Fişi Çift Onayla Sil">
+                                <i class="fa-solid fa-trash-can pointer-events-none"></i>
+                            </button>
+                            ` : ''}
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -2221,7 +2275,6 @@
             const canEdit = isAdmin || (isSales && isAtStep1);
             const showPrices = currentUser.canSeePrices === true;
 
-            // Fiyat sütunlarını Depo ve Saha için gizle
             document.querySelectorAll(".step1-price-col").forEach(el => {
                 el.style.display = showPrices ? "" : "none";
             });
@@ -2464,7 +2517,6 @@
                 const opt = document.createElement("option");
                 opt.value = p.id;
                 const colorTxt = (p.color && p.color !== "-") ? ` [${p.color}]` : "";
-                // Depo ekranında ürün fiyatları gizli
                 opt.innerText = `${p.id} - ${p.name}${colorTxt}`;
                 sel.appendChild(opt);
             });
