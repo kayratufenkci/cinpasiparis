@@ -415,7 +415,7 @@
                                         <input type="number" id="step1-catalog-qty" value="1" min="1" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-300 text-center bg-white">
                                     </div>
                                     <div class="sm:col-span-12 flex justify-end">
-                                        <button type="button" onclick="addItemFromCatalog()" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition flex items-center space-x-1.5 shadow-md cursor-pointer">
+                                        <button type="button" onclick="addItemFromCatalog()" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition flex items-center space-x-1.5 shadow-md cursor-pointer">
                                             <i class="fa-solid fa-plus pointer-events-none"></i><span class="pointer-events-none">Katalogdan Fişe Ekle</span>
                                         </button>
                                     </div>
@@ -448,7 +448,7 @@
                                         <input type="checkbox" id="chk-save-to-master" checked class="w-4 h-4 text-emerald-700 rounded">
                                         <span>Kalıcı kataloğa da ekle</span>
                                     </label>
-                                    <button type="button" onclick="addItemManual()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl transition shadow-md cursor-pointer">Özel Ürünü Ekle</button>
+                                    <button type="button" onclick="addItemManual()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition shadow-md cursor-pointer">Özel Ürünü Ekle</button>
                                 </div>
                             </div>
                         </div>
@@ -758,7 +758,7 @@
                     </div>
                     <div>
                         <h3 class="text-base font-extrabold text-slate-900">ÇİNPA Ürün Kataloğu & Bulut Listesi</h3>
-                        <p class="text-xs text-slate-500">Color.xlsx resmi kodlarıyla tüm varyantlar listelenir.</p>
+                        <p class="text-xs text-slate-500">Tüm cihazlarda renk varyantlarıyla tam eşitlenir.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeCatalogModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
@@ -882,7 +882,6 @@
 
     <!-- ================= JAVASCRIPT MOTORU ================= -->
     <script>
-        // COLOR.XLSX RESMİ 37 NEBİM RENK KODU SÖZLÜĞÜ
         const OFFICIAL_NEBIM_COLORS = {
             "AÇIK KAHVERENGİ": "1019",
             "ACIK KAHVERENGI": "1019",
@@ -990,12 +989,10 @@
             "RED": "1003"
         };
 
-        // KESİNLİKLE COLOR.XLSX KODLARINI DÖNDÜREN MOTOR
         function normalizeColorCode(val) {
             if (!val || val === '-' || val === 'nan' || val === 'undefined') return '';
             const raw = String(val).trim();
             
-            // Eğer metin içinde 1000-1036 arası 4 haneli kod geçiyorsa doğrudan kodu yakala
             const matchCode = raw.match(/\b(10\d{2})\b/);
             if (matchCode) {
                 const num = parseInt(matchCode[1], 10);
@@ -1006,19 +1003,16 @@
 
             const cleaned = raw.toUpperCase();
 
-            // Sözlükte birebir eşleşen varsa ver
             if (OFFICIAL_NEBIM_COLORS[cleaned]) {
                 return OFFICIAL_NEBIM_COLORS[cleaned];
             }
 
-            // Kısmi eşleşme (Uzun isimden kısaya doğru ara)
             for (let name in OFFICIAL_NEBIM_COLORS) {
                 if (cleaned.includes(name)) {
                     return OFFICIAL_NEBIM_COLORS[name];
                 }
             }
 
-            // Eğer sayısal bir değerse ve 1000-1036 arasındaysa ver
             if (/^\d+$/.test(cleaned)) {
                 return cleaned;
             }
@@ -1482,8 +1476,8 @@
         }
 
         // ================= KATALOG MOTORU =================
-        const CATALOG_DB_NAME = "CinpaOfficialCatalog_v4";
-        const CATALOG_STORE_NAME = "catalog_variants_all";
+        const CATALOG_DB_NAME = "CinpaOfficialCatalog_v5";
+        const CATALOG_STORE_NAME = "catalog_variants_unique";
 
         function openCatalogDB() {
             return new Promise((resolve, reject) => {
@@ -1511,9 +1505,9 @@
                         masterProducts = req.result;
                     } else if (masterProducts.length === 0) {
                         masterProducts = [
-                            { key: "0109024_1001_0", id: "0109024", name: "YUCCA BUSH", color: "1001", price: 860 },
-                            { key: "0109037_1004_1", id: "0109037", name: "MONSTERA", color: "1004", price: 624 },
-                            { key: "0107029_1003_2", id: "0107029", name: "DRACAENA", color: "1003", price: 70 }
+                            { key: "0109024_1001", id: "0109024", name: "YUCCA BUSH", color: "1001", price: 860 },
+                            { key: "0109037_1004", id: "0109037", name: "MONSTERA", color: "1004", price: 624 },
+                            { key: "0107029_1003", id: "0107029", name: "DRACAENA", color: "1003", price: 70 }
                         ];
                     }
                     updateHeaderBadgeCounts();
@@ -1538,10 +1532,18 @@
 
             if (!name) { showToast("Lütfen ürün adını yazınız.", true); return; }
 
-            const safeKey = `${code}_${color || 'STANDART'}_${Date.now()}`;
+            // BİRİNCİL TEKİL ANAHTAR: ÜRÜN KODU + RENK KODU
+            const safeKey = `${String(code).trim().toLowerCase()}_${color || 'STANDART'}`;
             const newProd = { key: safeKey, id: code, name: name, color: color, price: price };
             
-            masterProducts.unshift(newProd);
+            // Eğer aynı ürün ve renk zaten varsa güncelle, yoksa başa ekle
+            const existingIdx = masterProducts.findIndex(p => p.key === safeKey);
+            if (existingIdx >= 0) {
+                masterProducts[existingIdx] = newProd;
+            } else {
+                masterProducts.unshift(newProd);
+            }
+
             await saveCatalogToDB(masterProducts);
             renderCatalogTable();
             populateProductSelects();
@@ -1550,14 +1552,14 @@
             document.getElementById("cat-new-name").value = "";
             document.getElementById("cat-new-color").value = "";
             document.getElementById("cat-new-price").value = "";
-            showToast(`${name} (${color || 'Standart'}) varyantı kaydedildi!`);
+            showToast(`${name} (${color || 'Standart'}) kaydedildi!`);
         }
 
-        // ================= 17.907 SATIRIN TAMAMINI EKSİKSİZ ALAN EXCEL YÜKLEYİCİ =================
+        // ================= MÜKERRER KAYITLARI TEMİZLEYEN EXCEL YÜKLEYİCİ =================
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Katalog dosyası okunuyor, tüm satırlar işleniyor...");
+            showToast("Katalog dosyası okunuyor, mükerrer satırlar filtreleniyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -1609,7 +1611,8 @@
                         if (priceCol === -1) priceCol = 3;
                     }
 
-                    let newProducts = [];
+                    // MÜKERRERLERİ ENGELLEMEK İÇİN MAP KULLANILIR (ÜRÜNKODU + RENKKODU TEKİL OLUR)
+                    let uniqueMap = new Map();
 
                     for (let i = startRow; i < rawData.length; i++) {
                         let row = rawData[i];
@@ -1627,9 +1630,10 @@
                         let price = parseFloat(cleanPrice) || 0;
                         let normColor = normalizeColorCode(color);
 
-                        const safeKey = `${code || 'URUN'}_${normColor || 'STANDART'}_${i}`;
+                        // KESİN TEKİL ANAHTAR (AYNİ ÜRÜN VE RENK İKİNCİ KEZ EKLENEMEZ)
+                        const safeKey = `${String(code || 'URUN').trim().toLowerCase()}_${normColor || 'STANDART'}`;
 
-                        newProducts.push({
+                        uniqueMap.set(safeKey, {
                             key: safeKey,
                             id: code || `ÇNP-${i}`,
                             name: name || code,
@@ -1638,13 +1642,15 @@
                         });
                     }
 
+                    const newProducts = Array.from(uniqueMap.values());
+
                     if (newProducts.length > 0) {
                         masterProducts = newProducts;
                         await saveCatalogToDB(masterProducts);
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
                         populateProductSelects();
-                        showToast(`Başarıyla ${newProducts.length} adet ürün varyantı eksiksiz yüklendi!`);
+                        showToast(`Başarıyla ${newProducts.length} tekil ürün varyantı yüklendi!`);
                     } else {
                         showToast("Excel'den geçerli ürün satırı okunamadı!", true);
                     }
@@ -2159,7 +2165,6 @@
             document.getElementById("role-avatar-box").className = `w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold ${currentUser.avatarBg}`;
             document.getElementById("role-avatar-icon").className = `fa-solid ${currentUser.avatarIcon}`;
 
-            // Butonların görünürlüğü
             document.getElementById("btn-header-new-order").style.display = currentUser.canCreateOrder ? "flex" : "none";
             document.getElementById("btn-header-import-excel").style.display = currentUser.canCreateOrder ? "flex" : "none";
             document.getElementById("btn-header-catalog").style.display = currentUser.canManageCatalog ? "flex" : "none";
@@ -2544,8 +2549,11 @@
                 id: code, name: name, color: color, requestedQty: qty, dispatchedQty: qty, returnedQty: 0, price: price, warehouseNote: "", checked: true
             });
             if (saveMaster) {
-                const safeKey = `${code}_${color || 'STANDART'}_${Date.now()}`;
-                masterProducts.unshift({ key: safeKey, id: code, name: name, color: color, price: price });
+                const safeKey = `${code}_${color || 'STANDART'}`;
+                const existingIdx = masterProducts.findIndex(x => x.key === safeKey);
+                const newObj = { key: safeKey, id: code, name: name, color: color, price: price };
+                if (existingIdx >= 0) masterProducts[existingIdx] = newObj;
+                else masterProducts.unshift(newObj);
                 saveCatalogToDB(masterProducts);
             }
             await syncOrderToCloud(activeOrder);
