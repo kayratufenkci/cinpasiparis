@@ -49,7 +49,7 @@
         <span id="toast-msg" class="pointer-events-none"></span>
     </div>
 
-    <!-- ================= 1. GİRİŞ EKRANI (SADELEŞTİRİLMİŞ) ================= -->
+    <!-- ================= 1. GİRİŞ EKRANI ================= -->
     <section id="view-login" class="min-h-screen flex items-center justify-center p-4 bg-slate-950 bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950">
         <div class="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl space-y-6 border border-emerald-100">
             <div class="text-center space-y-2">
@@ -415,7 +415,7 @@
                                         <input type="number" id="step1-catalog-qty" value="1" min="1" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-300 text-center bg-white">
                                     </div>
                                     <div class="sm:col-span-12 flex justify-end">
-                                        <button type="button" onclick="addItemFromCatalog()" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition flex items-center space-x-1.5 shadow-md cursor-pointer">
+                                        <button type="button" onclick="addItemFromCatalog()" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition flex items-center space-x-1.5 shadow-md cursor-pointer">
                                             <i class="fa-solid fa-plus pointer-events-none"></i><span class="pointer-events-none">Katalogdan Fişe Ekle</span>
                                         </button>
                                     </div>
@@ -448,7 +448,7 @@
                                         <input type="checkbox" id="chk-save-to-master" checked class="w-4 h-4 text-emerald-700 rounded">
                                         <span>Kalıcı kataloğa da ekle</span>
                                     </label>
-                                    <button type="button" onclick="addItemManual()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition shadow-md cursor-pointer">Özel Ürünü Ekle</button>
+                                    <button type="button" onclick="addItemManual()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl transition shadow-md cursor-pointer">Özel Ürünü Ekle</button>
                                 </div>
                             </div>
                         </div>
@@ -758,7 +758,7 @@
                     </div>
                     <div>
                         <h3 class="text-base font-extrabold text-slate-900">ÇİNPA Ürün Kataloğu & Bulut Listesi</h3>
-                        <p class="text-xs text-slate-500">Tüm cihazlarda renk varyantlarıyla tam eşitlenir.</p>
+                        <p class="text-xs text-slate-500">Color.xlsx resmi kodlarıyla tüm varyantlar listelenir.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeCatalogModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
@@ -882,47 +882,148 @@
 
     <!-- ================= JAVASCRIPT MOTORU ================= -->
     <script>
-        const COLOR_NAME_TO_CODE = {
-            "BEYAZ": "1001", "WHITE": "1001",
-            "SIYAH": "1002", "SİYAH": "1002", "BLACK": "1002",
-            "KIRMIZI": "1003", "RED": "1003",
-            "YESIL": "1004", "YEŞİL": "1004", "GREEN": "1004",
-            "KOYU YESIL": "1001", "KOYU YEŞİL": "1001", "DARK GREEN": "1001",
-            "SARI": "1005", "YELLOW": "1005",
-            "MAVI": "1006", "MAVİ": "1006", "BLUE": "1006",
-            "TURUNCU": "1007", "ORANGE": "1007",
-            "PEMBE": "1008", "PINK": "1008",
-            "MOR": "1009", "PURPLE": "1009",
-            "GRI": "1010", "GRİ": "1010", "GREY": "1010", "GRAY": "1010",
-            "KAHVE": "1011", "KAHVERENGI": "1011", "KAHVERENGİ": "1011", "BROWN": "1011",
-            "KOYU KAHVE": "1011", "KOYU KAHVERENGI": "1011", "KOYU KAHVERENGİ": "1011", "DARK BROWN": "1011",
-            "ACIK KAHVE": "1011", "AÇIK KAHVE": "1011",
-            "BEJ": "1012", "BEIGE": "1012",
-            "BORDO": "1013", "BURGUNDY": "1013",
-            "LACIVERT": "1014", "NAVY": "1014",
-            "SOMON": "1015", "SALMON": "1015",
-            "ANTRASIT": "1016", "ANTRASİT": "1016"
+        // COLOR.XLSX RESMİ 37 NEBİM RENK KODU SÖZLÜĞÜ
+        const OFFICIAL_NEBIM_COLORS = {
+            "AÇIK KAHVERENGİ": "1019",
+            "ACIK KAHVERENGI": "1019",
+            "KOYU KAHVERENGİ": "1020",
+            "KOYU KAHVERENGI": "1020",
+            "YEŞİL-KIRMIZI": "1031",
+            "YESIL-KIRMIZI": "1031",
+            "LIGHT PURPLE": "1021",
+            "DARK FUCHSIA": "1036",
+            "YEŞİL-BEYAZ": "1012",
+            "YESIL-BEYAZ": "1012",
+            "KAHVE YEŞİL": "1027",
+            "KAHVE YESIL": "1027",
+            "BEYAZ-PEMBE": "1035",
+            "LIGHT GREEN": "1000",
+            "LIGHT BROWN": "1019",
+            "DARK PURPLE": "1022",
+            "AÇIK YEŞİL": "1000",
+            "ACIK YESIL": "1000",
+            "KOYU YEŞİL": "1001",
+            "KOYU YESIL": "1001",
+            "KAHVERENGİ": "1011",
+            "KAHVERENGI": "1011",
+            "YEŞİL-SARI": "1013",
+            "YESIL-SARI": "1013",
+            "KOYU PEMBE": "1017",
+            "AÇIK PEMBE": "1023",
+            "ACIK PEMBE": "1023",
+            "SARI-YEŞİL": "1025",
+            "SARI-YESIL": "1025",
+            "KOYU FUŞYA": "1036",
+            "KOYU FUSYA": "1036",
+            "DARK GREEN": "1001",
+            "DODGERBLUE": "1008",
+            "ANTHRACITE": "1018",
+            "DARK BROWN": "1020",
+            "LIGHT PINK": "1023",
+            "LIGHT BLUE": "1029",
+            "LIGHT GREY": "1033",
+            "LIGHT GRAY": "1033",
+            "AÇIK MAVİ": "1029",
+            "ACIK MAVI": "1029",
+            "KOYU MAVİ": "1030",
+            "KOYU MAVI": "1030",
+            "DARK PINK": "1017",
+            "DARK BLUE": "1030",
+            "DARK GREY": "1034",
+            "DARK GRAY": "1034",
+            "ANTRASİT": "1018",
+            "ANTRASIT": "1018",
+            "AÇIK MOR": "1021",
+            "ACIK MOR": "1021",
+            "KOYU MOR": "1022",
+            "AÇIK GRİ": "1033",
+            "ACIK GRI": "1033",
+            "KOYU GRİ": "1034",
+            "KOYU GRI": "1034",
+            "LACIVERT": "1008",
+            "BURGUNDY": "1009",
+            "KIRMIZI": "1003",
+            "TURUNCU": "1005",
+            "MAGENTA": "1017",
+            "FUCHSIA": "1032",
+            "ORANGE": "1005",
+            "YELLOW": "1006",
+            "PURPLE": "1007",
+            "MAROON": "1009",
+            "SILVER": "1028",
+            "SIENNA": "1011",
+            "SALMON": "1026",
+            "YEŞİL": "1002",
+            "YESIL": "1002",
+            "PEMBE": "1004",
+            "BORDO": "1009",
+            "BEYAZ": "1016",
+            "SİYAH": "1024",
+            "SIYAH": "1024",
+            "SOMON": "1026",
+            "GÜMÜŞ": "1028",
+            "GUMUS": "1028",
+            "FUŞYA": "1032",
+            "FUSYA": "1032",
+            "WHITE": "1016",
+            "BLACK": "1024",
+            "GREEN": "1002",
+            "BROWN": "1011",
+            "CREAM": "1014",
+            "LILAC": "1015",
+            "OLIVE": "1027",
+            "SARI": "1006",
+            "MAVİ": "1008",
+            "MAVI": "1008",
+            "KREM": "1014",
+            "LİLA": "1015",
+            "LILA": "1015",
+            "LIME": "1000",
+            "PINK": "1004",
+            "BLUE": "1008",
+            "NAVY": "1008",
+            "GREY": "1010",
+            "GRAY": "1010",
+            "MOR": "1007",
+            "GRİ": "1010",
+            "GRI": "1010",
+            "RED": "1003"
         };
 
+        // KESİNLİKLE COLOR.XLSX KODLARINI DÖNDÜREN MOTOR
         function normalizeColorCode(val) {
             if (!val || val === '-' || val === 'nan' || val === 'undefined') return '';
-            const cleaned = String(val).trim().toUpperCase();
+            const raw = String(val).trim();
             
+            // Eğer metin içinde 1000-1036 arası 4 haneli kod geçiyorsa doğrudan kodu yakala
+            const matchCode = raw.match(/\b(10\d{2})\b/);
+            if (matchCode) {
+                const num = parseInt(matchCode[1], 10);
+                if (num >= 1000 && num <= 1036) {
+                    return String(num);
+                }
+            }
+
+            const cleaned = raw.toUpperCase();
+
+            // Sözlükte birebir eşleşen varsa ver
+            if (OFFICIAL_NEBIM_COLORS[cleaned]) {
+                return OFFICIAL_NEBIM_COLORS[cleaned];
+            }
+
+            // Kısmi eşleşme (Uzun isimden kısaya doğru ara)
+            for (let name in OFFICIAL_NEBIM_COLORS) {
+                if (cleaned.includes(name)) {
+                    return OFFICIAL_NEBIM_COLORS[name];
+                }
+            }
+
+            // Eğer sayısal bir değerse ve 1000-1036 arasındaysa ver
             if (/^\d+$/.test(cleaned)) {
                 return cleaned;
             }
 
-            if (COLOR_NAME_TO_CODE[cleaned]) {
-                return COLOR_NAME_TO_CODE[cleaned];
-            }
-
-            for (let name in COLOR_NAME_TO_CODE) {
-                if (cleaned.includes(name)) {
-                    return COLOR_NAME_TO_CODE[name];
-                }
-            }
-
-            return cleaned;
+            return '';
         }
 
         const firebaseConfig = {
