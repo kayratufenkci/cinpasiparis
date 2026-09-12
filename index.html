@@ -107,7 +107,7 @@
                                     <span>Depocu (Kamber Usta)</span>
                                     <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
                                 </div>
-                                <div class="text-[11px] text-slate-500 font-medium">Sadece Depo Hazırlık & İkame Masasını Görür</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Fiyatsız Sevk & İkame Masasını Görür</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs pointer-events-none"></i>
@@ -124,7 +124,7 @@
                                     <span>Saha Ekibi (Sefa Usta)</span>
                                     <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
                                 </div>
-                                <div class="text-[11px] text-slate-500 font-medium">Yalnızca montaj/uygulamalı işleri görür</div>
+                                <div class="text-[11px] text-slate-500 font-medium">Yalnızca montaj işlerini fiyatsız görür</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs pointer-events-none"></i>
@@ -332,7 +332,7 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
-                        <button onclick="exportFinalOrderToExcel()" class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center space-x-1.5 shadow transition cursor-pointer">
+                        <button onclick="exportFinalOrderToExcel()" id="btn-action-export-siparis" class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center space-x-1.5 shadow transition cursor-pointer">
                             <i class="fa-solid fa-file-excel text-emerald-300 text-sm pointer-events-none"></i>
                             <span class="pointer-events-none">Sipariş Oluştur</span>
                         </button>
@@ -380,8 +380,8 @@
                                         <th class="p-3.5">Ürün Kodu & Tanımı</th>
                                         <th class="p-3.5 text-center w-28 bg-emerald-100/60 text-emerald-950">Renk Kodu</th>
                                         <th class="p-3.5 text-center w-32">Talep Adedi</th>
-                                        <th class="p-3.5 text-right w-36">Birim Fiyat (TL)</th>
-                                        <th class="p-3.5 text-right w-36">Toplam Tutar</th>
+                                        <th class="p-3.5 text-right w-36 step1-price-col">Birim Fiyat (TL)</th>
+                                        <th class="p-3.5 text-right w-36 step1-price-col">Toplam Tutar</th>
                                         <th class="p-3.5 text-center w-16" id="th-satis-action">Satır Sil</th>
                                     </tr>
                                 </thead>
@@ -420,7 +420,7 @@
                                         <input type="number" id="step1-catalog-qty" value="1" min="1" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-300 text-center bg-white">
                                     </div>
                                     <div class="sm:col-span-12 flex justify-end">
-                                        <button type="button" onclick="addItemFromCatalog()" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition flex items-center space-x-1.5 shadow-md cursor-pointer">
+                                        <button type="button" onclick="addItemFromCatalog()" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition flex items-center space-x-1.5 shadow-md cursor-pointer">
                                             <i class="fa-solid fa-plus pointer-events-none"></i><span class="pointer-events-none">Katalogdan Fişe Ekle</span>
                                         </button>
                                     </div>
@@ -453,15 +453,15 @@
                                         <input type="checkbox" id="chk-save-to-master" checked class="w-4 h-4 text-emerald-700 rounded">
                                         <span>Kalıcı kataloğa da ekle</span>
                                     </label>
-                                    <button type="button" onclick="addItemManual()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl transition shadow-md cursor-pointer">Özel Ürünü Ekle</button>
+                                    <button type="button" onclick="addItemManual()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition shadow-md cursor-pointer">Özel Ürünü Ekle</button>
                                 </div>
                             </div>
                         </div>
 
                         <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
                             <div>
-                                <span class="text-xs text-slate-500 font-bold uppercase">Sipariş Taslak Toplamı:</span>
-                                <div class="text-2xl font-black text-slate-900" id="step1-total-amount">0,00 ₺</div>
+                                <span class="text-xs text-slate-500 font-bold uppercase step1-price-col">Sipariş Taslak Toplamı:</span>
+                                <div class="text-2xl font-black text-slate-900 step1-price-col" id="step1-total-amount">0,00 ₺</div>
                             </div>
                             <div id="step1-action-buttons">
                                 <button type="button" onclick="forwardToWarehouse()" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2 cursor-pointer">
@@ -964,13 +964,13 @@
             },
             depo: {
                 roleId: 'depo', name: 'Kamber Usta', title: 'Depo Sorumlusu', badgeText: 'DEPO PANELİ',
-                dutyText: 'Sadece Depo Hazırlık & Sevkiyat Bekleyen siparişleri görür ve düzenlersiniz.',
+                dutyText: 'Sadece Depo Hazırlık & Sevkiyat Bekleyen siparişleri görür ve düzenlersiniz (Fiyatlar gizlidir).',
                 colorClass: 'bg-amber-50 text-amber-800 border-amber-200', avatarBg: 'bg-amber-100 text-amber-700', avatarIcon: 'fa-boxes-packing',
                 visibleSteps: [2], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false, canSeePrices: false
             },
             saha: {
                 roleId: 'saha', name: 'Sefa Usta', title: 'Saha & Uygulama Ekibi', badgeText: 'SAHA MOBİL PANELİ',
-                dutyText: 'Yalnızca UYGULAMASI / MONTAJI yapılacak olan işleri görürsünüz.',
+                dutyText: 'Yalnızca UYGULAMASI / MONTAJI yapılacak olan işleri görürsünüz (Fiyatlar gizlidir).',
                 colorClass: 'bg-purple-50 text-purple-700 border-purple-200', avatarBg: 'bg-purple-100 text-purple-700', avatarIcon: 'fa-helmet-safety',
                 visibleSteps: [3], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false, canSeePrices: false
             },
@@ -1048,7 +1048,7 @@
         let activeStepTab = 1;
         let parsedExcelItems = [];
 
-        // ================= CANLI BULUT KATALOG SENKRONİZASYONU =================
+        // ================= BULUT KATALOG SENKRONİZASYONU =================
         function listenToCatalogCloud() {
             if (!db) return;
             try {
@@ -1079,9 +1079,9 @@
                 showToast("Buluta aktarılacak ürün bulunamadı!", true);
                 return;
             }
-            showToast("Ürünler buluta eşitleniyor (Tüm bilgisayarlara gönderiliyor)...");
+            showToast("Ürünler buluta eşitleniyor (Tüm cihazlara gönderiliyor)...");
             await syncCatalogToCloudBatch(masterProducts);
-            showToast(`Başarıyla ${masterProducts.length} ürün buluta eşitlendi! Artık diğer tüm bilgisayarlarda görünecektir.`);
+            showToast(`Başarıyla ${masterProducts.length} ürün buluta eşitlendi! Diğer cihazlarda anında görünür.`);
         }
 
         async function syncCatalogToCloudBatch(productsList) {
@@ -1988,6 +1988,7 @@
             document.getElementById("role-avatar-box").className = `w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold ${currentUser.avatarBg}`;
             document.getElementById("role-avatar-icon").className = `fa-solid ${currentUser.avatarIcon}`;
 
+            // Butonların görünürlüğü
             document.getElementById("btn-header-new-order").style.display = currentUser.canCreateOrder ? "flex" : "none";
             document.getElementById("btn-header-import-excel").style.display = currentUser.canCreateOrder ? "flex" : "none";
             document.getElementById("btn-header-catalog").style.display = currentUser.canManageCatalog ? "flex" : "none";
@@ -2115,6 +2116,13 @@
             document.getElementById("detail-order-date").innerText = activeOrder.date;
             document.getElementById("step1-sales-rep").innerText = activeOrder.salesRep;
 
+            // Fiyat görme yetkisi olmayan roller için buton ve kolon kontrolü
+            const showPrices = currentUser.canSeePrices === true;
+            const btnSiparis = document.getElementById("btn-action-export-siparis");
+            if (btnSiparis) {
+                btnSiparis.style.display = showPrices ? "flex" : "none";
+            }
+
             const appBadge = document.getElementById("detail-order-application-badge");
             if (appBadge) {
                 if (activeOrder.hasApplication !== false) {
@@ -2211,6 +2219,12 @@
             const isSales = currentUser.roleId === 'satis';
             const isAtStep1 = activeOrder.currentStep === 1;
             const canEdit = isAdmin || (isSales && isAtStep1);
+            const showPrices = currentUser.canSeePrices === true;
+
+            // Fiyat sütunlarını Depo ve Saha için gizle
+            document.querySelectorAll(".step1-price-col").forEach(el => {
+                el.style.display = showPrices ? "" : "none";
+            });
 
             document.getElementById("step1-add-product-panel").style.display = canEdit ? "block" : "none";
             document.getElementById("step1-action-buttons").style.display = canEdit ? "block" : "none";
@@ -2218,7 +2232,8 @@
             document.getElementById("step1-lock-alert").style.display = (!canEdit && !isAdmin) ? "flex" : "none";
 
             if (!activeOrder.items || activeOrder.items.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 italic">Siparişte henüz ürün bulunmuyor.</td></tr>`;
+                const colSpan = showPrices ? 6 : 4;
+                tbody.innerHTML = `<tr><td colspan="${colSpan}" class="p-6 text-center text-slate-400 italic">Siparişte henüz ürün bulunmuyor.</td></tr>`;
             } else {
                 activeOrder.items.forEach((item, index) => {
                     const sub = item.requestedQty * item.price;
@@ -2235,16 +2250,20 @@
                         <td class="p-3.5 text-center">
                             ${canEdit ? `<input type="number" min="1" value="${item.requestedQty}" onchange="updateStep1Qty(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold">${item.requestedQty} Adet</span>`}
                         </td>
+                        ${showPrices ? `
                         <td class="p-3.5 text-right font-medium">
                             ${canEdit ? `<input type="number" min="0" step="any" value="${item.price}" onchange="updateStep1Price(${index}, this.value)" class="w-24 text-right font-bold border border-slate-300 rounded p-1"> ₺` : `${Number(item.price).toLocaleString('tr-TR')} ₺`}
                         </td>
                         <td class="p-3.5 text-right font-bold text-slate-900">${Number(sub).toLocaleString('tr-TR')} ₺</td>
+                        ` : ''}
                         ${canEdit ? `<td class="p-3.5 text-center"><button onclick="removeItemStep1(${index})" class="text-slate-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>` : ''}
                     `;
                     tbody.appendChild(tr);
                 });
             }
-            document.getElementById("step1-total-amount").innerText = total.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + " ₺ + KDV";
+            if (showPrices) {
+                document.getElementById("step1-total-amount").innerText = total.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + " ₺ + KDV";
+            }
         }
 
         async function forwardToWarehouse() {
@@ -2445,7 +2464,8 @@
                 const opt = document.createElement("option");
                 opt.value = p.id;
                 const colorTxt = (p.color && p.color !== "-") ? ` [${p.color}]` : "";
-                opt.innerText = `${p.id} - ${p.name}${colorTxt} (${Number(p.price).toLocaleString('tr-TR')} ₺)`;
+                // Depo ekranında ürün fiyatları gizli
+                opt.innerText = `${p.id} - ${p.name}${colorTxt}`;
                 sel.appendChild(opt);
             });
 
@@ -2524,6 +2544,7 @@
             const isSaha = currentUser && currentUser.roleId === 'saha';
             const isAtStep3 = activeOrder && activeOrder.currentStep === 3;
             const canEditSaha = isAdmin || (isSaha && isAtStep3);
+            const showPrices = currentUser && currentUser.canSeePrices === true;
 
             const lockAlert = document.getElementById("step3-lock-alert");
             if (lockAlert) lockAlert.style.display = (!canEditSaha && !isAdmin) ? "flex" : "none";
@@ -2558,11 +2579,12 @@
                     activeOrder.extras.forEach((ext, index) => {
                         const div = document.createElement("div");
                         div.className = "flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 text-xs";
+                        const priceLabel = showPrices ? ` x ${Number(ext.price).toLocaleString('tr-TR')} ₺` : '';
                         div.innerHTML = `
                             <div>
                                 <div class="font-mono text-[10px] text-slate-400 font-bold">${ext.id}</div>
                                 <div class="font-bold text-slate-900">${ext.name}</div>
-                                <div class="text-[11px] text-emerald-800 font-bold">${ext.qty} Adet x ${Number(ext.price).toLocaleString('tr-TR')} ₺</div>
+                                <div class="text-[11px] text-emerald-800 font-bold">${ext.qty} Adet${priceLabel}</div>
                             </div>
                             <div class="flex items-center space-x-2">
                                 <label class="flex items-center space-x-1.5 text-[11px] font-bold ${ext.faikApproval ? 'text-emerald-800' : 'text-amber-800'}">
@@ -2763,11 +2785,13 @@
             const s3 = document.getElementById("step3-extra-select");
             if (!s3) return;
             s3.innerHTML = "";
+            const showPrices = currentUser && currentUser.canSeePrices === true;
             masterProducts.slice(0, 50).forEach(p => {
                 const opt3 = document.createElement("option");
                 opt3.value = p.id;
                 const cTxt = p.color && p.color !== "-" ? ` [Renk: ${p.color}]` : "";
-                opt3.innerText = `${p.id} - ${p.name}${cTxt} (${Number(p.price).toLocaleString('tr-TR')} ₺)`;
+                const priceTxt = showPrices ? ` (${Number(p.price).toLocaleString('tr-TR')} ₺)` : "";
+                opt3.innerText = `${p.id} - ${p.name}${cTxt}${priceTxt}`;
                 s3.appendChild(opt3);
             });
         }
