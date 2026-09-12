@@ -781,7 +781,7 @@
                         <span>Buluta Gönder & Tüm Cihazlara Eşitle</span>
                     </button>
 
-                    <button type="button" onclick="exportCatalogAsBackup()" class="px-3.5 py-2 bg-slate-800 hover:bg-black text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5 cursor-pointer">
+                    <button type="button" onclick="exportCatalogAsBackup()" class="px-3.5 py-2 bg-slate-800 hover:bg-black text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5 cursor-pointer" title="Kataloğu Excel olarak yedekler">
                         <i class="fa-solid fa-download"></i>
                         <span>Yedek İndir (.xlsx)</span>
                     </button>
@@ -1204,10 +1204,20 @@
             try {
                 db.collection("catalog_items").onSnapshot((snapshot) => {
                     if (snapshot && !snapshot.empty) {
-                        const cloudProds = [];
+                        const cloudMap = new Map();
                         snapshot.forEach((doc) => {
-                            cloudProds.push(doc.data());
+                            const data = doc.data();
+                            // KESİN DEDUP: Sadece stok_renk bazlı benzersiz kayıtlar
+                            const uniqueKey = `${String(data.id || '').trim().toLowerCase()}_${String(data.color || 'STANDART').trim()}`;
+                            cloudMap.set(uniqueKey, {
+                                key: uniqueKey,
+                                id: String(data.id || '').trim(),
+                                name: String(data.name || '').trim(),
+                                color: normalizeColorCode(data.color),
+                                price: parseFloat(data.price) || 0
+                            });
                         });
+                        const cloudProds = Array.from(cloudMap.values());
                         if (cloudProds.length > 0) {
                             masterProducts = cloudProds;
                             saveCatalogToLocalDBOnly(masterProducts);
@@ -1230,6 +1240,17 @@
                 return;
             }
             showToast("Tüm tekil ürün varyantları buluta eşitleniyor...");
+            
+            // Buluttaki eski koleksiyonu temizleyip sadece güncel tekil listeyi yaz
+            if (db) {
+                try {
+                    const snap = await db.collection("catalog_items").get();
+                    const batch = db.batch();
+                    snap.forEach(doc => batch.delete(doc.ref));
+                    await batch.commit();
+                } catch(e) {}
+            }
+
             await syncCatalogToCloudBatch(masterProducts);
             showToast(`Başarıyla ${masterProducts.length} adet tekil varyant buluta eşitlendi!`);
         }
@@ -1242,13 +1263,14 @@
                     const chunk = productsList.slice(i, i + batchLimit);
                     const batch = db.batch();
                     chunk.forEach((p) => {
-                        const safeKey = p.key || `${String(p.id).trim().toLowerCase()}_${normalizeColorCode(p.color) || 'STANDART'}`;
+                        const normColor = normalizeColorCode(p.color);
+                        const safeKey = `${String(p.id).trim().toLowerCase()}_${normColor || 'STANDART'}`.replace(/[\/\#\$\[\]\s]/g, "_");
                         const ref = db.collection("catalog_items").doc(safeKey);
                         batch.set(ref, {
                             key: safeKey,
                             id: String(p.id).trim(),
                             name: String(p.name || '').trim(),
-                            color: normalizeColorCode(p.color),
+                            color: normColor,
                             price: parseFloat(p.price) || 0
                         });
                     });
@@ -1265,10 +1287,10 @@
                     const idb = await openCatalogDB();
                     const tx = idb.transaction(CATALOG_STORE_NAME, "readwrite");
                     const store = tx.objectStore(CATALOG_STORE_NAME);
-                    store.clear();
+                    store.clear(); // Eski tüm verileri sil, temiz başla
                     productsList.forEach((p) => {
                         const normColor = normalizeColorCode(p.color);
-                        const safeKey = p.key || `${String(p.id).trim().toLowerCase()}_${normColor || 'STANDART'}`;
+                        const safeKey = `${String(p.id).trim().toLowerCase()}_${normColor || 'STANDART'}`;
                         store.put({
                             key: safeKey,
                             id: String(p.id).trim(),
@@ -1475,9 +1497,9 @@
             }
         }
 
-        // ================= KATALOG MOTORU (TEKİL VARYANTLAR) =================
-        const CATALOG_DB_NAME = "CinpaOfficialCatalog_v6";
-        const CATALOG_STORE_NAME = "catalog_variants_dedup";
+        // ================= KATALOG MOTORU =================
+        const CATALOG_DB_NAME = "CinpaOfficialCatalog_v7";
+        const CATALOG_STORE_NAME = "catalog_variants_strict_dedup";
 
         function openCatalogDB() {
             return new Promise((resolve, reject) => {
@@ -1502,7 +1524,13 @@
 
                 req.onsuccess = () => {
                     if (req.result && req.result.length > 0) {
-                        masterProducts = req.result;
+                        // Bellekte de kesinlikle tekilleştir
+                        const map = new Map();
+                        req.result.forEach(p => {
+                            const k = p.key || `${String(p.id).trim().toLowerCase()}_${normalizeColorCode(p.color) || 'STANDART'}`;
+                            map.set(k, { key: k, id: p.id, name: p.name, color: normalizeColorCode(p.color), price: p.price });
+                        });
+                        masterProducts = Array.from(map.values());
                     } else if (masterProducts.length === 0) {
                         masterProducts = [
                             { key: "0109024_1001", id: "0109024", name: "YUCCA BUSH", color: "1001", price: 860 },
@@ -1553,11 +1581,11 @@
             showToast(`${name} (${color || 'Standart'}) kaydedildi!`);
         }
 
-        // ================= KESİN MÜKERRER TEMİZLEYİCİ EXCEL YÜKLEYİCİ =================
+        // ================= KESİN TEKİLLEŞTİRİLMİŞ EXCEL YÜKLEYİCİ =================
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Katalog dosyası okunuyor, mükerrer kayıtlar temizleniyor...");
+            showToast("Katalog dosyası okunuyor, mükerrer kayıtlar tamamen temizleniyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -1609,7 +1637,7 @@
                         if (priceCol === -1) priceCol = 3;
                     }
 
-                    // MAP İLE AYNİ ÜRÜN VE RENK KOMBİNASYONU KESİNLİKLE TEKİL YAPILIR
+                    // Map kullanarak aynı ürün ve renk kombinasyonunu kesinlikle tekil yapıyoruz
                     let uniqueMap = new Map();
 
                     for (let i = startRow; i < rawData.length; i++) {
@@ -1628,7 +1656,7 @@
                         let price = parseFloat(cleanPrice) || 0;
                         let normColor = normalizeColorCode(color);
 
-                        // KESİN TEKİL ANAHTAR (StokKodu + RenkKodu)
+                        // BİRİNCİL TEKİL ANAHTAR
                         const safeKey = `${String(code || 'URUN').trim().toLowerCase()}_${normColor || 'STANDART'}`;
 
                         uniqueMap.set(safeKey, {
@@ -2547,7 +2575,7 @@
                 id: code, name: name, color: color, requestedQty: qty, dispatchedQty: qty, returnedQty: 0, price: price, warehouseNote: "", checked: true
             });
             if (saveMaster) {
-                const safeKey = `${code}_${color || 'STANDART'}`;
+                const safeKey = `${String(code).trim().toLowerCase()}_${color || 'STANDART'}`;
                 const existingIdx = masterProducts.findIndex(x => x.key === safeKey);
                 const newObj = { key: safeKey, id: code, name: name, color: color, price: price };
                 if (existingIdx >= 0) masterProducts[existingIdx] = newObj;
@@ -2993,7 +3021,7 @@
 
         async function finalizeAndCloseOrder() {
             if (!activeOrder) return;
-            const c1 = confirm(`1. ONAY:\n\n"${activeOrder.id} - ${activeOrder.customer}" dosyasını faturalandırmak istediğinize emin misiniz?`);
+            const c1 = confirm(`1. ONAY:\n\n"${activeOrder.id} - ${activeOrder.customer}" dosyasını faturalandırmak istediğinize emin misiniz?` );
             if (!c1) return;
 
             const c2 = confirm(`2. KESİN ONAY:\n\nCariye işlenecek ve dosya kalıcı olarak KAPATILACAKTIR. Onaylıyor musunuz?`);
