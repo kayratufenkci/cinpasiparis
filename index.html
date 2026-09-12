@@ -1064,11 +1064,9 @@
 
             const orderLabel = `${targetOrder.id} - ${targetOrder.customer}`;
 
-            // 1. ONAY
             const confirm1 = confirm(`1. ONAY:\n\n"${orderLabel}" fişini sistemden silmek istediğinize emin misiniz?`);
             if (!confirm1) return;
 
-            // 2. KESİN ONAY
             const confirm2 = confirm(`2. KESİN ONAY:\n\nBu işlem GERİ ALINAMAZ!\n\n"${targetOrder.id}" nolu fiş ve tüm hareketleri buluttan kalıcı olarak silinecektir. Onaylıyor musunuz?`);
             if (!confirm2) return;
 
@@ -2170,7 +2168,6 @@
             document.getElementById("detail-order-date").innerText = activeOrder.date;
             document.getElementById("step1-sales-rep").innerText = activeOrder.salesRep;
 
-            // Fiyat görme yetkisi olmayan roller için buton ve kolon kontrolü
             const showPrices = currentUser.canSeePrices === true;
             const btnSiparis = document.getElementById("btn-action-export-siparis");
             if (btnSiparis) {
@@ -2319,11 +2316,19 @@
             }
         }
 
+        // ================= SATIŞ: ÇİFT ONAYLI DEPOYA İLET =================
         async function forwardToWarehouse() {
             if (!activeOrder.items || activeOrder.items.length === 0) {
                 showToast("Lütfen önce fişe en az bir ürün ekleyiniz.", true);
                 return;
             }
+
+            const c1 = confirm(`1. ONAY:\n\n"${activeOrder.customer}" siparişini depoya aktarmak istiyor musunuz?\n\nFiş kilitlenecek ve düzenleme depoya devredilecektir.`);
+            if (!c1) return;
+
+            const c2 = confirm(`2. KESİN ONAY:\n\nSipariş kalemlerini eksiksiz girdiğinizi onaylıyor musunuz? Depocu Kamber Usta toplama işlemine başlayacaktır.`);
+            if (!c2) return;
+
             activeOrder.currentStep = 2;
             await syncOrderToCloud(activeOrder);
             showToast("Sipariş depoya iletildi ve canlı buluta kaydedildi!");
@@ -2571,7 +2576,15 @@
         async function updateStep2Dispatched(index, val) { activeOrder.items[index].dispatchedQty = parseInt(val) || 0; await syncOrderToCloud(activeOrder); }
         async function updateStep2Note(index, val) { activeOrder.items[index].warehouseNote = val; await syncOrderToCloud(activeOrder); }
 
+        // ================= DEPO: ÇİFT ONAYLI SEVKE İLERLET =================
         async function forwardFromWarehouse() {
+            const c1 = confirm(`1. ONAY:\n\nDepo sayımı ve kolileme tamamlandı mı?\n\nBu fiş için Sevk İrsaliyesi kesilecek.`);
+            if (!c1) return;
+
+            const targetText = (activeOrder.hasApplication !== false) ? "Saha Ekibine (Sefa Usta)" : "doğrudan Muhasebeye (Gökhan)";
+            const c2 = confirm(`2. KESİN ONAY:\n\nÜrünlerin fiziki olarak araca yüklendiğini ve sevk miktarını onaylıyor musunuz?\n\nEvrak ${targetText} devredilecektir.`);
+            if (!c2) return;
+
             if (activeOrder.hasApplication !== false) {
                 activeOrder.currentStep = 3;
                 await syncOrderToCloud(activeOrder);
@@ -2694,8 +2707,16 @@
             showToast("İlave ürün talebi silindi.");
         }
 
+        // ================= SAHA: ÇİFT ONAYLI MUHASEBEYE GÖNDER =================
         async function forwardToAccounting() {
             if (!activeOrder) return;
+
+            const c1 = confirm(`1. ONAY:\n\nSaha montajı ve uygulama tamamen bitti mi?\n\nEvraklar Muhasebeye (Gökhan) faturalandırma için devredilecektir.`);
+            if (!c1) return;
+
+            const c2 = confirm(`2. KESİN ONAY:\n\nArtan iade adetleri ile Faik Bey onaylı ek talepleri tam olarak işlediğinizi onaylıyor musunuz?`);
+            if (!c2) return;
+
             activeOrder.currentStep = 4;
             await syncOrderToCloud(activeOrder);
             showToast("Montaj tamamlandı ve dosya Muhasebeye (Gökhan) iletildi!");
@@ -2824,7 +2845,12 @@
 
         async function finalizeAndCloseOrder() {
             if (!activeOrder) return;
-            if (!confirm(`"${activeOrder.id} - ${activeOrder.customer}" dosyasını faturalandırıp kapatmak istediğinize emin misiniz?`)) return;
+            const c1 = confirm(`1. ONAY:\n\n"${activeOrder.id} - ${activeOrder.customer}" dosyasını faturalandırmak istediğinize emin misiniz?`);
+            if (!c1) return;
+
+            const c2 = confirm(`2. KESİN ONAY:\n\nCariye işlenecek ve dosya kalıcı olarak KAPATILACAKTIR. Onaylıyor musunuz?`);
+            if (!c2) return;
+
             activeOrder.currentStep = 5;
             activeOrder.isClosed = true;
             await syncOrderToCloud(activeOrder);
