@@ -49,7 +49,7 @@
         <span id="toast-msg" class="pointer-events-none"></span>
     </div>
 
-    <!-- ================= 1. GİRİŞ EKRANI ================= -->
+    <!-- ================= 1. GİRİŞ EKRANI (SADELEŞTİRİLMİŞ) ================= -->
     <section id="view-login" class="min-h-screen flex items-center justify-center p-4 bg-slate-950 bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950">
         <div class="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl space-y-6 border border-emerald-100">
             <div class="text-center space-y-2">
@@ -78,7 +78,6 @@
                                     <span>Satış Uzmanı Girişi</span>
                                     <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
                                 </div>
-                                <div class="text-[11px] text-slate-500 font-medium">Sadece kendi siparişlerinizi görürsünüz</div>
                             </div>
                         </div>
                         <div class="flex items-center space-x-2 pt-1">
@@ -107,7 +106,6 @@
                                     <span>Depocu (Kamber Usta)</span>
                                     <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
                                 </div>
-                                <div class="text-[11px] text-slate-500 font-medium">Fiyatsız Sevk & İkame Masasını Görür</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs pointer-events-none"></i>
@@ -124,7 +122,6 @@
                                     <span>Saha Ekibi (Sefa Usta)</span>
                                     <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
                                 </div>
-                                <div class="text-[11px] text-slate-500 font-medium">Yalnızca montaj işlerini fiyatsız görür</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs pointer-events-none"></i>
@@ -141,7 +138,6 @@
                                     <span>Muhasebe (Gökhan)</span>
                                     <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
                                 </div>
-                                <div class="text-[11px] text-slate-500 font-medium">Depo/Saha Onaylı Fişleri Görür, Düzenler & Silebilir</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs pointer-events-none"></i>
@@ -158,7 +154,6 @@
                                     <span>Sistem Yöneticisi (Admin)</span>
                                     <i class="fa-solid fa-lock text-[10px] text-emerald-300"></i>
                                 </div>
-                                <div class="text-[11px] text-emerald-200 font-medium">Tam Yetki, Düzenleme & Silme</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-arrow-right-to-bracket text-emerald-300 text-xs pointer-events-none"></i>
@@ -1524,7 +1519,6 @@
                         let color = String(row[colorCol] !== undefined ? row[colorCol] : '').trim();
                         let rawPrice = row[priceCol] !== undefined ? row[priceCol] : 0;
 
-                        // Tamamen boş satırları ve başlık tekrarını atla
                         if (!code && !name) continue;
                         if (code.toLowerCase() === 'itemcode' || code.toLowerCase() === 'stok kodu') continue;
 
@@ -1532,7 +1526,6 @@
                         let price = parseFloat(cleanPrice) || 0;
                         let normColor = normalizeColorCode(color);
 
-                        // HİÇBİR SATIRIN BİRBİRİNİ EZMEMESİ İÇİN SATIR İNDEKSİYLE BENZERSİZ KEY
                         const safeKey = `${code || 'URUN'}_${normColor || 'STANDART'}_${i}`;
 
                         newProducts.push({
@@ -2065,6 +2058,7 @@
             document.getElementById("role-avatar-box").className = `w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold ${currentUser.avatarBg}`;
             document.getElementById("role-avatar-icon").className = `fa-solid ${currentUser.avatarIcon}`;
 
+            // Butonların görünürlüğü
             document.getElementById("btn-header-new-order").style.display = currentUser.canCreateOrder ? "flex" : "none";
             document.getElementById("btn-header-import-excel").style.display = currentUser.canCreateOrder ? "flex" : "none";
             document.getElementById("btn-header-catalog").style.display = currentUser.canManageCatalog ? "flex" : "none";
