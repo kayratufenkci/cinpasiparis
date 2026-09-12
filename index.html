@@ -1229,9 +1229,9 @@
                 showToast("Buluta aktarılacak ürün bulunamadı!", true);
                 return;
             }
-            showToast("Tüm ürün varyantları buluta eşitleniyor...");
+            showToast("Tüm tekil ürün varyantları buluta eşitleniyor...");
             await syncCatalogToCloudBatch(masterProducts);
-            showToast(`Başarıyla ${masterProducts.length} adet renk varyantı buluta eşitlendi!`);
+            showToast(`Başarıyla ${masterProducts.length} adet tekil varyant buluta eşitlendi!`);
         }
 
         async function syncCatalogToCloudBatch(productsList) {
@@ -1241,8 +1241,8 @@
                 for (let i = 0; i < productsList.length; i += batchLimit) {
                     const chunk = productsList.slice(i, i + batchLimit);
                     const batch = db.batch();
-                    chunk.forEach((p, idx) => {
-                        const safeKey = p.key ? String(p.key).replace(/[\/\#\$\[\]\s]/g, "_") : `CNP_${i + idx}`;
+                    chunk.forEach((p) => {
+                        const safeKey = p.key || `${String(p.id).trim().toLowerCase()}_${normalizeColorCode(p.color) || 'STANDART'}`;
                         const ref = db.collection("catalog_items").doc(safeKey);
                         batch.set(ref, {
                             key: safeKey,
@@ -1266,9 +1266,9 @@
                     const tx = idb.transaction(CATALOG_STORE_NAME, "readwrite");
                     const store = tx.objectStore(CATALOG_STORE_NAME);
                     store.clear();
-                    productsList.forEach((p, idx) => {
+                    productsList.forEach((p) => {
                         const normColor = normalizeColorCode(p.color);
-                        const safeKey = p.key || `${String(p.id).trim()}_${normColor || 'STANDART'}_${idx}`;
+                        const safeKey = p.key || `${String(p.id).trim().toLowerCase()}_${normColor || 'STANDART'}`;
                         store.put({
                             key: safeKey,
                             id: String(p.id).trim(),
@@ -1475,9 +1475,9 @@
             }
         }
 
-        // ================= KATALOG MOTORU =================
-        const CATALOG_DB_NAME = "CinpaOfficialCatalog_v5";
-        const CATALOG_STORE_NAME = "catalog_variants_unique";
+        // ================= KATALOG MOTORU (TEKİL VARYANTLAR) =================
+        const CATALOG_DB_NAME = "CinpaOfficialCatalog_v6";
+        const CATALOG_STORE_NAME = "catalog_variants_dedup";
 
         function openCatalogDB() {
             return new Promise((resolve, reject) => {
@@ -1532,11 +1532,9 @@
 
             if (!name) { showToast("Lütfen ürün adını yazınız.", true); return; }
 
-            // BİRİNCİL TEKİL ANAHTAR: ÜRÜN KODU + RENK KODU
             const safeKey = `${String(code).trim().toLowerCase()}_${color || 'STANDART'}`;
             const newProd = { key: safeKey, id: code, name: name, color: color, price: price };
             
-            // Eğer aynı ürün ve renk zaten varsa güncelle, yoksa başa ekle
             const existingIdx = masterProducts.findIndex(p => p.key === safeKey);
             if (existingIdx >= 0) {
                 masterProducts[existingIdx] = newProd;
@@ -1555,11 +1553,11 @@
             showToast(`${name} (${color || 'Standart'}) kaydedildi!`);
         }
 
-        // ================= MÜKERRER KAYITLARI TEMİZLEYEN EXCEL YÜKLEYİCİ =================
+        // ================= KESİN MÜKERRER TEMİZLEYİCİ EXCEL YÜKLEYİCİ =================
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Katalog dosyası okunuyor, mükerrer satırlar filtreleniyor...");
+            showToast("Katalog dosyası okunuyor, mükerrer kayıtlar temizleniyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -1611,7 +1609,7 @@
                         if (priceCol === -1) priceCol = 3;
                     }
 
-                    // MÜKERRERLERİ ENGELLEMEK İÇİN MAP KULLANILIR (ÜRÜNKODU + RENKKODU TEKİL OLUR)
+                    // MAP İLE AYNİ ÜRÜN VE RENK KOMBİNASYONU KESİNLİKLE TEKİL YAPILIR
                     let uniqueMap = new Map();
 
                     for (let i = startRow; i < rawData.length; i++) {
@@ -1630,7 +1628,7 @@
                         let price = parseFloat(cleanPrice) || 0;
                         let normColor = normalizeColorCode(color);
 
-                        // KESİN TEKİL ANAHTAR (AYNİ ÜRÜN VE RENK İKİNCİ KEZ EKLENEMEZ)
+                        // KESİN TEKİL ANAHTAR (StokKodu + RenkKodu)
                         const safeKey = `${String(code || 'URUN').trim().toLowerCase()}_${normColor || 'STANDART'}`;
 
                         uniqueMap.set(safeKey, {
@@ -1650,7 +1648,7 @@
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
                         populateProductSelects();
-                        showToast(`Başarıyla ${newProducts.length} tekil ürün varyantı yüklendi!`);
+                        showToast(`Başarıyla ${newProducts.length} adet tekil ürün varyantı yüklendi!`);
                     } else {
                         showToast("Excel'den geçerli ürün satırı okunamadı!", true);
                     }
