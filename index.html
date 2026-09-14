@@ -373,7 +373,7 @@
                                 <thead class="bg-emerald-50/60 text-emerald-900 text-xs font-bold uppercase border-b border-emerald-100">
                                     <tr>
                                         <th class="p-3.5">Ürün Kodu & Tanımı</th>
-                                        <th class="p-3.5 text-center w-36 bg-emerald-100/60 text-emerald-950">Renk Adı (Kodu)</th>
+                                        <th class="p-3.5 text-center w-32 bg-emerald-100/60 text-emerald-950 font-extrabold">Renk Kodu</th>
                                         <th class="p-3.5 text-center w-32">Talep Adedi</th>
                                         <th class="p-3.5 text-right w-36 step1-price-col">Birim Fiyat (TL)</th>
                                         <th class="p-3.5 text-right w-36 step1-price-col">Toplam Tutar</th>
@@ -399,12 +399,12 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
                                     <div class="sm:col-span-6">
                                         <label class="block text-[11px] font-bold text-slate-500 mb-1">Katalogda Ürün Ara (Kod, İsim veya Renk Adı/Kodu Yazın)</label>
-                                        <input type="text" id="step1-product-search" oninput="searchCatalogDropdown(this.value)" placeholder="Örn: 0103644 veya KASIMPATI veya KIRMIZI..." class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white mb-2">
+                                        <input type="text" id="step1-product-search" oninput="searchCatalogDropdown(this.value)" placeholder="Örn: 0103644 veya KASIMPATI veya 1003..." class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white mb-2">
                                         <select id="step1-select-product" onchange="syncSelectedCatalogDetails()" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white"></select>
                                     </div>
                                     <div class="sm:col-span-2">
-                                        <label class="block text-[11px] font-bold text-emerald-900 mb-1">Renk Kodu / Adı</label>
-                                        <input type="text" id="step1-catalog-color" placeholder="Örn: 1007 veya MOR" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-400 bg-emerald-50 text-center">
+                                        <label class="block text-[11px] font-bold text-emerald-900 mb-1">Renk Kodu</label>
+                                        <input type="text" id="step1-catalog-color" placeholder="Örn: 1007" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-400 bg-emerald-50 text-center font-mono">
                                     </div>
                                     <div class="sm:col-span-2">
                                         <label class="block text-[11px] font-bold text-slate-500 mb-1">Birim Fiyat (TL)</label>
@@ -432,8 +432,8 @@
                                     <input type="text" id="manual-name" placeholder="Örn: YUCCA BUSH" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white">
                                 </div>
                                 <div class="sm:col-span-2">
-                                    <label class="block text-[11px] font-bold text-emerald-900 mb-1">Renk Kodu / Adı</label>
-                                    <input type="text" id="manual-color" placeholder="Örn: 1016 veya BEYAZ" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-400 bg-emerald-50 text-center">
+                                    <label class="block text-[11px] font-bold text-emerald-900 mb-1">Renk Kodu</label>
+                                    <input type="text" id="manual-color" placeholder="Örn: 1016" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-400 bg-emerald-50 text-center font-mono">
                                 </div>
                                 <div class="sm:col-span-2">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Fiyat (TL)</label>
@@ -488,7 +488,7 @@
                                     <tr>
                                         <th class="p-3.5 w-12 text-center">Toplandı</th>
                                         <th class="p-3.5">Talep Edilen Ürün</th>
-                                        <th class="p-3.5 text-center w-36 bg-emerald-100/60 text-emerald-950">Renk Adı (Kodu)</th>
+                                        <th class="p-3.5 text-center w-32 bg-emerald-100/60 text-emerald-950 font-extrabold">Renk Kodu</th>
                                         <th class="p-3.5 text-center">Sipariş Miktarı</th>
                                         <th class="p-3.5 text-center w-36">Fiili Sevk Miktarı</th>
                                         <th class="p-3.5">Depo Hazırlık & İkame Notu</th>
@@ -506,13 +506,13 @@
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
                                 <div class="sm:col-span-6">
-                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Katalogda Ürün Ara (Kod, Ad veya Renk Adı/Kodu Yazın)</label>
-                                    <input type="text" id="depo-product-search" oninput="searchDepoCatalogDropdown(this.value)" placeholder="Örn: 0103644 veya KASIMPATI veya KIRMIZI..." class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white mb-2">
+                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Katalogda Ürün Ara (Kod, İsim veya Renk Adı/Kodu Yazın)</label>
+                                    <input type="text" id="depo-product-search" oninput="searchDepoCatalogDropdown(this.value)" placeholder="Örn: 0103644 veya KASIMPATI veya 1007..." class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white mb-2">
                                     <select id="depo-select-product" onchange="syncDepoSelectedColor()" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white"></select>
                                 </div>
                                 <div class="sm:col-span-2">
-                                    <label class="block text-[11px] font-bold text-emerald-900 mb-1">Renk Kodu / Adı</label>
-                                    <input type="text" id="depo-add-color" placeholder="Örn: 1007 veya MOR" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-400 bg-emerald-50 text-center">
+                                    <label class="block text-[11px] font-bold text-emerald-900 mb-1">Renk Kodu</label>
+                                    <input type="text" id="depo-add-color" placeholder="Örn: 1007" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-400 bg-emerald-50 text-center font-mono">
                                 </div>
                                 <div class="sm:col-span-2">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Adet</label>
@@ -626,7 +626,7 @@
                                 <thead class="bg-emerald-900 text-white text-xs font-bold uppercase tracking-wider">
                                     <tr>
                                         <th class="p-3.5">Ürün / Kalem Açıklaması</th>
-                                        <th class="p-3.5 text-center w-36 bg-emerald-950 text-emerald-200">Renk Adı (Kodu)</th>
+                                        <th class="p-3.5 text-center w-32 bg-emerald-950 text-emerald-200 font-extrabold">Renk Kodu</th>
                                         <th class="p-3.5 text-center">İlk Sipariş</th>
                                         <th class="p-3.5 text-center">Sevk Edilen</th>
                                         <th class="p-3.5 text-center">İade</th>
@@ -706,7 +706,7 @@
                     <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/40 rounded-2xl p-5 text-center cursor-pointer hover:bg-emerald-50 transition" onclick="document.getElementById('excel-file-input').click()">
                         <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-600 mb-1"></i>
                         <div class="text-xs font-extrabold text-slate-800">Bilgisayardan Excel Fişini Seçmek İçin Tıklayın</div>
-                        <div class="text-[11px] text-slate-500">Ürün kodu, renk, net miktar ve fiyatlar otomatik işlenir.</div>
+                        <div class="text-[11px] text-slate-500">Ürün kodu, renk kodu, net miktar ve fiyatlar otomatik işlenir.</div>
                         <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleExcelFileUpload(event)">
                     </div>
                 </div>
@@ -729,7 +729,7 @@
                             <tr>
                                 <th class="p-2">Ürün Kodu</th>
                                 <th class="p-2">Ürün Adı</th>
-                                <th class="p-2 text-center bg-emerald-100 text-emerald-950 font-extrabold">Renk</th>
+                                <th class="p-2 text-center bg-emerald-100 text-emerald-950 font-extrabold">Renk Kodu</th>
                                 <th class="p-2 text-center">Miktar (Qty1)</th>
                                 <th class="p-2 text-right">Birim Fiyat</th>
                             </tr>
@@ -758,7 +758,7 @@
                     </div>
                     <div>
                         <h3 class="text-base font-extrabold text-slate-900">ÇİNPA Ürün Kataloğu & Bulut Listesi</h3>
-                        <p class="text-xs text-slate-500">Color.xlsx resmi renk eşleşmeleriyle listelenir.</p>
+                        <p class="text-xs text-slate-500">Color.xlsx kodlarıyla tüm varyantlar listelenir.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeCatalogModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
@@ -801,14 +801,14 @@
             <div class="flex items-center space-x-3">
                 <div class="relative flex-1">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                    <input type="text" id="cat-search-input" onkeyup="filterCatalogTable()" placeholder="Katalogda ürün kodu, adı veya renk adı ara..." class="w-full text-xs pl-9 pr-3 py-2.5 rounded-xl border border-emerald-200 bg-slate-50 focus:bg-white">
+                    <input type="text" id="cat-search-input" onkeyup="filterCatalogTable()" placeholder="Katalogda ürün kodu, adı veya renk kodu ara..." class="w-full text-xs pl-9 pr-3 py-2.5 rounded-xl border border-emerald-200 bg-slate-50 focus:bg-white">
                 </div>
             </div>
 
             <div class="bg-slate-50 p-4 rounded-2xl border border-emerald-100 grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
                 <input type="text" id="cat-new-code" placeholder="Kod (Örn: 0103644)" class="sm:col-span-3 p-2.5 rounded-xl border border-slate-300 font-bold bg-white">
                 <input type="text" id="cat-new-name" placeholder="Ürün Tanımı (Örn: KASIMPATI 72 CM)" class="sm:col-span-4 p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
-                <input type="text" id="cat-new-color" placeholder="Renk Kodu / Adı (Örn: MOR)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 bg-white font-medium text-center">
+                <input type="text" id="cat-new-color" placeholder="Renk Kodu (Örn: 1007)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 bg-white font-medium text-center font-mono">
                 <input type="number" id="cat-new-price" placeholder="Fiyat (TL)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 font-bold bg-white text-right">
                 <button type="button" onclick="saveProductToMasterCatalog()" class="sm:col-span-1 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl transition cursor-pointer">+ Ekle</button>
             </div>
@@ -820,7 +820,7 @@
                             <th class="p-3 w-10 text-center"><input type="checkbox" id="select-all-catalog" onchange="toggleSelectAllCatalog(this.checked)" class="w-4 h-4 text-emerald-700 rounded cursor-pointer"></th>
                             <th class="p-3">Ürün Kodu</th>
                             <th class="p-3">Ürün Adı</th>
-                            <th class="p-3 text-center bg-emerald-50 text-emerald-950">Renk Adı (Kodu)</th>
+                            <th class="p-3 text-center bg-emerald-50 text-emerald-950 font-extrabold">Renk Kodu</th>
                             <th class="p-3 text-right">Toptan Fiyat</th>
                             <th class="p-3 text-center w-16">Sil</th>
                         </tr>
@@ -884,43 +884,14 @@
     <script>
         // COLOR.XLSX RESMİ 37 NEBİM RENK ADLARI VE KODLARI
         const OFFICIAL_CODE_TO_NAME = {
-            "1000": "AÇIK YEŞİL",
-            "1001": "KOYU YEŞİL",
-            "1002": "YEŞİL",
-            "1003": "KIRMIZI",
-            "1004": "PEMBE",
-            "1005": "TURUNCU",
-            "1006": "SARI",
-            "1007": "MOR",
-            "1008": "MAVİ",
-            "1009": "BORDO",
-            "1010": "GRİ",
-            "1011": "KAHVERENGİ",
-            "1012": "YEŞİL-BEYAZ",
-            "1013": "YEŞİL-SARI",
-            "1014": "KREM",
-            "1015": "LİLA",
-            "1016": "BEYAZ",
-            "1017": "KOYU PEMBE",
-            "1018": "ANTRASİT",
-            "1019": "AÇIK KAHVERENGİ",
-            "1020": "KOYU KAHVERENGİ",
-            "1021": "AÇIK MOR",
-            "1022": "KOYU MOR",
-            "1023": "AÇIK PEMBE",
-            "1024": "SİYAH",
-            "1025": "SARI-YEŞİL",
-            "1026": "SOMON",
-            "1027": "KAHVE YEŞİL",
-            "1028": "GÜMÜŞ",
-            "1029": "AÇIK MAVİ",
-            "1030": "KOYU MAVİ",
-            "1031": "YEŞİL-KIRMIZI",
-            "1032": "FUŞYA",
-            "1033": "AÇIK GRİ",
-            "1034": "KOYU GRİ",
-            "1035": "BEYAZ-PEMBE",
-            "1036": "KOYU FUŞYA"
+            "1000": "AÇIK YEŞİL", "1001": "KOYU YEŞİL", "1002": "YEŞİL", "1003": "KIRMIZI", "1004": "PEMBE",
+            "1005": "TURUNCU", "1006": "SARI", "1007": "MOR", "1008": "MAVİ", "1009": "BORDO",
+            "1010": "GRİ", "1011": "KAHVERENGİ", "1012": "YEŞİL-BEYAZ", "1013": "YEŞİL-SARI", "1014": "KREM",
+            "1015": "LİLA", "1016": "BEYAZ", "1017": "KOYU PEMBE", "1018": "ANTRASİT", "1019": "AÇIK KAHVERENGİ",
+            "1020": "KOYU KAHVERENGİ", "1021": "AÇIK MOR", "1022": "KOYU MOR", "1023": "AÇIK PEMBE", "1024": "SİYAH",
+            "1025": "SARI-YEŞİL", "1026": "SOMON", "1027": "KAHVE YEŞİL", "1028": "GÜMÜŞ", "1029": "AÇIK MAVİ",
+            "1030": "KOYU MAVİ", "1031": "YEŞİL-KIRMIZI", "1032": "FUŞYA", "1033": "AÇIK GRİ", "1034": "KOYU GRİ",
+            "1035": "BEYAZ-PEMBE", "1036": "KOYU FUŞYA"
         };
 
         const OFFICIAL_NEBIM_COLORS = {
@@ -952,7 +923,6 @@
             "MOR": "1007", "GRİ": "1010", "GRI": "1010", "RED": "1003"
         };
 
-        // KODU TÜRKÇE YAZILI RENK İSMİNE ÇEVİRİR (ÖRN: 1014 -> KREM)
         function getColorNameFromCode(code) {
             if (!code) return "";
             const cleanCode = String(code).trim();
@@ -1434,7 +1404,7 @@
             }
         }
 
-        const CATALOG_DB_NAME = "CinpaCatalog_2026_NameColorsOfficial";
+        const CATALOG_DB_NAME = "CinpaCatalog_2026_StrictNameColors";
         const CATALOG_STORE_NAME = "catalog";
 
         function openCatalogDB() {
@@ -1523,7 +1493,7 @@
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Katalog dosyası okunuyor, 'İPTAL'ler ayıklanıp renk isimleri atanıyor...");
+            showToast("Katalog dosyası okunuyor, 'İPTAL'ler ayıklanıp renk kodları atanıyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -1833,11 +1803,10 @@
                 const sub = item.requestedQty * item.price;
                 previewTotal += sub;
                 const tr = document.createElement("tr");
-                const colorName = getColorNameFromCode(item.color);
                 tr.innerHTML = `
                     <td class="p-2 font-mono font-bold text-slate-700">${item.id}</td>
                     <td class="p-2 font-medium text-slate-900">${item.name}</td>
-                    <td class="p-2 text-center font-bold text-emerald-800 bg-emerald-50">${colorName || '-'}</td>
+                    <td class="p-2 text-center font-bold text-emerald-800 bg-emerald-50 font-mono">${item.color || '-'}</td>
                     <td class="p-2 text-center font-bold">${item.requestedQty} Adet</td>
                     <td class="p-2 text-right font-bold">${Number(item.price).toLocaleString('tr-TR')} ₺</td>
                 `;
@@ -2373,7 +2342,7 @@
             renderStep1(); renderStep2(); renderStep3(); renderStep4();
         }
 
-        // ================= YAZI İLE RENK GÖSTERME (ÖRN: [KREM], [KIRMIZI]) =================
+        // ÜRÜN ADININ YANINDA RESMİ RENK ADINI YAZDIRIR ([KREM], [KIRMIZI] vb.)
         function formatProductNameWithColor(name, color) {
             const normColor = normalizeColorCode(color, name);
             if (normColor) {
@@ -2412,7 +2381,6 @@
                     const sub = item.requestedQty * itemPr;
                     total += sub;
                     const normColor = normalizeColorCode(item.color, item.name);
-                    const colorName = getColorNameFromCode(normColor);
                     const displayName = formatProductNameWithColor(item.name, item.color);
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
@@ -2420,8 +2388,8 @@
                             <div class="text-xs text-slate-400 font-mono">${item.id || 'ÖZEL'}</div>
                             <div>${displayName}</div>
                         </td>
-                        <td class="p-3.5 text-center">
-                            ${canEdit ? `<input type="text" value="${colorName}" placeholder="Renk Adı / Kodu" onchange="updateStep1Color(${index}, this.value)" class="w-28 text-center font-bold border border-emerald-400 bg-emerald-50 text-emerald-950 rounded p-1 text-xs">` : `<span class="font-bold text-xs bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded">${colorName || '-'}</span>`}
+                        <td class="p-3.5 text-center font-mono font-bold">
+                            ${canEdit ? `<input type="text" value="${normColor}" placeholder="Renk Kodu" onchange="updateStep1Color(${index}, this.value)" class="w-24 text-center font-bold border border-emerald-400 bg-emerald-50 text-emerald-950 rounded p-1 text-xs font-mono">` : `<span class="font-bold text-xs bg-emerald-100 text-emerald-900 px-2.5 py-1 rounded font-mono">${normColor || '-'}</span>`}
                         </td>
                         <td class="p-3.5 text-center">
                             ${canEdit ? `<input type="number" min="1" value="${item.requestedQty}" onchange="updateStep1Qty(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold">${item.requestedQty} Adet</span>`}
@@ -2493,7 +2461,7 @@
                 const normColor = normalizeColorCode(p.color, p.name);
                 const colorName = getColorNameFromCode(normColor);
                 opt.value = p.key;
-                const colorTxt = colorName ? ` [${colorName}]` : " [Standart]";
+                const colorTxt = colorName ? ` [${colorName} - ${normColor}]` : " [Standart]";
                 opt.innerText = `${p.id} - ${p.name}${colorTxt} (${Number(parseCleanPrice(p.price)).toLocaleString('tr-TR')} ₺)`;
                 s1.appendChild(opt);
             });
@@ -2588,7 +2556,7 @@
             showToast("Ürün fişten çıkarıldı.");
         }
 
-        // ================= 2. ADIM: DEPO =================
+        // ================= 2. ADIM: DEPO (İŞARETLİ SÜTUNDA SAYISAL RENK KODU YAZAR) =================
         function renderStep2() {
             const tbody = document.getElementById("step2-items-tbody");
             if (!tbody) return;
@@ -2606,7 +2574,6 @@
             if (activeOrder.items) {
                 activeOrder.items.forEach((item, index) => {
                     const normColor = normalizeColorCode(item.color, item.name);
-                    const colorName = getColorNameFromCode(normColor);
                     const displayName = formatProductNameWithColor(item.name, item.color);
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
@@ -2617,7 +2584,7 @@
                             <div class="inline-block px-1.5 py-0.5 mb-0.5 bg-slate-100 rounded text-slate-600 font-mono text-xs font-black tracking-wider border border-slate-200">${item.id || 'ÖZEL'}</div>
                             <div class="text-sm font-extrabold text-slate-900">${displayName}</div>
                         </td>
-                        <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${colorName || '-'}</td>
+                        <td class="p-3.5 text-center font-mono font-bold text-sm bg-emerald-50 text-emerald-950">${normColor || '-'}</td>
                         <td class="p-3.5 text-center font-bold text-slate-500">${item.requestedQty} Adet</td>
                         <td class="p-3.5 text-center">
                             ${canEditWarehouse ? `<input type="number" min="0" value="${item.dispatchedQty}" onchange="updateStep2Dispatched(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold text-amber-900">${item.dispatchedQty} Adet</span>`}
@@ -2666,7 +2633,7 @@
                 const normColor = normalizeColorCode(p.color, p.name);
                 const colorName = getColorNameFromCode(normColor);
                 opt.value = p.key;
-                const colorTxt = colorName ? ` [${colorName}]` : " [Standart]";
+                const colorTxt = colorName ? ` [${colorName} - ${normColor}]` : " [Standart]";
                 opt.innerText = `${p.id} - ${p.name}${colorTxt}`;
                 sel.appendChild(opt);
             });
@@ -2681,7 +2648,7 @@
             const cInput = document.getElementById("depo-add-color");
             if (cInput && p) {
                 const normColor = normalizeColorCode(p.color, p.name);
-                cInput.value = getColorNameFromCode(normColor);
+                cInput.value = normColor;
             }
         }
 
@@ -2897,7 +2864,6 @@
                     subtotal += lineTotal;
 
                     const normColor = normalizeColorCode(item.color, item.name);
-                    const colorName = getColorNameFromCode(normColor);
                     const displayName = formatProductNameWithColor(item.name, item.color);
 
                     const tr = document.createElement("tr");
@@ -2906,7 +2872,7 @@
                             <div class="text-xs text-slate-400 font-mono">${item.id}</div>
                             <div>${displayName}</div>
                         </td>
-                        <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${colorName || '-'}</td>
+                        <td class="p-3.5 text-center font-mono font-bold text-sm bg-emerald-50 text-emerald-950">${normColor || '-'}</td>
                         <td class="p-3.5 text-center font-medium">${req}</td>
                         <td class="p-3.5 text-center font-medium">${disp}</td>
                         <td class="p-3.5 text-center text-red-700 font-bold">${ret}</td>
@@ -2932,7 +2898,6 @@
                         subtotal += lineTotal;
 
                         const normColor = normalizeColorCode(ext.color, ext.name);
-                        const colorName = getColorNameFromCode(normColor);
                         const displayName = formatProductNameWithColor(ext.name, ext.color);
 
                         const tr = document.createElement("tr");
@@ -2942,7 +2907,7 @@
                                 <div class="text-xs text-emerald-700 font-mono">[İlave Kalem] ${ext.id}</div>
                                 <div>${displayName}</div>
                             </td>
-                            <td class="p-3.5 text-center font-bold text-xs bg-emerald-100 text-emerald-900">${colorName || '-'}</td>
+                            <td class="p-3.5 text-center font-mono font-bold text-sm bg-emerald-100 text-emerald-950">${normColor || '-'}</td>
                             <td class="p-3.5 text-center text-slate-400">-</td>
                             <td class="p-3.5 text-center text-slate-400">-</td>
                             <td class="p-3.5 text-center text-slate-400">-</td>
@@ -3023,7 +2988,7 @@
                 const normColor = normalizeColorCode(p.color, p.name);
                 const colorName = getColorNameFromCode(normColor);
                 opt3.value = p.key;
-                const cTxt = colorName ? ` [${colorName}]` : " [Standart]";
+                const cTxt = colorName ? ` [${colorName} - ${normColor}]` : " [Standart]";
                 const priceTxt = showPrices ? ` (${Number(parseCleanPrice(p.price)).toLocaleString('tr-TR')} ₺)` : "";
                 opt3.innerText = `${p.id} - ${p.name}${cTxt}${priceTxt}`;
                 s3.appendChild(opt3);
@@ -3039,7 +3004,7 @@
                 const cInput = document.getElementById("step1-catalog-color");
                 if (cInput) {
                     const normColor = normalizeColorCode(p.color, p.name);
-                    cInput.value = getColorNameFromCode(normColor);
+                    cInput.value = normColor;
                 }
             }
         }
@@ -3097,14 +3062,12 @@
             list.slice(0, 300).forEach((p, idx) => {
                 const tr = document.createElement("tr");
                 const normColor = normalizeColorCode(p.color, p.name);
-                const colorName = getColorNameFromCode(normColor);
                 const pr = parseCleanPrice(p.price);
-                const colorLabel = colorName ? `${colorName} (${normColor})` : '-';
                 tr.innerHTML = `
                     <td class="p-3 text-center"><input type="checkbox" value="${idx}" class="catalog-row-checkbox w-4 h-4 text-emerald-700 rounded cursor-pointer"></td>
                     <td class="p-3 font-mono font-bold text-slate-900">${p.id}</td>
                     <td class="p-3 font-medium">${p.name}</td>
-                    <td class="p-3 text-emerald-900 font-bold bg-emerald-50 text-center">${colorLabel}</td>
+                    <td class="p-3 text-emerald-950 font-bold bg-emerald-50 text-center font-mono">${normColor || '-'}</td>
                     <td class="p-3 text-right font-bold text-emerald-800">${Number(pr).toLocaleString('tr-TR')} ₺</td>
                     <td class="p-3 text-center"><button type="button" onclick="removeProductByIndex(${idx})" class="text-slate-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>
                 `;
