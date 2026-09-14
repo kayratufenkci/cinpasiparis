@@ -1501,7 +1501,7 @@
         }
 
         // ================= KATALOG MOTORU =================
-        const CATALOG_DB_NAME = "CinpaCatalog_2026_ColorAddedFinal";
+        const CATALOG_DB_NAME = "CinpaCatalog_2026_Ironclad";
         const CATALOG_STORE_NAME = "catalog";
 
         function openCatalogDB() {
@@ -1529,8 +1529,14 @@
                     if (req.result && req.result.length > 0) {
                         const map = new Map();
                         req.result.forEach(p => {
-                            const k = `${String(p.id).trim().toLowerCase()}_${normalizeColorCode(p.color) || 'STANDART'}`;
-                            map.set(k, { key: k, id: p.id, name: p.name, color: normalizeColorCode(p.color), price: parseCleanPrice(p.price) });
+                            const rawId = String(p.id || '').trim();
+                            const rawName = String(p.name || '').trim();
+                            // KESİN KONTROL: Veritabanında eskiden kalmış iptal kelimesi varsa yükleme
+                            const fullCheck = `${rawId} ${rawName}`.toUpperCase();
+                            if (fullCheck.includes('İPTAL') || fullCheck.includes('IPTAL')) return;
+
+                            const k = `${rawId.toLowerCase()}_${normalizeColorCode(p.color) || 'STANDART'}`;
+                            map.set(k, { key: k, id: rawId, name: rawName, color: normalizeColorCode(p.color), price: parseCleanPrice(p.price) });
                         });
                         masterProducts = Array.from(map.values());
                     } else if (masterProducts.length === 0) {
@@ -1561,6 +1567,12 @@
 
             if (!name) { showToast("Lütfen ürün adını yazınız.", true); return; }
 
+            const fullCheck = `${code} ${name}`.toUpperCase();
+            if (fullCheck.includes('İPTAL') || fullCheck.includes('IPTAL')) {
+                showToast("İptal kelimesi içeren ürünler kataloğa eklenemez!", true);
+                return;
+            }
+
             const safeKey = `${String(code).trim().toLowerCase()}_${color || 'STANDART'}`;
             const newProd = { key: safeKey, id: code, name: name, color: color, price: price };
             
@@ -1582,11 +1594,11 @@
             showToast(`${name} (${color || 'Standart'}) kaydedildi!`);
         }
 
-        // ================= KESİN İPTAL FİLTRELİ & RENK EŞLEŞTİRMELİ EXCEL YÜKLEME =================
+        // ================= KESİN KESİN İPTAL FİLTRELİ EXCEL YÜKLEME =================
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Ürün Excel dosyası okunuyor, Color.xlsx kodları işleniyor...");
+            showToast("Ürün Excel dosyası okunuyor, 'İPTAL' kelimesi içeren satırlar tamamen ayıklanıyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -1648,6 +1660,7 @@
                     }
 
                     let uniqueMap = new Map();
+                    let skippedCount = 0;
 
                     for (let i = startRow; i < rawData.length; i++) {
                         let row = rawData[i];
@@ -1655,23 +1668,23 @@
 
                         let code = String(row[codeCol] !== undefined ? row[codeCol] : '').trim();
                         let name = String(row[nameCol] !== undefined ? row[nameCol] : '').trim();
-                        let colorRaw = String(row[colorCol] !== undefined ? row[colorCol] : '').trim();
+                        let color = String(row[colorCol] !== undefined ? row[colorCol] : '').trim();
                         let rawPrice = row[priceCol] !== undefined ? row[priceCol] : 0;
 
                         if (!code && !name) continue;
                         if (code.toLowerCase() === 'itemcode' || code.toLowerCase() === 'stok kodu') continue;
 
-                        // İPTAL FİLTRESİ
-                        const checkText = `${code} ${name}`.toLowerCase();
-                        if (checkText.includes('iptal')) {
-                            continue;
+                        // KESİN İPTAL FİLTRESİ (BÜYÜK/KÜÇÜK HARF DUYARSIZ KONTROL)
+                        const checkString = `${code} ${name} ${color}`.toUpperCase();
+                        if (checkString.includes('İPTAL') || checkString.includes('IPTAL')) {
+                            skippedCount++;
+                            continue; // Bu satırı tamamen atla
                         }
 
                         let price = parseCleanPrice(rawPrice);
-                        // RENKLER COLOR.XLSX TABLOSUNDAN KOD ALIR
-                        let normColor = normalizeColorCode(colorRaw);
+                        let normColor = normalizeColorCode(color);
 
-                        const safeKey = `${String(code || 'URUN').trim().toLowerCase()}_${normColor || 'STANDART'}`;
+                        const safeKey = `${String(code).trim().toLowerCase()}_${normColor || 'STANDART'}`;
 
                         if (!uniqueMap.has(safeKey)) {
                             uniqueMap.set(safeKey, {
@@ -1700,7 +1713,7 @@
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
                         populateProductSelects();
-                        showToast(`Başarıyla ${newProducts.length} adet ürün yüklendi ("İptal" olanlar elendi)!`);
+                        showToast(`Başarıyla ${newProducts.length} adet ürün yüklendi (${skippedCount} adet iptal ürün filtrelendi)!`);
                     } else {
                         showToast("Excel'den geçerli ürün satırı okunamadı!", true);
                     }
@@ -2444,7 +2457,6 @@
             renderStep1(); renderStep2(); renderStep3(); renderStep4();
         }
 
-        // ================= ÜRÜN ADININ YANINDA RENK KODUNUN GÖSTERİLMESİ İÇİN YARDIMCI FONKSİYON =================
         function formatProductNameWithColor(name, color) {
             const normColor = normalizeColorCode(color);
             if (normColor) {
