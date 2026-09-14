@@ -1621,15 +1621,17 @@
                             else if ((h === 'colorcode' || h === 'renk kodu' || h === 'renkkodu' || h === 'color' || h === 'renk' || h === 'renk adı' || h === 'renk tanımı' || h === 'colordescription') && colorCol === -1) {
                                 colorCol = colIdx;
                             } 
-                            // Fiyat Sütunu (Döviz, kur, kdv, liste gibi sütunlar kesinlikle elenir)
+                            // Fiyat Sütunu
                             else if ((h === 'price' || h === 'birim fiyat' || h === 'birimfiyat' || h === 'toptan fiyat' || h === 'satış fiyatı' || h === 'satis fiyati' || h === 'fiyat' || h === 'fiyatı' || h === 'pricevi') && priceCol === -1) {
                                 priceCol = colIdx;
                             }
                         });
 
+                        // GÜVENLİ INCLUDES KONTROLÜ (HATA GİDERİLDİ)
                         if (priceCol === -1) {
                             row.forEach((h, colIdx) => {
-                                if (('fiyat' in h || 'price' in h) && !['listesi', 'no', 'tarih', 'döviz', 'currency', 'rate', 'iskonto', 'kdv', 'tip'].some(neg => h.includes(neg))) {
+                                const strH = String(h || '').toLowerCase();
+                                if ((strH.includes('fiyat') || strH.includes('price')) && !['listesi', 'no', 'tarih', 'döviz', 'currency', 'rate', 'iskonto', 'kdv', 'tip'].some(neg => strH.includes(neg))) {
                                     priceCol = colIdx;
                                 }
                             });
@@ -1686,7 +1688,6 @@
                             });
                         } else {
                             const existing = uniqueMap.get(safeKey);
-                            // Sıfır fiyatın gerçek fiyatı ezmesini kesin olarak engelle
                             if (existing.price === 0 && price > 0) {
                                 existing.price = price;
                             }
