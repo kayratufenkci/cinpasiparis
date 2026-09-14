@@ -758,7 +758,7 @@
                     </div>
                     <div>
                         <h3 class="text-base font-extrabold text-slate-900">ÇİNPA Ürün Kataloğu & Bulut Listesi</h3>
-                        <p class="text-xs text-slate-500">Tüm cihazlarda renk varyantlarıyla tam eşitlenir.</p>
+                        <p class="text-xs text-slate-500">Color.xlsx kodlarıyla tüm varyantlar listelenir.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeCatalogModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
@@ -882,6 +882,7 @@
 
     <!-- ================= JAVASCRIPT MOTORU ================= -->
     <script>
+        // COLOR.XLSX & COLOR_2.XLSX RESMİ 37 NEBİM RENK KODU SÖZLÜĞÜ
         const OFFICIAL_NEBIM_COLORS = {
             "AÇIK KAHVERENGİ": "1019",
             "ACIK KAHVERENGI": "1019",
@@ -1198,32 +1199,30 @@
             }
         }
 
-        // ================= CANLI BULUT KATALOG SENKRONİZASYONU =================
+        // ================= CANLI BULUT KATALOG SENKRONİZASYONU (HAFİFLETİLMİŞ ÇOKLU PARÇA) =================
         function listenToCatalogCloud() {
             if (!db) return;
             try {
-                db.collection("catalog_items").onSnapshot((snapshot) => {
-                    if (snapshot && !snapshot.empty) {
-                        const cloudMap = new Map();
-                        snapshot.forEach((doc) => {
-                            const data = doc.data();
-                            // KESİN DEDUP: Sadece stok_renk bazlı benzersiz kayıtlar
-                            const uniqueKey = `${String(data.id || '').trim().toLowerCase()}_${String(data.color || 'STANDART').trim()}`;
-                            cloudMap.set(uniqueKey, {
-                                key: uniqueKey,
-                                id: String(data.id || '').trim(),
-                                name: String(data.name || '').trim(),
-                                color: normalizeColorCode(data.color),
-                                price: parseFloat(data.price) || 0
-                            });
-                        });
-                        const cloudProds = Array.from(cloudMap.values());
-                        if (cloudProds.length > 0) {
-                            masterProducts = cloudProds;
-                            saveCatalogToLocalDBOnly(masterProducts);
-                            renderCatalogTable();
-                            updateHeaderBadgeCounts();
-                            populateProductSelects();
+                // Sadece yeni metadata belgesini dinle (eski 26 binlik koleksiyondan tamamen ayrıldı)
+                db.collection("cinpa_catalog_v2").doc("meta").onSnapshot(async (metaDoc) => {
+                    if (metaDoc && metaDoc.exists) {
+                        const meta = metaDoc.data();
+                        const totalChunks = meta.totalChunks || 0;
+                        if (totalChunks > 0) {
+                            let loadedItems = [];
+                            for (let i = 0; i < totalChunks; i++) {
+                                const cDoc = await db.collection("cinpa_catalog_v2").doc(`chunk_${i}`).get();
+                                if (cDoc.exists && cDoc.data().items) {
+                                    loadedItems.push(...cDoc.data().items);
+                                }
+                            }
+                            if (loadedItems.length > 0) {
+                                masterProducts = loadedItems;
+                                saveCatalogToLocalDBOnly(masterProducts);
+                                renderCatalogTable();
+                                updateHeaderBadgeCounts();
+                                populateProductSelects();
+                            }
                         }
                     }
                 }, (err) => {
@@ -1239,45 +1238,36 @@
                 showToast("Buluta aktarılacak ürün bulunamadı!", true);
                 return;
             }
-            showToast("Tüm tekil ürün varyantları buluta eşitleniyor...");
-            
-            // Buluttaki eski koleksiyonu temizleyip sadece güncel tekil listeyi yaz
-            if (db) {
-                try {
-                    const snap = await db.collection("catalog_items").get();
-                    const batch = db.batch();
-                    snap.forEach(doc => batch.delete(doc.ref));
-                    await batch.commit();
-                } catch(e) {}
+            showToast("Tüm ürünler buluta eşitleniyor (Tüm cihazlara gönderiliyor)...");
+
+            if (!db) {
+                showToast("Bulut bağlantısı kurulamadı.", true);
+                return;
             }
 
-            await syncCatalogToCloudBatch(masterProducts);
-            showToast(`Başarıyla ${masterProducts.length} adet tekil varyant buluta eşitlendi!`);
-        }
-
-        async function syncCatalogToCloudBatch(productsList) {
-            if (!db) return;
             try {
-                const batchLimit = 300;
-                for (let i = 0; i < productsList.length; i += batchLimit) {
-                    const chunk = productsList.slice(i, i + batchLimit);
-                    const batch = db.batch();
-                    chunk.forEach((p) => {
-                        const normColor = normalizeColorCode(p.color);
-                        const safeKey = `${String(p.id).trim().toLowerCase()}_${normColor || 'STANDART'}`.replace(/[\/\#\$\[\]\s]/g, "_");
-                        const ref = db.collection("catalog_items").doc(safeKey);
-                        batch.set(ref, {
-                            key: safeKey,
-                            id: String(p.id).trim(),
-                            name: String(p.name || '').trim(),
-                            color: normColor,
-                            price: parseFloat(p.price) || 0
-                        });
+                const chunkSize = 500;
+                const totalChunks = Math.ceil(masterProducts.length / chunkSize);
+                
+                // 1. Metadata kaydet
+                await db.collection("cinpa_catalog_v2").doc("meta").set({
+                    totalCount: masterProducts.length,
+                    totalChunks: totalChunks,
+                    updatedAt: Date.now()
+                });
+
+                // 2. Parçalar halinde kaydet
+                for (let i = 0; i < totalChunks; i++) {
+                    const slice = masterProducts.slice(i * chunkSize, (i + 1) * chunkSize);
+                    await db.collection("cinpa_catalog_v2").doc(`chunk_${i}`).set({
+                        items: slice
                     });
-                    await batch.commit();
                 }
-            } catch(e) {
-                console.warn("Katalog buluta yüklenirken hata:", e);
+
+                showToast(`Başarıyla ${masterProducts.length} ürün buluta eşitlendi! Tüm cihazlarda güncellendi.`);
+            } catch(err) {
+                console.error("Bulut senkronizasyon hatası:", err);
+                showToast("Buluta yüklenirken hata oluştu: " + err.message, true);
             }
         }
 
@@ -1287,7 +1277,7 @@
                     const idb = await openCatalogDB();
                     const tx = idb.transaction(CATALOG_STORE_NAME, "readwrite");
                     const store = tx.objectStore(CATALOG_STORE_NAME);
-                    store.clear(); // Eski tüm verileri sil, temiz başla
+                    store.clear();
                     productsList.forEach((p) => {
                         const normColor = normalizeColorCode(p.color);
                         const safeKey = `${String(p.id).trim().toLowerCase()}_${normColor || 'STANDART'}`;
@@ -1498,8 +1488,8 @@
         }
 
         // ================= KATALOG MOTORU =================
-        const CATALOG_DB_NAME = "CinpaOfficialCatalog_v7";
-        const CATALOG_STORE_NAME = "catalog_variants_strict_dedup";
+        const CATALOG_DB_NAME = "CinpaCatalog_2026_Strict";
+        const CATALOG_STORE_NAME = "catalog";
 
         function openCatalogDB() {
             return new Promise((resolve, reject) => {
@@ -1524,10 +1514,9 @@
 
                 req.onsuccess = () => {
                     if (req.result && req.result.length > 0) {
-                        // Bellekte de kesinlikle tekilleştir
                         const map = new Map();
                         req.result.forEach(p => {
-                            const k = p.key || `${String(p.id).trim().toLowerCase()}_${normalizeColorCode(p.color) || 'STANDART'}`;
+                            const k = `${String(p.id).trim().toLowerCase()}_${normalizeColorCode(p.color) || 'STANDART'}`;
                             map.set(k, { key: k, id: p.id, name: p.name, color: normalizeColorCode(p.color), price: p.price });
                         });
                         masterProducts = Array.from(map.values());
@@ -1549,7 +1538,6 @@
 
         async function saveCatalogToDB(productsList) {
             await saveCatalogToLocalDBOnly(productsList);
-            await syncCatalogToCloudBatch(productsList);
         }
 
         async function saveProductToMasterCatalog() {
@@ -1581,11 +1569,11 @@
             showToast(`${name} (${color || 'Standart'}) kaydedildi!`);
         }
 
-        // ================= KESİN TEKİLLEŞTİRİLMİŞ EXCEL YÜKLEYİCİ =================
+        // ================= KESİN MÜKERRER TEMİZLEYİCİ EXCEL YÜKLEYİCİ =================
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Katalog dosyası okunuyor, mükerrer kayıtlar tamamen temizleniyor...");
+            showToast("Katalog dosyası okunuyor, mükerrer satırlar filtreleniyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -1637,7 +1625,6 @@
                         if (priceCol === -1) priceCol = 3;
                     }
 
-                    // Map kullanarak aynı ürün ve renk kombinasyonunu kesinlikle tekil yapıyoruz
                     let uniqueMap = new Map();
 
                     for (let i = startRow; i < rawData.length; i++) {
@@ -1656,16 +1643,18 @@
                         let price = parseFloat(cleanPrice) || 0;
                         let normColor = normalizeColorCode(color);
 
-                        // BİRİNCİL TEKİL ANAHTAR
+                        // KESİN TEKİL ANAHTAR: Stok Kodu + Renk Kodu
                         const safeKey = `${String(code || 'URUN').trim().toLowerCase()}_${normColor || 'STANDART'}`;
 
-                        uniqueMap.set(safeKey, {
-                            key: safeKey,
-                            id: code || `ÇNP-${i}`,
-                            name: name || code,
-                            color: normColor,
-                            price: price
-                        });
+                        if (!uniqueMap.has(safeKey) || (price > 0 && uniqueMap.get(safeKey).price === 0)) {
+                            uniqueMap.set(safeKey, {
+                                key: safeKey,
+                                id: code || `ÇNP-${i}`,
+                                name: name || code,
+                                color: normColor,
+                                price: price
+                            });
+                        }
                     }
 
                     const newProducts = Array.from(uniqueMap.values());
