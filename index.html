@@ -1501,7 +1501,7 @@
         }
 
         // ================= KATALOG MOTORU =================
-        const CATALOG_DB_NAME = "CinpaCatalog_2026_NoCancelStrict";
+        const CATALOG_DB_NAME = "CinpaCatalog_2026_ColorAddedFinal";
         const CATALOG_STORE_NAME = "catalog";
 
         function openCatalogDB() {
@@ -1582,11 +1582,11 @@
             showToast(`${name} (${color || 'Standart'}) kaydedildi!`);
         }
 
-        // ================= KESİN İPTAL FİLTRELİ EXCEL YÜKLEME =================
+        // ================= KESİN İPTAL FİLTRELİ & RENK EŞLEŞTİRMELİ EXCEL YÜKLEME =================
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Ürün Excel dosyası okunuyor, kodunda İPTAL geçenler eleniyor...");
+            showToast("Ürün Excel dosyası okunuyor, Color.xlsx kodları işleniyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -1655,23 +1655,23 @@
 
                         let code = String(row[codeCol] !== undefined ? row[codeCol] : '').trim();
                         let name = String(row[nameCol] !== undefined ? row[nameCol] : '').trim();
-                        let color = String(row[colorCol] !== undefined ? row[colorCol] : '').trim();
+                        let colorRaw = String(row[colorCol] !== undefined ? row[colorCol] : '').trim();
                         let rawPrice = row[priceCol] !== undefined ? row[priceCol] : 0;
 
                         if (!code && !name) continue;
                         if (code.toLowerCase() === 'itemcode' || code.toLowerCase() === 'stok kodu') continue;
 
-                        // KOD VEYA İSİM KISMINDA "İPTAL" GEÇİYORSA KESİNLİKLE ALMA
-                        const codeUpper = code.toUpperCase();
-                        const nameUpper = name.toUpperCase();
-                        if (codeUpper.includes('İPTAL') || codeUpper.includes('IPTAL') || nameUpper.includes('İPTAL') || nameUpper.includes('IPTAL')) {
+                        // İPTAL FİLTRESİ
+                        const checkText = `${code} ${name}`.toLowerCase();
+                        if (checkText.includes('iptal')) {
                             continue;
                         }
 
                         let price = parseCleanPrice(rawPrice);
-                        let normColor = normalizeColorCode(color);
+                        // RENKLER COLOR.XLSX TABLOSUNDAN KOD ALIR
+                        let normColor = normalizeColorCode(colorRaw);
 
-                        const safeKey = `${String(code).trim().toLowerCase()}_${normColor || 'STANDART'}`;
+                        const safeKey = `${String(code || 'URUN').trim().toLowerCase()}_${normColor || 'STANDART'}`;
 
                         if (!uniqueMap.has(safeKey)) {
                             uniqueMap.set(safeKey, {
@@ -1700,7 +1700,7 @@
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
                         populateProductSelects();
-                        showToast(`Başarıyla ${newProducts.length} adet geçerli ürün yüklendi ("İptal" olanlar elendi)!`);
+                        showToast(`Başarıyla ${newProducts.length} adet ürün yüklendi ("İptal" olanlar elendi)!`);
                     } else {
                         showToast("Excel'den geçerli ürün satırı okunamadı!", true);
                     }
@@ -2444,6 +2444,15 @@
             renderStep1(); renderStep2(); renderStep3(); renderStep4();
         }
 
+        // ================= ÜRÜN ADININ YANINDA RENK KODUNUN GÖSTERİLMESİ İÇİN YARDIMCI FONKSİYON =================
+        function formatProductNameWithColor(name, color) {
+            const normColor = normalizeColorCode(color);
+            if (normColor) {
+                return `${name} <span class="text-emerald-700 font-mono font-bold">[${normColor}]</span>`;
+            }
+            return name;
+        }
+
         function renderStep1() {
             const tbody = document.getElementById("step1-items-tbody");
             if (!tbody) return;
@@ -2473,11 +2482,12 @@
                     const sub = item.requestedQty * itemPr;
                     total += sub;
                     const normColor = normalizeColorCode(item.color);
+                    const displayName = formatProductNameWithColor(item.name, item.color);
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td class="p-3.5 font-bold text-slate-900">
                             <div class="text-xs text-slate-400 font-mono">${item.id || 'ÖZEL'}</div>
-                            <div>${item.name}</div>
+                            <div>${displayName}</div>
                         </td>
                         <td class="p-3.5 text-center">
                             ${canEdit ? `<input type="text" value="${normColor}" placeholder="Renk Kodu" onchange="updateStep1Color(${index}, this.value)" class="w-20 text-center font-bold border border-emerald-400 bg-emerald-50 text-emerald-950 rounded p-1 text-xs">` : `<span class="font-bold text-xs bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded">${normColor || '-'}</span>`}
@@ -2662,6 +2672,7 @@
             if (activeOrder.items) {
                 activeOrder.items.forEach((item, index) => {
                     const normColor = normalizeColorCode(item.color);
+                    const displayName = formatProductNameWithColor(item.name, item.color);
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td class="p-3.5 text-center">
@@ -2669,7 +2680,7 @@
                         </td>
                         <td class="p-3.5 font-bold text-slate-900">
                             <div class="inline-block px-1.5 py-0.5 mb-0.5 bg-slate-100 rounded text-slate-600 font-mono text-xs font-black tracking-wider border border-slate-200">${item.id || 'ÖZEL'}</div>
-                            <div class="text-sm font-extrabold text-slate-900">${item.name}</div>
+                            <div class="text-sm font-extrabold text-slate-900">${displayName}</div>
                         </td>
                         <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${normColor || '-'}</td>
                         <td class="p-3.5 text-center font-bold text-slate-500">${item.requestedQty} Adet</td>
@@ -2816,12 +2827,13 @@
             if (activeOrder && activeOrder.items) {
                 activeOrder.items.forEach((item, index) => {
                     const normColor = normalizeColorCode(item.color);
+                    const displayName = formatProductNameWithColor(item.name, item.color);
                     const div = document.createElement("div");
                     div.className = "flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 text-xs";
                     div.innerHTML = `
                         <div>
-                            <div class="font-mono text-[10px] text-slate-400 font-bold">${item.id} [${normColor || '-'}]</div>
-                            <div class="font-bold text-slate-900">${item.name}</div>
+                            <div class="font-mono text-[10px] text-slate-400 font-bold">${item.id}</div>
+                            <div class="font-bold text-slate-900">${displayName}</div>
                             <div class="text-[11px] text-slate-500">Sevk: <span class="font-bold text-amber-900">${item.dispatchedQty}</span> Adet</div>
                         </div>
                         <div class="flex items-center space-x-2">
@@ -2838,14 +2850,14 @@
                     extContainer.innerHTML = `<div class="p-4 text-center text-slate-400 italic text-xs">Henüz ilave ürün talebi açılmadı.</div>`;
                 } else {
                     activeOrder.extras.forEach((ext, index) => {
+                        const displayName = formatProductNameWithColor(ext.name, ext.color);
                         const div = document.createElement("div");
                         div.className = "flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 text-xs";
                         const priceLabel = showPrices ? ` x ${Number(parseCleanPrice(ext.price)).toLocaleString('tr-TR')} ₺` : '';
-                        const normColor = normalizeColorCode(ext.color);
                         div.innerHTML = `
                             <div>
-                                <div class="font-mono text-[10px] text-slate-400 font-bold">${ext.id} [${normColor || '-'}]</div>
-                                <div class="font-bold text-slate-900">${ext.name}</div>
+                                <div class="font-mono text-[10px] text-slate-400 font-bold">${ext.id}</div>
+                                <div class="font-bold text-slate-900">${displayName}</div>
                                 <div class="text-[11px] text-emerald-800 font-bold">${ext.qty} Adet${priceLabel}</div>
                             </div>
                             <div class="flex items-center space-x-2">
@@ -2948,12 +2960,13 @@
                     subtotal += lineTotal;
 
                     const normColor = normalizeColorCode(item.color);
+                    const displayName = formatProductNameWithColor(item.name, item.color);
 
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td class="p-3.5 font-bold text-slate-900">
                             <div class="text-xs text-slate-400 font-mono">${item.id}</div>
-                            <div>${item.name}</div>
+                            <div>${displayName}</div>
                         </td>
                         <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${normColor || '-'}</td>
                         <td class="p-3.5 text-center font-medium">${req}</td>
@@ -2981,13 +2994,14 @@
                         subtotal += lineTotal;
 
                         const normColor = normalizeColorCode(ext.color);
+                        const displayName = formatProductNameWithColor(ext.name, ext.color);
 
                         const tr = document.createElement("tr");
                         tr.className = "bg-emerald-50/30";
                         tr.innerHTML = `
                             <td class="p-3.5 font-bold text-slate-900">
                                 <div class="text-xs text-emerald-700 font-mono">[İlave Kalem] ${ext.id}</div>
-                                <div>${ext.name}</div>
+                                <div>${displayName}</div>
                             </td>
                             <td class="p-3.5 text-center font-bold text-xs bg-emerald-100 text-emerald-900">${normColor || '-'}</td>
                             <td class="p-3.5 text-center text-slate-400">-</td>
