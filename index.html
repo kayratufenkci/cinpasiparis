@@ -1021,7 +1021,6 @@
             return '';
         }
 
-        // FİYATI EKSİKSİZ VE BOZMADAN OKUYAN FONKSİYON
         function parseCleanPrice(val) {
             if (val === null || val === undefined) return 0;
             if (typeof val === 'number') return isNaN(val) ? 0 : val;
@@ -1502,7 +1501,7 @@
         }
 
         // ================= KATALOG MOTORU =================
-        const CATALOG_DB_NAME = "CinpaCatalog_2026_NoCancel";
+        const CATALOG_DB_NAME = "CinpaCatalog_2026_FinalClean";
         const CATALOG_STORE_NAME = "catalog";
 
         function openCatalogDB() {
@@ -1587,7 +1586,7 @@
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Ürün Excel dosyası okunuyor, iptal yazıları filtreleniyor...");
+            showToast("Ürün Excel dosyası okunuyor, iptal yazıları ve mükerrer kayıtlar filtreleniyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -1662,7 +1661,7 @@
                         if (!code && !name) continue;
                         if (code.toLowerCase() === 'itemcode' || code.toLowerCase() === 'stok kodu') continue;
 
-                        // KOD VEYA AÇIKLAMADA "İPTAL" GEÇİYORSA KATALOGA DAHİL ETME
+                        // KOD VEYA AÇIKLAMADA "İPTAL" GEÇİYORSA KATALOGA KESİNLİKLE ALMA
                         const checkText = `${code} ${name}`.toLowerCase();
                         if (checkText.includes('iptal')) {
                             continue;
@@ -1700,7 +1699,7 @@
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
                         populateProductSelects();
-                        showToast(`Başarıyla ${newProducts.length} adet geçerli ürün yüklendi ("İptal" olanlar filtrelendi)!`);
+                        showToast(`Başarıyla ${newProducts.length} adet geçerli ürün yüklendi ("İptal" olanlar elendi)!`);
                     } else {
                         showToast("Excel'den geçerli ürün satırı okunamadı!", true);
                     }
