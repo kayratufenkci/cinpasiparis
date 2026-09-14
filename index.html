@@ -882,7 +882,7 @@
 
     <!-- ================= JAVASCRIPT MOTORU ================= -->
     <script>
-        // COLOR.XLSX & COLOR_2.XLSX RESMİ 37 NEBİM RENK KODU SÖZLÜĞÜ
+        // COLOR.XLSX RESMİ 37 NEBİM RENK KODU SÖZLÜĞÜ
         const OFFICIAL_NEBIM_COLORS = {
             "AÇIK KAHVERENGİ": "1019",
             "ACIK KAHVERENGI": "1019",
@@ -990,10 +990,11 @@
             "RED": "1003"
         };
 
-        function normalizeColorCode(val) {
-            if (!val || val === '-' || val === 'nan' || val === 'undefined') return '';
-            const raw = String(val).trim();
+        // KESİNLİKLE METİN VE AD İÇERİSİNDEN DE RENK YAKALAYAN GELİŞMİŞ NORMALİZER
+        function normalizeColorCode(val, productName = "") {
+            const raw = String(val || "").trim();
             
+            // 1. Zaten sayısal resmi kod mu?
             const matchCode = raw.match(/\b(10\d{2})\b/);
             if (matchCode) {
                 const num = parseInt(matchCode[1], 10);
@@ -1002,19 +1003,30 @@
                 }
             }
 
+            // 2. Renk alanındaki metinden eşleştir
             const cleaned = raw.toUpperCase();
-
             if (OFFICIAL_NEBIM_COLORS[cleaned]) {
                 return OFFICIAL_NEBIM_COLORS[cleaned];
             }
-
             for (let name in OFFICIAL_NEBIM_COLORS) {
                 if (cleaned.includes(name)) {
                     return OFFICIAL_NEBIM_COLORS[name];
                 }
             }
 
-            if (/^\d+$/.test(cleaned)) {
+            // 3. Renk kodu hala boşsa ve ürün adında renk geçiyorsa (Örn: GUZMANIA KIRMIZI BÜYÜK) adın içinden çek
+            if (productName) {
+                const pNameUpper = String(productName).toUpperCase();
+                for (let name in OFFICIAL_NEBIM_COLORS) {
+                    // Kelime olarak geçip geçmediğini kontrol et
+                    const regex = new RegExp(`\\b${name}\\b`, 'i');
+                    if (regex.test(pNameUpper) || pNameUpper.includes(name)) {
+                        return OFFICIAL_NEBIM_COLORS[name];
+                    }
+                }
+            }
+
+            if (/^\d+$/.test(cleaned) && parseInt(cleaned, 10) >= 1000 && parseInt(cleaned, 10) <= 1036) {
                 return cleaned;
             }
 
@@ -1303,7 +1315,7 @@
                         const check = `${p.id || ''} ${p.name || ''}`.toUpperCase();
                         if (check.includes('İPTAL') || check.includes('IPTAL')) return;
 
-                        const normColor = normalizeColorCode(p.color);
+                        const normColor = normalizeColorCode(p.color, p.name);
                         const safeKey = `${String(p.id).trim().toLowerCase()}_${normColor || 'STANDART'}`;
                         store.put({
                             key: safeKey,
@@ -1329,7 +1341,7 @@
             const rows = masterProducts.map(p => ({
                 "Ürün Kodu": p.id,
                 "Ürün Tanımı": p.name,
-                "Renk Kodu": normalizeColorCode(p.color),
+                "Renk Kodu": normalizeColorCode(p.color, p.name),
                 "Toptan Fiyat": parseCleanPrice(p.price)
             }));
             const ws = XLSX.utils.json_to_sheet(rows);
@@ -1512,7 +1524,7 @@
         }
 
         // ================= KATALOG MOTORU =================
-        const CATALOG_DB_NAME = "CinpaCatalog_2026_StrictNoCancel";
+        const CATALOG_DB_NAME = "CinpaCatalog_2026_StrictNameColors";
         const CATALOG_STORE_NAME = "catalog";
 
         function openCatalogDB() {
@@ -1540,11 +1552,13 @@
                     if (req.result && req.result.length > 0) {
                         const map = new Map();
                         req.result.forEach(p => {
-                            const check = `${p.id || ''} ${p.name || ''}`.toUpperCase();
-                            if (check.includes('İPTAL') || check.includes('IPTAL')) return;
+                            const rawId = String(p.id || '').trim();
+                            const rawName = String(p.name || '').trim();
+                            const fullCheck = `${rawId} ${rawName}`.toUpperCase();
+                            if (fullCheck.includes('İPTAL') || fullCheck.includes('IPTAL')) return;
 
-                            const k = `${String(p.id).trim().toLowerCase()}_${normalizeColorCode(p.color) || 'STANDART'}`;
-                            map.set(k, { key: k, id: p.id, name: p.name, color: normalizeColorCode(p.color), price: parseCleanPrice(p.price) });
+                            const k = `${rawId.toLowerCase()}_${normalizeColorCode(p.color, p.name) || 'STANDART'}`;
+                            map.set(k, { key: k, id: rawId, name: rawName, color: normalizeColorCode(p.color, p.name), price: parseCleanPrice(p.price) });
                         });
                         masterProducts = Array.from(map.values());
                     } else if (masterProducts.length === 0) {
@@ -1570,7 +1584,7 @@
         async function saveProductToMasterCatalog() {
             const code = document.getElementById("cat-new-code").value.trim() || `ÇNP-${Math.floor(100 + Math.random() * 900)}`;
             const name = document.getElementById("cat-new-name").value.trim();
-            const color = normalizeColorCode(document.getElementById("cat-new-color").value.trim());
+            const color = normalizeColorCode(document.getElementById("cat-new-color").value.trim(), name);
             const price = parseCleanPrice(document.getElementById("cat-new-price").value);
 
             if (!name) { showToast("Lütfen ürün adını yazınız.", true); return; }
@@ -1602,11 +1616,11 @@
             showToast(`${name} (${color || 'Standart'}) kaydedildi!`);
         }
 
-        // ================= KESİN KESİN İPTAL FİLTRELİ EXCEL YÜKLEME =================
+        // ================= KESİN İPTAL FİLTRELİ & ADINDAN RENK ALAN EXCEL YÜKLEYİCİ =================
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Ürün Excel dosyası okunuyor, 'İPTAL' kelimesi içeren satırlar tamamen ayıklanıyor...");
+            showToast("Katalog dosyası okunuyor, 'İPTAL'ler ayıklanıp renk kodları atanıyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -1682,15 +1696,16 @@
                         if (!code && !name) continue;
                         if (code.toLowerCase() === 'itemcode' || code.toLowerCase() === 'stok kodu') continue;
 
-                        // KESİN İPTAL FİLTRESİ (BÜYÜK/KÜÇÜK HARF DUYARSIZ KONTROL)
-                        const checkString = `${code} ${name} ${color}`.toUpperCase();
+                        // İPTAL FİLTRESİ: Kod veya adda iptal geçiyorsa kesinlikle alma
+                        const checkString = `${code} ${name}`.toUpperCase();
                         if (checkString.includes('İPTAL') || checkString.includes('IPTAL')) {
                             skippedCount++;
-                            continue; // Bu satırı tamamen atla
+                            continue;
                         }
 
                         let price = parseCleanPrice(rawPrice);
-                        let normColor = normalizeColorCode(color);
+                        // HEM RENK SÜTUNUNDAN HEM DE ADIN İÇİNDEKİ KELİMEDEN RENK BUL
+                        let normColor = normalizeColorCode(color, name);
 
                         const safeKey = `${String(code).trim().toLowerCase()}_${normColor || 'STANDART'}`;
 
@@ -1734,7 +1749,7 @@
             event.target.value = "";
         }
 
-        // ================= EXCEL FİŞİ OKUMA =================
+        // ================= EXCEL FİŞİ OKUMA (ADINDAN DA RENK ÇIKARIR) =================
         function handleExcelFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1872,14 +1887,15 @@
                 let qty = parseFloat(String(rawQty).replace(/[^0-9,.-]/g, '').replace(',', '.')) || 1;
                 let price = parseCleanPrice(rawPrice);
 
-                let finalColor = normalizeColorCode(color);
                 let productName = (explicitName && explicitName !== '' && explicitName !== 'nan') ? explicitName : '';
+                // HEM RENK SÜTUNUNDAN HEM DE ADINDAN RENK ÇÖZÜMLE
+                let finalColor = normalizeColorCode(color, productName);
 
                 if (masterProducts.length > 0) {
                     const cleanCode = code.toLowerCase().replace(/^0+/, '');
                     const found = masterProducts.find(p => {
                         const pCode = String(p.id || '').trim().toLowerCase();
-                        const pColor = normalizeColorCode(p.color);
+                        const pColor = normalizeColorCode(p.color, p.name);
                         const codeMatches = (pCode === code.toLowerCase() || pCode.replace(/^0+/, '') === cleanCode);
                         if (finalColor) {
                             return codeMatches && pColor === finalColor;
@@ -1889,7 +1905,7 @@
 
                     if (found) {
                         if (!productName) productName = found.name;
-                        if (!finalColor && found.color) finalColor = normalizeColorCode(found.color);
+                        if (!finalColor && found.color) finalColor = normalizeColorCode(found.color, found.name);
                         if (price === 0 && found.price > 0) price = parseCleanPrice(found.price);
                     }
                 }
@@ -1963,7 +1979,7 @@
             const formattedItems = parsedExcelItems.map(i => ({
                 id: i.id,
                 name: i.name,
-                color: normalizeColorCode(i.color),
+                color: normalizeColorCode(i.color, i.name),
                 requestedQty: i.requestedQty,
                 dispatchedQty: i.dispatchedQty,
                 returnedQty: 0,
@@ -2004,7 +2020,7 @@
                 const netQty = Math.max(0, dispatched - returned);
                 const unitPrice = parseCleanPrice(item.price);
                 const priceVI = Number((unitPrice * 1.20).toFixed(2));
-                const colorCode = normalizeColorCode(item.color);
+                const colorCode = normalizeColorCode(item.color, item.name);
 
                 if (netQty > 0) {
                     excelRows.push({
@@ -2027,7 +2043,7 @@
                 if (ext.faikApproval && (ext.qty || 0) > 0) {
                     const unitPrice = parseCleanPrice(ext.price);
                     const priceVI = Number((unitPrice * 1.20).toFixed(2));
-                    const colorCode = normalizeColorCode(ext.color);
+                    const colorCode = normalizeColorCode(ext.color, ext.name);
 
                     excelRows.push({
                         "Barcode": "", "ItemTypeCode": 1, "ItemCode": String(ext.id || '').trim(),
@@ -2073,7 +2089,7 @@
                 const netQty = Math.max(0, dispatched - returned);
                 const unitPrice = parseCleanPrice(item.price);
                 const priceVI = Number((unitPrice * 1.20).toFixed(2));
-                const colorCode = normalizeColorCode(item.color);
+                const colorCode = normalizeColorCode(item.color, item.name);
 
                 if (netQty > 0) {
                     excelRows.push({
@@ -2096,7 +2112,7 @@
                 if (ext.faikApproval && (ext.qty || 0) > 0) {
                     const unitPrice = parseCleanPrice(ext.price);
                     const priceVI = Number((unitPrice * 1.20).toFixed(2));
-                    const colorCode = normalizeColorCode(ext.color);
+                    const colorCode = normalizeColorCode(ext.color, ext.name);
 
                     excelRows.push({
                         "Barcode": "", "ItemTypeCode": 1, "ItemCode": String(ext.id || '').trim(),
@@ -2115,7 +2131,7 @@
             });
 
             if (excelRows.length === 0) {
-                showToast("İrsaliye oluşturulacak sevk edilmiş ürün kalemi bulunamadı!", true);
+                showToast("Dışa aktarılacak ürün kalemi bulunamadı!", true);
                 return;
             }
 
@@ -2466,9 +2482,9 @@
         }
 
         function formatProductNameWithColor(name, color) {
-            const normColor = normalizeColorCode(color);
+            const normColor = normalizeColorCode(color, name);
             if (normColor) {
-                return `${name} <span class="text-emerald-700 font-mono font-bold">[${normColor}]</span>`;
+                return `${name} <span class="text-emerald-700 font-mono font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">[${normColor}]</span>`;
             }
             return name;
         }
@@ -2501,7 +2517,7 @@
                     const itemPr = parseCleanPrice(item.price);
                     const sub = item.requestedQty * itemPr;
                     total += sub;
-                    const normColor = normalizeColorCode(item.color);
+                    const normColor = normalizeColorCode(item.color, item.name);
                     const displayName = formatProductNameWithColor(item.name, item.color);
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
@@ -2578,7 +2594,7 @@
 
             matched.forEach(p => {
                 const opt = document.createElement("option");
-                const normColor = normalizeColorCode(p.color);
+                const normColor = normalizeColorCode(p.color, p.name);
                 opt.value = p.key;
                 const colorTxt = normColor ? ` [Renk Kodu: ${normColor}]` : " [Standart]";
                 opt.innerText = `${p.id} - ${p.name}${colorTxt} (${Number(parseCleanPrice(p.price)).toLocaleString('tr-TR')} ₺)`;
@@ -2598,7 +2614,7 @@
             if (!p) { showToast("Lütfen bir ürün seçin.", true); return; }
             
             const finalPrice = isNaN(customPrice) || customPrice === 0 ? parseCleanPrice(p.price) : customPrice;
-            const finalColor = normalizeColorCode(customColor || p.color);
+            const finalColor = normalizeColorCode(customColor || p.color, p.name);
 
             if (!activeOrder.items) activeOrder.items = [];
             activeOrder.items.push({
@@ -2620,7 +2636,7 @@
         async function addItemManual() {
             const code = document.getElementById("manual-code").value.trim() || `ÇNP-${Math.floor(100 + Math.random() * 900)}`;
             const name = document.getElementById("manual-name").value.trim();
-            const color = normalizeColorCode(document.getElementById("manual-color").value.trim());
+            const color = normalizeColorCode(document.getElementById("manual-color").value.trim(), name);
             const price = parseCleanPrice(document.getElementById("manual-price").value);
             const qty = parseInt(document.getElementById("manual-qty").value) || 1;
             const saveMaster = document.getElementById("chk-save-to-master").checked;
@@ -2649,7 +2665,7 @@
         }
 
         async function updateStep1Color(index, val) {
-            activeOrder.items[index].color = normalizeColorCode(val);
+            activeOrder.items[index].color = normalizeColorCode(val, activeOrder.items[index].name);
             await syncOrderToCloud(activeOrder);
             renderStep1();
         }
@@ -2691,7 +2707,7 @@
 
             if (activeOrder.items) {
                 activeOrder.items.forEach((item, index) => {
-                    const normColor = normalizeColorCode(item.color);
+                    const normColor = normalizeColorCode(item.color, item.name);
                     const displayName = formatProductNameWithColor(item.name, item.color);
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
@@ -2745,7 +2761,7 @@
 
             matched.forEach(p => {
                 const opt = document.createElement("option");
-                const normColor = normalizeColorCode(p.color);
+                const normColor = normalizeColorCode(p.color, p.name);
                 opt.value = p.key;
                 const colorTxt = normColor ? ` [Renk Kodu: ${normColor}]` : " [Standart]";
                 opt.innerText = `${p.id} - ${p.name}${colorTxt}`;
@@ -2761,7 +2777,7 @@
             const p = masterProducts.find(x => x.key === sel.value);
             const cInput = document.getElementById("depo-add-color");
             if (cInput && p) {
-                cInput.value = normalizeColorCode(p.color);
+                cInput.value = normalizeColorCode(p.color, p.name);
             }
         }
 
@@ -2772,7 +2788,7 @@
             const p = masterProducts.find(x => x.key === selectedKey);
             if (!p) { showToast("Lütfen bir ürün seçin.", true); return; }
 
-            const finalColor = normalizeColorCode(customColor || p.color);
+            const finalColor = normalizeColorCode(customColor || p.color, p.name);
 
             if (!activeOrder.items) activeOrder.items = [];
             activeOrder.items.push({
@@ -2846,7 +2862,7 @@
 
             if (activeOrder && activeOrder.items) {
                 activeOrder.items.forEach((item, index) => {
-                    const normColor = normalizeColorCode(item.color);
+                    const normColor = normalizeColorCode(item.color, item.name);
                     const displayName = formatProductNameWithColor(item.name, item.color);
                     const div = document.createElement("div");
                     div.className = "flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 text-xs";
@@ -2918,7 +2934,7 @@
             activeOrder.extras.push({
                 id: p.id,
                 name: p.name,
-                color: normalizeColorCode(p.color),
+                color: normalizeColorCode(p.color, p.name),
                 qty: qty,
                 price: parseCleanPrice(p.price),
                 faikApproval: false
@@ -2979,7 +2995,7 @@
                     sumEvrak3 += ret * pr;
                     subtotal += lineTotal;
 
-                    const normColor = normalizeColorCode(item.color);
+                    const normColor = normalizeColorCode(item.color, item.name);
                     const displayName = formatProductNameWithColor(item.name, item.color);
 
                     const tr = document.createElement("tr");
@@ -3013,7 +3029,7 @@
                         sumEvrak4 += lineTotal;
                         subtotal += lineTotal;
 
-                        const normColor = normalizeColorCode(ext.color);
+                        const normColor = normalizeColorCode(ext.color, ext.name);
                         const displayName = formatProductNameWithColor(ext.name, ext.color);
 
                         const tr = document.createElement("tr");
@@ -3101,7 +3117,7 @@
             const showPrices = currentUser && currentUser.canSeePrices === true;
             masterProducts.slice(0, 100).forEach(p => {
                 const opt3 = document.createElement("option");
-                const normColor = normalizeColorCode(p.color);
+                const normColor = normalizeColorCode(p.color, p.name);
                 opt3.value = p.key;
                 const cTxt = normColor ? ` [Renk Kodu: ${normColor}]` : " [Standart]";
                 const priceTxt = showPrices ? ` (${Number(parseCleanPrice(p.price)).toLocaleString('tr-TR')} ₺)` : "";
@@ -3117,7 +3133,7 @@
             if (p) {
                 document.getElementById("step1-catalog-price").value = parseCleanPrice(p.price);
                 const cInput = document.getElementById("step1-catalog-color");
-                if (cInput) cInput.value = normalizeColorCode(p.color);
+                if (cInput) cInput.value = normalizeColorCode(p.color, p.name);
             }
         }
 
@@ -3173,7 +3189,7 @@
 
             list.slice(0, 300).forEach((p, idx) => {
                 const tr = document.createElement("tr");
-                const normColor = normalizeColorCode(p.color);
+                const normColor = normalizeColorCode(p.color, p.name);
                 const pr = parseCleanPrice(p.price);
                 tr.innerHTML = `
                     <td class="p-3 text-center"><input type="checkbox" value="${idx}" class="catalog-row-checkbox w-4 h-4 text-emerald-700 rounded cursor-pointer"></td>
