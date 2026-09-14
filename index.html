@@ -373,7 +373,7 @@
                                 <thead class="bg-emerald-50/60 text-emerald-900 text-xs font-bold uppercase border-b border-emerald-100">
                                     <tr>
                                         <th class="p-3.5">Ürün Kodu & Tanımı</th>
-                                        <th class="p-3.5 text-center w-28 bg-emerald-100/60 text-emerald-950">Renk Kodu</th>
+                                        <th class="p-3.5 text-center w-36 bg-emerald-100/60 text-emerald-950">Renk Adı (Kodu)</th>
                                         <th class="p-3.5 text-center w-32">Talep Adedi</th>
                                         <th class="p-3.5 text-right w-36 step1-price-col">Birim Fiyat (TL)</th>
                                         <th class="p-3.5 text-right w-36 step1-price-col">Toplam Tutar</th>
@@ -398,13 +398,13 @@
                             <div id="add-mode-catalog-box" class="space-y-3">
                                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
                                     <div class="sm:col-span-6">
-                                        <label class="block text-[11px] font-bold text-slate-500 mb-1">Katalogda Ürün Ara (Kod, İsim veya Renk Kodu Yazın)</label>
-                                        <input type="text" id="step1-product-search" oninput="searchCatalogDropdown(this.value)" placeholder="Örn: 0103644 veya KASIMPATI veya 1007..." class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white mb-2">
+                                        <label class="block text-[11px] font-bold text-slate-500 mb-1">Katalogda Ürün Ara (Kod, İsim veya Renk Adı/Kodu Yazın)</label>
+                                        <input type="text" id="step1-product-search" oninput="searchCatalogDropdown(this.value)" placeholder="Örn: 0103644 veya KASIMPATI veya KIRMIZI..." class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white mb-2">
                                         <select id="step1-select-product" onchange="syncSelectedCatalogDetails()" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white"></select>
                                     </div>
                                     <div class="sm:col-span-2">
-                                        <label class="block text-[11px] font-bold text-emerald-900 mb-1">Renk Kodu</label>
-                                        <input type="text" id="step1-catalog-color" placeholder="Örn: 1007" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-400 bg-emerald-50 text-center">
+                                        <label class="block text-[11px] font-bold text-emerald-900 mb-1">Renk Kodu / Adı</label>
+                                        <input type="text" id="step1-catalog-color" placeholder="Örn: 1007 veya MOR" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-400 bg-emerald-50 text-center">
                                     </div>
                                     <div class="sm:col-span-2">
                                         <label class="block text-[11px] font-bold text-slate-500 mb-1">Birim Fiyat (TL)</label>
@@ -432,8 +432,8 @@
                                     <input type="text" id="manual-name" placeholder="Örn: YUCCA BUSH" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-300 bg-white">
                                 </div>
                                 <div class="sm:col-span-2">
-                                    <label class="block text-[11px] font-bold text-emerald-900 mb-1">Renk Kodu</label>
-                                    <input type="text" id="manual-color" placeholder="Örn: 1016" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-400 bg-emerald-50 text-center">
+                                    <label class="block text-[11px] font-bold text-emerald-900 mb-1">Renk Kodu / Adı</label>
+                                    <input type="text" id="manual-color" placeholder="Örn: 1016 veya BEYAZ" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-400 bg-emerald-50 text-center">
                                 </div>
                                 <div class="sm:col-span-2">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Fiyat (TL)</label>
@@ -488,7 +488,7 @@
                                     <tr>
                                         <th class="p-3.5 w-12 text-center">Toplandı</th>
                                         <th class="p-3.5">Talep Edilen Ürün</th>
-                                        <th class="p-3.5 text-center w-28 bg-emerald-100/60 text-emerald-950">Renk Kodu</th>
+                                        <th class="p-3.5 text-center w-36 bg-emerald-100/60 text-emerald-950">Renk Adı (Kodu)</th>
                                         <th class="p-3.5 text-center">Sipariş Miktarı</th>
                                         <th class="p-3.5 text-center w-36">Fiili Sevk Miktarı</th>
                                         <th class="p-3.5">Depo Hazırlık & İkame Notu</th>
@@ -506,13 +506,13 @@
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
                                 <div class="sm:col-span-6">
-                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Katalogda Ürün Ara (Kod, Ad veya Renk Kodu Yazın)</label>
-                                    <input type="text" id="depo-product-search" oninput="searchDepoCatalogDropdown(this.value)" placeholder="Örn: 0103644 veya KASIMPATI veya 1007..." class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white mb-2">
+                                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Katalogda Ürün Ara (Kod, Ad veya Renk Adı/Kodu Yazın)</label>
+                                    <input type="text" id="depo-product-search" oninput="searchDepoCatalogDropdown(this.value)" placeholder="Örn: 0103644 veya KASIMPATI veya KIRMIZI..." class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white mb-2">
                                     <select id="depo-select-product" onchange="syncDepoSelectedColor()" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white"></select>
                                 </div>
                                 <div class="sm:col-span-2">
-                                    <label class="block text-[11px] font-bold text-emerald-900 mb-1">Renk Kodu</label>
-                                    <input type="text" id="depo-add-color" placeholder="Örn: 1007" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-400 bg-emerald-50 text-center">
+                                    <label class="block text-[11px] font-bold text-emerald-900 mb-1">Renk Kodu / Adı</label>
+                                    <input type="text" id="depo-add-color" placeholder="Örn: 1007 veya MOR" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-400 bg-emerald-50 text-center">
                                 </div>
                                 <div class="sm:col-span-2">
                                     <label class="block text-[11px] font-bold text-slate-500 mb-1">Adet</label>
@@ -626,7 +626,7 @@
                                 <thead class="bg-emerald-900 text-white text-xs font-bold uppercase tracking-wider">
                                     <tr>
                                         <th class="p-3.5">Ürün / Kalem Açıklaması</th>
-                                        <th class="p-3.5 text-center w-28 bg-emerald-950 text-emerald-200">Renk Kodu</th>
+                                        <th class="p-3.5 text-center w-36 bg-emerald-950 text-emerald-200">Renk Adı (Kodu)</th>
                                         <th class="p-3.5 text-center">İlk Sipariş</th>
                                         <th class="p-3.5 text-center">Sevk Edilen</th>
                                         <th class="p-3.5 text-center">İade</th>
@@ -706,7 +706,7 @@
                     <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/40 rounded-2xl p-5 text-center cursor-pointer hover:bg-emerald-50 transition" onclick="document.getElementById('excel-file-input').click()">
                         <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-600 mb-1"></i>
                         <div class="text-xs font-extrabold text-slate-800">Bilgisayardan Excel Fişini Seçmek İçin Tıklayın</div>
-                        <div class="text-[11px] text-slate-500">Ürün kodu, renk kodu, net miktar ve fiyatlar otomatik işlenir.</div>
+                        <div class="text-[11px] text-slate-500">Ürün kodu, renk, net miktar ve fiyatlar otomatik işlenir.</div>
                         <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleExcelFileUpload(event)">
                     </div>
                 </div>
@@ -729,7 +729,7 @@
                             <tr>
                                 <th class="p-2">Ürün Kodu</th>
                                 <th class="p-2">Ürün Adı</th>
-                                <th class="p-2 text-center bg-emerald-100 text-emerald-950 font-extrabold">Renk Kodu</th>
+                                <th class="p-2 text-center bg-emerald-100 text-emerald-950 font-extrabold">Renk</th>
                                 <th class="p-2 text-center">Miktar (Qty1)</th>
                                 <th class="p-2 text-right">Birim Fiyat</th>
                             </tr>
@@ -758,7 +758,7 @@
                     </div>
                     <div>
                         <h3 class="text-base font-extrabold text-slate-900">ÇİNPA Ürün Kataloğu & Bulut Listesi</h3>
-                        <p class="text-xs text-slate-500">Color.xlsx kodlarıyla tüm varyantlar listelenir.</p>
+                        <p class="text-xs text-slate-500">Color.xlsx resmi renk eşleşmeleriyle listelenir.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeCatalogModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
@@ -801,14 +801,14 @@
             <div class="flex items-center space-x-3">
                 <div class="relative flex-1">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                    <input type="text" id="cat-search-input" onkeyup="filterCatalogTable()" placeholder="Katalogda ürün kodu, adı veya renk kodu ara..." class="w-full text-xs pl-9 pr-3 py-2.5 rounded-xl border border-emerald-200 bg-slate-50 focus:bg-white">
+                    <input type="text" id="cat-search-input" onkeyup="filterCatalogTable()" placeholder="Katalogda ürün kodu, adı veya renk adı ara..." class="w-full text-xs pl-9 pr-3 py-2.5 rounded-xl border border-emerald-200 bg-slate-50 focus:bg-white">
                 </div>
             </div>
 
             <div class="bg-slate-50 p-4 rounded-2xl border border-emerald-100 grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
                 <input type="text" id="cat-new-code" placeholder="Kod (Örn: 0103644)" class="sm:col-span-3 p-2.5 rounded-xl border border-slate-300 font-bold bg-white">
                 <input type="text" id="cat-new-name" placeholder="Ürün Tanımı (Örn: KASIMPATI 72 CM)" class="sm:col-span-4 p-2.5 rounded-xl border border-slate-300 bg-white font-medium">
-                <input type="text" id="cat-new-color" placeholder="Renk Kodu (Örn: 1007)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 bg-white font-medium text-center">
+                <input type="text" id="cat-new-color" placeholder="Renk Kodu / Adı (Örn: MOR)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 bg-white font-medium text-center">
                 <input type="number" id="cat-new-price" placeholder="Fiyat (TL)" class="sm:col-span-2 p-2.5 rounded-xl border border-slate-300 font-bold bg-white text-right">
                 <button type="button" onclick="saveProductToMasterCatalog()" class="sm:col-span-1 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl transition cursor-pointer">+ Ekle</button>
             </div>
@@ -820,7 +820,7 @@
                             <th class="p-3 w-10 text-center"><input type="checkbox" id="select-all-catalog" onchange="toggleSelectAllCatalog(this.checked)" class="w-4 h-4 text-emerald-700 rounded cursor-pointer"></th>
                             <th class="p-3">Ürün Kodu</th>
                             <th class="p-3">Ürün Adı</th>
-                            <th class="p-3 text-center bg-emerald-50 text-emerald-950">Renk Kodu</th>
+                            <th class="p-3 text-center bg-emerald-50 text-emerald-950">Renk Adı (Kodu)</th>
                             <th class="p-3 text-right">Toptan Fiyat</th>
                             <th class="p-3 text-center w-16">Sil</th>
                         </tr>
@@ -882,119 +882,89 @@
 
     <!-- ================= JAVASCRIPT MOTORU ================= -->
     <script>
-        // COLOR.XLSX RESMİ 37 NEBİM RENK KODU SÖZLÜĞÜ
-        const OFFICIAL_NEBIM_COLORS = {
-            "AÇIK KAHVERENGİ": "1019",
-            "ACIK KAHVERENGI": "1019",
-            "KOYU KAHVERENGİ": "1020",
-            "KOYU KAHVERENGI": "1020",
-            "YEŞİL-KIRMIZI": "1031",
-            "YESIL-KIRMIZI": "1031",
-            "LIGHT PURPLE": "1021",
-            "DARK FUCHSIA": "1036",
-            "YEŞİL-BEYAZ": "1012",
-            "YESIL-BEYAZ": "1012",
-            "KAHVE YEŞİL": "1027",
-            "KAHVE YESIL": "1027",
-            "BEYAZ-PEMBE": "1035",
-            "LIGHT GREEN": "1000",
-            "LIGHT BROWN": "1019",
-            "DARK PURPLE": "1022",
-            "AÇIK YEŞİL": "1000",
-            "ACIK YESIL": "1000",
-            "KOYU YEŞİL": "1001",
-            "KOYU YESIL": "1001",
-            "KAHVERENGİ": "1011",
-            "KAHVERENGI": "1011",
-            "YEŞİL-SARI": "1013",
-            "YESIL-SARI": "1013",
-            "KOYU PEMBE": "1017",
-            "AÇIK PEMBE": "1023",
-            "ACIK PEMBE": "1023",
-            "SARI-YEŞİL": "1025",
-            "SARI-YESIL": "1025",
-            "KOYU FUŞYA": "1036",
-            "KOYU FUSYA": "1036",
-            "DARK GREEN": "1001",
-            "DODGERBLUE": "1008",
-            "ANTHRACITE": "1018",
-            "DARK BROWN": "1020",
-            "LIGHT PINK": "1023",
-            "LIGHT BLUE": "1029",
-            "LIGHT GREY": "1033",
-            "LIGHT GRAY": "1033",
-            "AÇIK MAVİ": "1029",
-            "ACIK MAVI": "1029",
-            "KOYU MAVİ": "1030",
-            "KOYU MAVI": "1030",
-            "DARK PINK": "1017",
-            "DARK BLUE": "1030",
-            "DARK GREY": "1034",
-            "DARK GRAY": "1034",
-            "ANTRASİT": "1018",
-            "ANTRASIT": "1018",
-            "AÇIK MOR": "1021",
-            "ACIK MOR": "1021",
-            "KOYU MOR": "1022",
-            "AÇIK GRİ": "1033",
-            "ACIK GRI": "1033",
-            "KOYU GRİ": "1034",
-            "KOYU GRI": "1034",
-            "LACIVERT": "1008",
-            "BURGUNDY": "1009",
-            "KIRMIZI": "1003",
-            "TURUNCU": "1005",
-            "MAGENTA": "1017",
-            "FUCHSIA": "1032",
-            "ORANGE": "1005",
-            "YELLOW": "1006",
-            "PURPLE": "1007",
-            "MAROON": "1009",
-            "SILVER": "1028",
-            "SIENNA": "1011",
-            "SALMON": "1026",
-            "YEŞİL": "1002",
-            "YESIL": "1002",
-            "PEMBE": "1004",
-            "BORDO": "1009",
-            "BEYAZ": "1016",
-            "SİYAH": "1024",
-            "SIYAH": "1024",
-            "SOMON": "1026",
-            "GÜMÜŞ": "1028",
-            "GUMUS": "1028",
-            "FUŞYA": "1032",
-            "FUSYA": "1032",
-            "WHITE": "1016",
-            "BLACK": "1024",
-            "GREEN": "1002",
-            "BROWN": "1011",
-            "CREAM": "1014",
-            "LILAC": "1015",
-            "OLIVE": "1027",
-            "SARI": "1006",
-            "MAVİ": "1008",
-            "MAVI": "1008",
-            "KREM": "1014",
-            "LİLA": "1015",
-            "LILA": "1015",
-            "LIME": "1000",
-            "PINK": "1004",
-            "BLUE": "1008",
-            "NAVY": "1008",
-            "GREY": "1010",
-            "GRAY": "1010",
-            "MOR": "1007",
-            "GRİ": "1010",
-            "GRI": "1010",
-            "RED": "1003"
+        // COLOR.XLSX RESMİ 37 NEBİM RENK ADLARI VE KODLARI
+        const OFFICIAL_CODE_TO_NAME = {
+            "1000": "AÇIK YEŞİL",
+            "1001": "KOYU YEŞİL",
+            "1002": "YEŞİL",
+            "1003": "KIRMIZI",
+            "1004": "PEMBE",
+            "1005": "TURUNCU",
+            "1006": "SARI",
+            "1007": "MOR",
+            "1008": "MAVİ",
+            "1009": "BORDO",
+            "1010": "GRİ",
+            "1011": "KAHVERENGİ",
+            "1012": "YEŞİL-BEYAZ",
+            "1013": "YEŞİL-SARI",
+            "1014": "KREM",
+            "1015": "LİLA",
+            "1016": "BEYAZ",
+            "1017": "KOYU PEMBE",
+            "1018": "ANTRASİT",
+            "1019": "AÇIK KAHVERENGİ",
+            "1020": "KOYU KAHVERENGİ",
+            "1021": "AÇIK MOR",
+            "1022": "KOYU MOR",
+            "1023": "AÇIK PEMBE",
+            "1024": "SİYAH",
+            "1025": "SARI-YEŞİL",
+            "1026": "SOMON",
+            "1027": "KAHVE YEŞİL",
+            "1028": "GÜMÜŞ",
+            "1029": "AÇIK MAVİ",
+            "1030": "KOYU MAVİ",
+            "1031": "YEŞİL-KIRMIZI",
+            "1032": "FUŞYA",
+            "1033": "AÇIK GRİ",
+            "1034": "KOYU GRİ",
+            "1035": "BEYAZ-PEMBE",
+            "1036": "KOYU FUŞYA"
         };
 
-        // KESİNLİKLE METİN VE AD İÇERİSİNDEN DE RENK YAKALAYAN GELİŞMİŞ NORMALİZER
+        const OFFICIAL_NEBIM_COLORS = {
+            "AÇIK KAHVERENGİ": "1019", "ACIK KAHVERENGI": "1019", "KOYU KAHVERENGİ": "1020", "KOYU KAHVERENGI": "1020",
+            "YEŞİL-KIRMIZI": "1031", "YESIL-KIRMIZI": "1031", "LIGHT PURPLE": "1021", "DARK FUCHSIA": "1036",
+            "YEŞİL-BEYAZ": "1012", "YESIL-BEYAZ": "1012", "KAHVE YEŞİL": "1027", "KAHVE YESIL": "1027",
+            "BEYAZ-PEMBE": "1035", "LIGHT GREEN": "1000", "LIGHT BROWN": "1019", "DARK PURPLE": "1022",
+            "AÇIK YEŞİL": "1000", "ACIK YESIL": "1000", "KOYU YEŞİL": "1001", "KOYU YESIL": "1001",
+            "KAHVERENGİ": "1011", "KAHVERENGI": "1011", "YEŞİL-SARI": "1013", "YESIL-SARI": "1013",
+            "KOYU PEMBE": "1017", "AÇIK PEMBE": "1023", "ACIK PEMBE": "1023", "SARI-YEŞİL": "1025",
+            "SARI-YESIL": "1025", "KOYU FUŞYA": "1036", "KOYU FUSYA": "1036", "DARK GREEN": "1001",
+            "DODGERBLUE": "1008", "ANTHRACITE": "1018", "DARK BROWN": "1020", "LIGHT PINK": "1023",
+            "LIGHT BLUE": "1029", "LIGHT GREY": "1033", "LIGHT GRAY": "1033", "AÇIK MAVİ": "1029",
+            "ACIK MAVI": "1029", "KOYU MAVİ": "1030", "KOYU MAVI": "1030", "DARK PINK": "1017",
+            "DARK BLUE": "1030", "DARK GREY": "1034", "DARK GRAY": "1034", "ANTRASİT": "1018",
+            "ANTRASIT": "1018", "AÇIK MOR": "1021", "ACIK MOR": "1021", "KOYU MOR": "1022",
+            "AÇIK GRİ": "1033", "ACIK GRI": "1033", "KOYU GRİ": "1034", "KOYU GRI": "1034",
+            "LACIVERT": "1008", "BURGUNDY": "1009", "KIRMIZI": "1003", "TURUNCU": "1005",
+            "MAGENTA": "1017", "FUCHSIA": "1032", "ORANGE": "1005", "YELLOW": "1006",
+            "PURPLE": "1007", "MAROON": "1009", "SILVER": "1028", "SIENNA": "1011",
+            "SALMON": "1026", "YEŞİL": "1002", "YESIL": "1002", "PEMBE": "1004",
+            "BORDO": "1009", "BEYAZ": "1016", "SİYAH": "1024", "SIYAH": "1024",
+            "SOMON": "1026", "GÜMÜŞ": "1028", "GUMUS": "1028", "FUŞYA": "1032",
+            "FUSYA": "1032", "WHITE": "1016", "BLACK": "1024", "GREEN": "1002",
+            "BROWN": "1011", "CREAM": "1014", "LILAC": "1015", "OLIVE": "1027",
+            "SARI": "1006", "MAVİ": "1008", "MAVI": "1008", "KREM": "1014",
+            "LİLA": "1015", "LILA": "1015", "LIME": "1000", "PINK": "1004",
+            "BLUE": "1008", "NAVY": "1008", "GREY": "1010", "GRAY": "1010",
+            "MOR": "1007", "GRİ": "1010", "GRI": "1010", "RED": "1003"
+        };
+
+        // KODU TÜRKÇE YAZILI RENK İSMİNE ÇEVİRİR (ÖRN: 1014 -> KREM)
+        function getColorNameFromCode(code) {
+            if (!code) return "";
+            const cleanCode = String(code).trim();
+            if (OFFICIAL_CODE_TO_NAME[cleanCode]) {
+                return OFFICIAL_CODE_TO_NAME[cleanCode];
+            }
+            return cleanCode;
+        }
+
         function normalizeColorCode(val, productName = "") {
             const raw = String(val || "").trim();
             
-            // 1. Zaten sayısal resmi kod mu?
             const matchCode = raw.match(/\b(10\d{2})\b/);
             if (matchCode) {
                 const num = parseInt(matchCode[1], 10);
@@ -1003,7 +973,6 @@
                 }
             }
 
-            // 2. Renk alanındaki metinden eşleştir
             const cleaned = raw.toUpperCase();
             if (OFFICIAL_NEBIM_COLORS[cleaned]) {
                 return OFFICIAL_NEBIM_COLORS[cleaned];
@@ -1014,11 +983,9 @@
                 }
             }
 
-            // 3. Renk kodu hala boşsa ve ürün adında renk geçiyorsa (Örn: GUZMANIA KIRMIZI BÜYÜK) adın içinden çek
             if (productName) {
                 const pNameUpper = String(productName).toUpperCase();
                 for (let name in OFFICIAL_NEBIM_COLORS) {
-                    // Kelime olarak geçip geçmediğini kontrol et
                     const regex = new RegExp(`\\b${name}\\b`, 'i');
                     if (regex.test(pNameUpper) || pNameUpper.includes(name)) {
                         return OFFICIAL_NEBIM_COLORS[name];
@@ -1124,67 +1091,13 @@
             }
         };
 
-        const HARDCODED_DEFAULT_ORDERS = [
-            {
-                id: "CNP-2026-625", customer: "DENEME", salesRep: "Salih Şahin", date: "2026-09-08", notes: "Salih Şahin siparişi",
-                hasApplication: true, currentStep: 1, isClosed: false, extras: [],
-                items: [{ id: "0109024", name: "YUCCA BUSH", color: "1001", requestedQty: 20, dispatchedQty: 20, returnedQty: 0, price: 860, warehouseNote: "", checked: true }]
-            },
-            {
-                id: "CNP-2026-575", customer: "Yeni Excel Sipariş Projesi", salesRep: "Orhan Özen", date: "2026-09-08", notes: "Saha onaylı sipariş",
-                hasApplication: true, currentStep: 3, isClosed: false, extras: [],
-                items: [{ id: "0109037", name: "MONSTERA", color: "1004", requestedQty: 50, dispatchedQty: 50, returnedQty: 2, price: 624, warehouseNote: "Sevk edildi", checked: true }]
-            },
-            {
-                id: "CNP-2026-569", customer: "deneme", salesRep: "Salih Şahin", date: "2026-09-08", notes: "Muhasebede bekliyor",
-                hasApplication: false, currentStep: 4, isClosed: false, extras: [],
-                items: [{ id: "0107029", name: "DRACAENA", color: "1003", requestedQty: 10, dispatchedQty: 10, returnedQty: 0, price: 70, warehouseNote: "", checked: true }]
-            },
-            {
-                id: "CNP-2026-472", customer: "deneme", salesRep: "Orhan Özen", date: "2026-09-07", notes: "Fatura kesildi",
-                hasApplication: false, currentStep: 5, isClosed: true, extras: [],
-                items: [{ id: "0103644", name: "KASIMPATI 72 CM", color: "1004", requestedQty: 10, dispatchedQty: 10, returnedQty: 0, price: 350, warehouseNote: "", checked: true }]
-            },
-            {
-                id: "CNP-2026-293", customer: "deneme", salesRep: "Orhan Özen", date: "2026-09-08", notes: "Fatura kesildi",
-                hasApplication: true, currentStep: 5, isClosed: true, extras: [],
-                items: [{ id: "0107502", name: "KASIMPATI 72 CM", color: "1007", requestedQty: 15, dispatchedQty: 15, returnedQty: 0, price: 420, warehouseNote: "", checked: true }]
-            },
-            {
-                id: "CNP-2026-228", customer: "deneme", salesRep: "Uğur Morkoç", date: "2026-09-08", notes: "Muhasebede bekliyor",
-                hasApplication: false, currentStep: 4, isClosed: false, extras: [],
-                items: [{ id: "0109013", name: "STARLİÇE REAL TOUCH", color: "", requestedQty: 16, dispatchedQty: 16, returnedQty: 0, price: 2880, warehouseNote: "", checked: true }]
-            },
-            {
-                id: "CNP-2026-154", customer: "deneme", salesRep: "Tolga Keleş", date: "2026-09-08", notes: "Muhasebede bekliyor",
-                hasApplication: true, currentStep: 4, isClosed: false, extras: [],
-                items: [{ id: "0109043", name: "BONSAI 112 CM", color: "", requestedQty: 4, dispatchedQty: 4, returnedQty: 0, price: 14160, warehouseNote: "", checked: true }]
-            },
-            {
-                id: "CNP-2026-139", customer: "deneme", salesRep: "Orhan Özen", date: "2026-09-07", notes: "Fatura kesildi",
-                hasApplication: false, currentStep: 5, isClosed: true, extras: [],
-                items: [{ id: "0107029", name: "DRACAENA", color: "", requestedQty: 10, dispatchedQty: 10, returnedQty: 0, price: 70, warehouseNote: "", checked: true }]
-            },
-            {
-                id: "CNP-2026-916", customer: "rrrrrrr", salesRep: "Orhan Özen", date: "2026-09-07", notes: "1. Satış Formunda",
-                hasApplication: true, currentStep: 1, isClosed: false, extras: [],
-                items: [{ id: "0109024", name: "YUCCA BUSH", color: "1001", requestedQty: 20, dispatchedQty: 20, returnedQty: 0, price: 860, warehouseNote: "", checked: true }]
-            },
-            {
-                id: "CNP-2026-826", customer: "ggggggg", salesRep: "Orhan Özen", date: "2026-09-07", notes: "1. Satış Formunda",
-                hasApplication: true, currentStep: 1, isClosed: false, extras: [],
-                items: [{ id: "0103644", name: "KASIMPATI 72 CM", color: "1004", requestedQty: 10, dispatchedQty: 10, returnedQty: 0, price: 350, warehouseNote: "", checked: true }]
-            }
-        ];
-
-        let orders = JSON.parse(JSON.stringify(HARDCODED_DEFAULT_ORDERS));
+        let orders = [];
         let masterProducts = [];
         let currentUser = null;
         let activeOrder = null;
         let activeStepTab = 1;
         let parsedExcelItems = [];
 
-        // ================= ÇİFT ONAYLI FİŞ SİLME =================
         async function deleteOrderWithDoubleConfirm(orderId, event) {
             if (event) event.stopPropagation();
 
@@ -1227,7 +1140,6 @@
             }
         }
 
-        // ================= CANLI BULUT KATALOG SENKRONİZASYONU =================
         function listenToCatalogCloud() {
             if (!db) return;
             try {
@@ -1338,12 +1250,17 @@
                 showToast("Dışa aktarılacak ürün bulunmuyor!", true);
                 return;
             }
-            const rows = masterProducts.map(p => ({
-                "Ürün Kodu": p.id,
-                "Ürün Tanımı": p.name,
-                "Renk Kodu": normalizeColorCode(p.color, p.name),
-                "Toptan Fiyat": parseCleanPrice(p.price)
-            }));
+            const rows = masterProducts.map(p => {
+                const normColor = normalizeColorCode(p.color, p.name);
+                const colorName = getColorNameFromCode(normColor);
+                return {
+                    "Ürün Kodu": p.id,
+                    "Ürün Tanımı": p.name,
+                    "Renk Adı": colorName,
+                    "Renk Kodu": normColor,
+                    "Toptan Fiyat": parseCleanPrice(p.price)
+                };
+            });
             const ws = XLSX.utils.json_to_sheet(rows);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Katalog");
@@ -1351,7 +1268,6 @@
             showToast("Katalog Excel yedeği indirildi!");
         }
 
-        // ================= GLOBAL MODAL AÇMA / KAPAMA =================
         function showModal(elId) {
             const el = document.getElementById(elId);
             if (!el) return;
@@ -1447,7 +1363,6 @@
             return subtotal * 1.20;
         }
 
-        // ================= CANLI BULUT SENKRONİZASYONU =================
         function listenToOrdersCloud() {
             try {
                 const cachedOrders = localStorage.getItem("cinpa_cached_orders");
@@ -1471,11 +1386,7 @@
                         cloudOrders.push(doc.data());
                     });
                     
-                    if (cloudOrders.length === 0 && orders.length > 0) {
-                        orders.forEach(async (ord) => {
-                            await db.collection("orders").doc(ord.id).set(ord);
-                        });
-                    } else if (cloudOrders.length > 0) {
+                    if (cloudOrders.length > 0) {
                         cloudOrders.sort((a, b) => (b.id > a.id ? 1 : -1));
                         orders = cloudOrders;
                     }
@@ -1523,8 +1434,7 @@
             }
         }
 
-        // ================= KATALOG MOTORU =================
-        const CATALOG_DB_NAME = "CinpaCatalog_2026_StrictNameColors";
+        const CATALOG_DB_NAME = "CinpaCatalog_2026_NameColorsOfficial";
         const CATALOG_STORE_NAME = "catalog";
 
         function openCatalogDB() {
@@ -1561,12 +1471,6 @@
                             map.set(k, { key: k, id: rawId, name: rawName, color: normalizeColorCode(p.color, p.name), price: parseCleanPrice(p.price) });
                         });
                         masterProducts = Array.from(map.values());
-                    } else if (masterProducts.length === 0) {
-                        masterProducts = [
-                            { key: "0109024_1001", id: "0109024", name: "YUCCA BUSH", color: "1001", price: 860 },
-                            { key: "0109037_1004", id: "0109037", name: "MONSTERA", color: "1004", price: 624 },
-                            { key: "0107029_1003", id: "0107029", name: "DRACAENA", color: "1003", price: 70 }
-                        ];
                     }
                     updateHeaderBadgeCounts();
                     populateProductSelects();
@@ -1613,14 +1517,13 @@
             document.getElementById("cat-new-name").value = "";
             document.getElementById("cat-new-color").value = "";
             document.getElementById("cat-new-price").value = "";
-            showToast(`${name} (${color || 'Standart'}) kaydedildi!`);
+            showToast(`${name} kaydedildi!`);
         }
 
-        // ================= KESİN İPTAL FİLTRELİ & ADINDAN RENK ALAN EXCEL YÜKLEYİCİ =================
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Katalog dosyası okunuyor, 'İPTAL'ler ayıklanıp renk kodları atanıyor...");
+            showToast("Katalog dosyası okunuyor, 'İPTAL'ler ayıklanıp renk isimleri atanıyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -1669,11 +1572,7 @@
                     }
 
                     if (startRow === -1) {
-                        startRow = 0;
-                        codeCol = 0;
-                        nameCol = 1;
-                        colorCol = 2;
-                        priceCol = 3;
+                        startRow = 0; codeCol = 0; nameCol = 1; colorCol = 2; priceCol = 3;
                     } else {
                         if (codeCol === -1) codeCol = 0;
                         if (nameCol === -1) nameCol = 1;
@@ -1696,7 +1595,6 @@
                         if (!code && !name) continue;
                         if (code.toLowerCase() === 'itemcode' || code.toLowerCase() === 'stok kodu') continue;
 
-                        // İPTAL FİLTRESİ: Kod veya adda iptal geçiyorsa kesinlikle alma
                         const checkString = `${code} ${name}`.toUpperCase();
                         if (checkString.includes('İPTAL') || checkString.includes('IPTAL')) {
                             skippedCount++;
@@ -1704,7 +1602,6 @@
                         }
 
                         let price = parseCleanPrice(rawPrice);
-                        // HEM RENK SÜTUNUNDAN HEM DE ADIN İÇİNDEKİ KELİMEDEN RENK BUL
                         let normColor = normalizeColorCode(color, name);
 
                         const safeKey = `${String(code).trim().toLowerCase()}_${normColor || 'STANDART'}`;
@@ -1749,7 +1646,6 @@
             event.target.value = "";
         }
 
-        // ================= EXCEL FİŞİ OKUMA (ADINDAN DA RENK ÇIKARIR) =================
         function handleExcelFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1888,7 +1784,6 @@
                 let price = parseCleanPrice(rawPrice);
 
                 let productName = (explicitName && explicitName !== '' && explicitName !== 'nan') ? explicitName : '';
-                // HEM RENK SÜTUNUNDAN HEM DE ADINDAN RENK ÇÖZÜMLE
                 let finalColor = normalizeColorCode(color, productName);
 
                 if (masterProducts.length > 0) {
@@ -1938,10 +1833,11 @@
                 const sub = item.requestedQty * item.price;
                 previewTotal += sub;
                 const tr = document.createElement("tr");
+                const colorName = getColorNameFromCode(item.color);
                 tr.innerHTML = `
                     <td class="p-2 font-mono font-bold text-slate-700">${item.id}</td>
                     <td class="p-2 font-medium text-slate-900">${item.name}</td>
-                    <td class="p-2 text-center font-bold text-emerald-800 bg-emerald-50">${item.color || '-'}</td>
+                    <td class="p-2 text-center font-bold text-emerald-800 bg-emerald-50">${colorName || '-'}</td>
                     <td class="p-2 text-center font-bold">${item.requestedQty} Adet</td>
                     <td class="p-2 text-right font-bold">${Number(item.price).toLocaleString('tr-TR')} ₺</td>
                 `;
@@ -2007,7 +1903,6 @@
             openOrderDetail(newId);
         }
 
-        // ================= İRSALİYE OLUŞTUR (.XLSX) =================
         function exportIrsaliyeExcel() {
             if (!activeOrder) return;
             const excelRows = [];
@@ -2076,7 +1971,6 @@
             showToast("İrsaliye Excel (.xlsx) dosyası başarıyla oluşturuldu ve indirildi!");
         }
 
-        // ================= NEBİM V3 FORMATINDA SİPARİŞ OLUŞTUR (.XLSX) =================
         function exportFinalOrderToExcel() {
             if (!activeOrder) return;
             const excelRows = [];
@@ -2145,7 +2039,6 @@
             showToast("Sipariş Excel (.xlsx) dosyası başarıyla oluşturuldu ve indirildi!");
         }
 
-        // ================= GİRİŞ & ROL İŞLEMLERİ =================
         function requestPasswordAndLogin(roleKey) {
             if (roleKey === 'depo') {
                 const pass = prompt("Depocu (Kamber Usta) Giriş Şifresi:");
@@ -2289,7 +2182,6 @@
             renderOrderList();
         }
 
-        // ================= SİPARİŞ LİSTESİ & ADIM YÖNETİMİ =================
         function renderOrderList() {
             const tbody = document.getElementById("orders-table-body");
             if (!tbody) return;
@@ -2481,10 +2373,12 @@
             renderStep1(); renderStep2(); renderStep3(); renderStep4();
         }
 
+        // ================= YAZI İLE RENK GÖSTERME (ÖRN: [KREM], [KIRMIZI]) =================
         function formatProductNameWithColor(name, color) {
             const normColor = normalizeColorCode(color, name);
             if (normColor) {
-                return `${name} <span class="text-emerald-700 font-mono font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">[${normColor}]</span>`;
+                const colorName = getColorNameFromCode(normColor);
+                return `${name} <span class="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 text-xs">[${colorName}]</span>`;
             }
             return name;
         }
@@ -2518,6 +2412,7 @@
                     const sub = item.requestedQty * itemPr;
                     total += sub;
                     const normColor = normalizeColorCode(item.color, item.name);
+                    const colorName = getColorNameFromCode(normColor);
                     const displayName = formatProductNameWithColor(item.name, item.color);
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
@@ -2526,7 +2421,7 @@
                             <div>${displayName}</div>
                         </td>
                         <td class="p-3.5 text-center">
-                            ${canEdit ? `<input type="text" value="${normColor}" placeholder="Renk Kodu" onchange="updateStep1Color(${index}, this.value)" class="w-20 text-center font-bold border border-emerald-400 bg-emerald-50 text-emerald-950 rounded p-1 text-xs">` : `<span class="font-bold text-xs bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded">${normColor || '-'}</span>`}
+                            ${canEdit ? `<input type="text" value="${colorName}" placeholder="Renk Adı / Kodu" onchange="updateStep1Color(${index}, this.value)" class="w-28 text-center font-bold border border-emerald-400 bg-emerald-50 text-emerald-950 rounded p-1 text-xs">` : `<span class="font-bold text-xs bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded">${colorName || '-'}</span>`}
                         </td>
                         <td class="p-3.5 text-center">
                             ${canEdit ? `<input type="number" min="1" value="${item.requestedQty}" onchange="updateStep1Qty(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold">${item.requestedQty} Adet</span>`}
@@ -2547,7 +2442,6 @@
             }
         }
 
-        // ================= SATIŞ: ÇİFT ONAYLI DEPOYA İLET =================
         async function forwardToWarehouse() {
             if (!activeOrder.items || activeOrder.items.length === 0) {
                 showToast("Lütfen önce fişe en az bir ürün ekleyiniz.", true);
@@ -2566,7 +2460,6 @@
             returnToDashboard();
         }
 
-        // ================= ARAMA AÇILIR LİSTELERİ =================
         function searchCatalogDropdown(query) {
             const s1 = document.getElementById("step1-select-product");
             if (!s1) return;
@@ -2577,11 +2470,14 @@
             if (!q) {
                 matched = masterProducts.slice(0, 100);
             } else {
-                matched = masterProducts.filter(p => 
-                    p.id.toLowerCase().includes(q) || 
-                    p.name.toLowerCase().includes(q) || 
-                    (p.color && String(p.color).toLowerCase().includes(q))
-                ).slice(0, 100);
+                matched = masterProducts.filter(p => {
+                    const normColor = normalizeColorCode(p.color, p.name);
+                    const colorName = getColorNameFromCode(normColor).toLowerCase();
+                    return p.id.toLowerCase().includes(q) || 
+                           p.name.toLowerCase().includes(q) || 
+                           colorName.includes(q) ||
+                           (normColor && normColor.includes(q));
+                }).slice(0, 100);
             }
 
             if (matched.length === 0) {
@@ -2595,8 +2491,9 @@
             matched.forEach(p => {
                 const opt = document.createElement("option");
                 const normColor = normalizeColorCode(p.color, p.name);
+                const colorName = getColorNameFromCode(normColor);
                 opt.value = p.key;
-                const colorTxt = normColor ? ` [Renk Kodu: ${normColor}]` : " [Standart]";
+                const colorTxt = colorName ? ` [${colorName}]` : " [Standart]";
                 opt.innerText = `${p.id} - ${p.name}${colorTxt} (${Number(parseCleanPrice(p.price)).toLocaleString('tr-TR')} ₺)`;
                 s1.appendChild(opt);
             });
@@ -2630,7 +2527,8 @@
             });
             await syncOrderToCloud(activeOrder);
             renderStep1();
-            showToast(`${p.name} (${finalColor || 'Standart'}) fişe eklendi!`);
+            const colorName = getColorNameFromCode(finalColor);
+            showToast(`${p.name} (${colorName || 'Standart'}) fişe eklendi!`);
         }
 
         async function addItemManual() {
@@ -2708,6 +2606,7 @@
             if (activeOrder.items) {
                 activeOrder.items.forEach((item, index) => {
                     const normColor = normalizeColorCode(item.color, item.name);
+                    const colorName = getColorNameFromCode(normColor);
                     const displayName = formatProductNameWithColor(item.name, item.color);
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
@@ -2718,7 +2617,7 @@
                             <div class="inline-block px-1.5 py-0.5 mb-0.5 bg-slate-100 rounded text-slate-600 font-mono text-xs font-black tracking-wider border border-slate-200">${item.id || 'ÖZEL'}</div>
                             <div class="text-sm font-extrabold text-slate-900">${displayName}</div>
                         </td>
-                        <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${normColor || '-'}</td>
+                        <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${colorName || '-'}</td>
                         <td class="p-3.5 text-center font-bold text-slate-500">${item.requestedQty} Adet</td>
                         <td class="p-3.5 text-center">
                             ${canEditWarehouse ? `<input type="number" min="0" value="${item.dispatchedQty}" onchange="updateStep2Dispatched(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold text-amber-900">${item.dispatchedQty} Adet</span>`}
@@ -2744,11 +2643,14 @@
             if (!q) {
                 matched = masterProducts.slice(0, 100);
             } else {
-                matched = masterProducts.filter(p => 
-                    p.id.toLowerCase().includes(q) || 
-                    p.name.toLowerCase().includes(q) || 
-                    (p.color && String(p.color).toLowerCase().includes(q))
-                ).slice(0, 100);
+                matched = masterProducts.filter(p => {
+                    const normColor = normalizeColorCode(p.color, p.name);
+                    const colorName = getColorNameFromCode(normColor).toLowerCase();
+                    return p.id.toLowerCase().includes(q) || 
+                           p.name.toLowerCase().includes(q) || 
+                           colorName.includes(q) ||
+                           (normColor && normColor.includes(q));
+                }).slice(0, 100);
             }
 
             if (matched.length === 0) {
@@ -2762,8 +2664,9 @@
             matched.forEach(p => {
                 const opt = document.createElement("option");
                 const normColor = normalizeColorCode(p.color, p.name);
+                const colorName = getColorNameFromCode(normColor);
                 opt.value = p.key;
-                const colorTxt = normColor ? ` [Renk Kodu: ${normColor}]` : " [Standart]";
+                const colorTxt = colorName ? ` [${colorName}]` : " [Standart]";
                 opt.innerText = `${p.id} - ${p.name}${colorTxt}`;
                 sel.appendChild(opt);
             });
@@ -2777,7 +2680,8 @@
             const p = masterProducts.find(x => x.key === sel.value);
             const cInput = document.getElementById("depo-add-color");
             if (cInput && p) {
-                cInput.value = normalizeColorCode(p.color, p.name);
+                const normColor = normalizeColorCode(p.color, p.name);
+                cInput.value = getColorNameFromCode(normColor);
             }
         }
 
@@ -2818,7 +2722,6 @@
         async function updateStep2Dispatched(index, val) { activeOrder.items[index].dispatchedQty = parseInt(val) || 0; await syncOrderToCloud(activeOrder); }
         async function updateStep2Note(index, val) { activeOrder.items[index].warehouseNote = val; await syncOrderToCloud(activeOrder); }
 
-        // ================= DEPO: ÇİFT ONAYLI SEVKE İLERLET =================
         async function forwardFromWarehouse() {
             const c1 = confirm(`1. ONAY:\n\nDepo sayımı ve kolileme tamamlandı mı?\n\nBu fiş için Sevk İrsaliyesi kesilecek.`);
             if (!c1) return;
@@ -2862,7 +2765,6 @@
 
             if (activeOrder && activeOrder.items) {
                 activeOrder.items.forEach((item, index) => {
-                    const normColor = normalizeColorCode(item.color, item.name);
                     const displayName = formatProductNameWithColor(item.name, item.color);
                     const div = document.createElement("div");
                     div.className = "flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 text-xs";
@@ -2952,7 +2854,6 @@
             showToast("İlave ürün talebi silindi.");
         }
 
-        // ================= SAHA: ÇİFT ONAYLI MUHASEBEYE GÖNDER =================
         async function forwardToAccounting() {
             if (!activeOrder) return;
 
@@ -2968,7 +2869,7 @@
             returnToDashboard();
         }
 
-        // ================= 4. ADIM: MUHASEBE & SATIR SİL =================
+        // ================= 4. ADIM: MUHASEBE =================
         function renderStep4() {
             const tbody = document.getElementById("step4-items-tbody");
             if (!tbody || !activeOrder) return;
@@ -2996,6 +2897,7 @@
                     subtotal += lineTotal;
 
                     const normColor = normalizeColorCode(item.color, item.name);
+                    const colorName = getColorNameFromCode(normColor);
                     const displayName = formatProductNameWithColor(item.name, item.color);
 
                     const tr = document.createElement("tr");
@@ -3004,7 +2906,7 @@
                             <div class="text-xs text-slate-400 font-mono">${item.id}</div>
                             <div>${displayName}</div>
                         </td>
-                        <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${normColor || '-'}</td>
+                        <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${colorName || '-'}</td>
                         <td class="p-3.5 text-center font-medium">${req}</td>
                         <td class="p-3.5 text-center font-medium">${disp}</td>
                         <td class="p-3.5 text-center text-red-700 font-bold">${ret}</td>
@@ -3030,6 +2932,7 @@
                         subtotal += lineTotal;
 
                         const normColor = normalizeColorCode(ext.color, ext.name);
+                        const colorName = getColorNameFromCode(normColor);
                         const displayName = formatProductNameWithColor(ext.name, ext.color);
 
                         const tr = document.createElement("tr");
@@ -3039,7 +2942,7 @@
                                 <div class="text-xs text-emerald-700 font-mono">[İlave Kalem] ${ext.id}</div>
                                 <div>${displayName}</div>
                             </td>
-                            <td class="p-3.5 text-center font-bold text-xs bg-emerald-100 text-emerald-900">${normColor || '-'}</td>
+                            <td class="p-3.5 text-center font-bold text-xs bg-emerald-100 text-emerald-900">${colorName || '-'}</td>
                             <td class="p-3.5 text-center text-slate-400">-</td>
                             <td class="p-3.5 text-center text-slate-400">-</td>
                             <td class="p-3.5 text-center text-slate-400">-</td>
@@ -3118,8 +3021,9 @@
             masterProducts.slice(0, 100).forEach(p => {
                 const opt3 = document.createElement("option");
                 const normColor = normalizeColorCode(p.color, p.name);
+                const colorName = getColorNameFromCode(normColor);
                 opt3.value = p.key;
-                const cTxt = normColor ? ` [Renk Kodu: ${normColor}]` : " [Standart]";
+                const cTxt = colorName ? ` [${colorName}]` : " [Standart]";
                 const priceTxt = showPrices ? ` (${Number(parseCleanPrice(p.price)).toLocaleString('tr-TR')} ₺)` : "";
                 opt3.innerText = `${p.id} - ${p.name}${cTxt}${priceTxt}`;
                 s3.appendChild(opt3);
@@ -3133,7 +3037,10 @@
             if (p) {
                 document.getElementById("step1-catalog-price").value = parseCleanPrice(p.price);
                 const cInput = document.getElementById("step1-catalog-color");
-                if (cInput) cInput.value = normalizeColorCode(p.color, p.name);
+                if (cInput) {
+                    const normColor = normalizeColorCode(p.color, p.name);
+                    cInput.value = getColorNameFromCode(normColor);
+                }
             }
         }
 
@@ -3190,12 +3097,14 @@
             list.slice(0, 300).forEach((p, idx) => {
                 const tr = document.createElement("tr");
                 const normColor = normalizeColorCode(p.color, p.name);
+                const colorName = getColorNameFromCode(normColor);
                 const pr = parseCleanPrice(p.price);
+                const colorLabel = colorName ? `${colorName} (${normColor})` : '-';
                 tr.innerHTML = `
                     <td class="p-3 text-center"><input type="checkbox" value="${idx}" class="catalog-row-checkbox w-4 h-4 text-emerald-700 rounded cursor-pointer"></td>
                     <td class="p-3 font-mono font-bold text-slate-900">${p.id}</td>
                     <td class="p-3 font-medium">${p.name}</td>
-                    <td class="p-3 text-emerald-900 font-bold bg-emerald-50 text-center">${normColor || '-'}</td>
+                    <td class="p-3 text-emerald-900 font-bold bg-emerald-50 text-center">${colorLabel}</td>
                     <td class="p-3 text-right font-bold text-emerald-800">${Number(pr).toLocaleString('tr-TR')} ₺</td>
                     <td class="p-3 text-center"><button type="button" onclick="removeProductByIndex(${idx})" class="text-slate-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>
                 `;
@@ -3236,11 +3145,14 @@
 
         function filterCatalogTable() {
             const q = document.getElementById("cat-search-input").value.toLowerCase();
-            const filtered = masterProducts.filter(p => 
-                p.id.toLowerCase().includes(q) || 
-                p.name.toLowerCase().includes(q) || 
-                (p.color && String(p.color).toLowerCase().includes(q))
-            );
+            const filtered = masterProducts.filter(p => {
+                const normColor = normalizeColorCode(p.color, p.name);
+                const colorName = getColorNameFromCode(normColor).toLowerCase();
+                return p.id.toLowerCase().includes(q) || 
+                       p.name.toLowerCase().includes(q) || 
+                       colorName.includes(q) ||
+                       (normColor && normColor.includes(q));
+            });
             renderCatalogTable(filtered);
         }
 
@@ -3347,7 +3259,6 @@
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
         }
 
-        // ================= BAŞLANGIÇ YÜKLEMESİ VE EVENT ATAMALARI =================
         window.addEventListener('DOMContentLoaded', () => {
             loadCatalogFromDB();
 
