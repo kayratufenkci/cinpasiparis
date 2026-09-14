@@ -230,7 +230,7 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <button onclick="logout()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 sm:hidden cursor-pointer">
+                    <button onclick="logout()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex items-center space-x-1 sm:hidden cursor-pointer">
                         <i class="fa-solid fa-arrow-left"></i>
                         <span>Geri Dön</span>
                     </button>
@@ -882,6 +882,7 @@
 
     <!-- ================= JAVASCRIPT MOTORU ================= -->
     <script>
+        // COLOR.XLSX & COLOR_2.XLSX RESMİ 37 NEBİM RENK KODU SÖZLÜĞÜ
         const OFFICIAL_NEBIM_COLORS = {
             "AÇIK KAHVERENGİ": "1019",
             "ACIK KAHVERENGI": "1019",
@@ -1020,14 +1021,13 @@
             return '';
         }
 
+        // FİYATI EKSİKSİZ VE BOZMADAN OKUYAN FONKSİYON
         function parseCleanPrice(val) {
             if (val === null || val === undefined) return 0;
             if (typeof val === 'number') return isNaN(val) ? 0 : val;
             let str = String(val).trim();
             if (!str) return 0;
-            // Para birimi sembollerini ve boşlukları kaldır
             str = str.replace(/[₺$€TL\s]/gi, '');
-            // Türkçe format: 1.250,50 -> 1250.50
             if (str.includes(',') && str.includes('.')) {
                 str = str.replace(/\./g, '').replace(',', '.');
             } else if (str.includes(',')) {
@@ -1216,7 +1216,7 @@
             }
         }
 
-        // ================= CANLI BULUT KATALOG SENKRONİZASYONU (HAFİFLETİLMİŞ ÇOKLU PARÇA) =================
+        // ================= BULUT KATALOG SENKRONİZASYONU =================
         function listenToCatalogCloud() {
             if (!db) return;
             try {
@@ -1278,7 +1278,7 @@
                     });
                 }
 
-                showToast(`Başarıyla ${masterProducts.length} ürün buluta eşitlendi! Tüm cihazlarda güncellendi.`);
+                showToast(`Başarıyla ${masterProducts.length} ürün buluta eşitlendi!`);
             } catch(err) {
                 console.error("Bulut senkronizasyon hatası:", err);
                 showToast("Buluta yüklenirken hata oluştu: " + err.message, true);
@@ -1502,7 +1502,7 @@
         }
 
         // ================= KATALOG MOTORU =================
-        const CATALOG_DB_NAME = "CinpaCatalog_2026_StrictPrice";
+        const CATALOG_DB_NAME = "CinpaCatalog_2026_PerfectPrice";
         const CATALOG_STORE_NAME = "catalog";
 
         function openCatalogDB() {
@@ -1583,11 +1583,11 @@
             showToast(`${name} (${color || 'Standart'}) kaydedildi!`);
         }
 
-        // ================= KESİN MÜKERRER & SIFIR FİYAT TEMİZLEYİCİ EXCEL YÜKLEYİCİ =================
+        // ================= KESİN VE DOĞRU EXCEL KATALOG YÜKLEYİCİ =================
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Katalog dosyası okunuyor, fiyatlar analiz ediliyor...");
+            showToast("Ürün Excel dosyası okunuyor, fiyat ve kodlar çekiliyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -1609,16 +1609,31 @@
                         let row = rawData[r].map(c => String(c || '').toLowerCase().trim());
                         
                         row.forEach((h, colIdx) => {
+                            // Kod Sütunu
                             if ((h === 'itemcode' || h === 'stok kodu' || h === 'stokkodu' || h === 'ürün kodu' || h === 'urunkodu' || h === 'kod' || h === 'barkod' || h === 'barcode') && codeCol === -1) {
                                 codeCol = colIdx;
-                            } else if ((h === 'itemdescription' || h === 'ürün adı' || h === 'urun adi' || h === 'stok adı' || h === 'açıklama' || h === 'tanım' || h === 'tanim' || h === 'ad') && nameCol === -1) {
+                            } 
+                            // Ad Sütunu
+                            else if ((h === 'itemdescription' || h === 'ürün adı' || h === 'urun adi' || h === 'stok adı' || h === 'açıklama' || h === 'tanım' || h === 'tanim' || h === 'ad') && nameCol === -1) {
                                 nameCol = colIdx;
-                            } else if ((h === 'colorcode' || h === 'renk kodu' || h === 'renkkodu' || h === 'color' || h === 'renk') && colorCol === -1) {
+                            } 
+                            // Renk Sütunu
+                            else if ((h === 'colorcode' || h === 'renk kodu' || h === 'renkkodu' || h === 'color' || h === 'renk' || h === 'renk adı' || h === 'renk tanımı' || h === 'colordescription') && colorCol === -1) {
                                 colorCol = colIdx;
-                            } else if ((h === 'price' || h === 'birim fiyat' || h === 'birimfiyat' || h === 'toptan fiyat' || h === 'satış fiyatı' || h === 'fiyat' || h === 'fiyat 1' || h === 'pricevi') && priceCol === -1) {
+                            } 
+                            // Fiyat Sütunu (Döviz, kur, kdv, liste gibi sütunlar kesinlikle elenir)
+                            else if ((h === 'price' || h === 'birim fiyat' || h === 'birimfiyat' || h === 'toptan fiyat' || h === 'satış fiyatı' || h === 'satis fiyati' || h === 'fiyat' || h === 'fiyatı' || h === 'pricevi') && priceCol === -1) {
                                 priceCol = colIdx;
                             }
                         });
+
+                        if (priceCol === -1) {
+                            row.forEach((h, colIdx) => {
+                                if (('fiyat' in h || 'price' in h) && !['listesi', 'no', 'tarih', 'döviz', 'currency', 'rate', 'iskonto', 'kdv', 'tip'].some(neg => h.includes(neg))) {
+                                    priceCol = colIdx;
+                                }
+                            });
+                        }
 
                         if (codeCol !== -1 && (nameCol !== -1 || priceCol !== -1)) {
                             startRow = r + 1;
@@ -1653,12 +1668,14 @@
                         if (!code && !name) continue;
                         if (code.toLowerCase() === 'itemcode' || code.toLowerCase() === 'stok kodu') continue;
 
+                        // FİYATI EKSİKSİZ OKU
                         let price = parseCleanPrice(rawPrice);
+                        // RENK KODUNU COLOR.XLSX TABLOSUNDAN EŞLEŞTİR
                         let normColor = normalizeColorCode(color);
 
+                        // BİRİNCİL TEKİL ANAHTAR (StokKodu + RenkKodu)
                         const safeKey = `${String(code || 'URUN').trim().toLowerCase()}_${normColor || 'STANDART'}`;
 
-                        // EĞER BU ÜRÜN/RENK DAHA ÖNCE EKLENMEDİYSE VEYA YENİ GELEN FİYAT > 0 VE ESKİSİ 0 İSE GÜNCELLE
                         if (!uniqueMap.has(safeKey)) {
                             uniqueMap.set(safeKey, {
                                 key: safeKey,
@@ -1669,7 +1686,7 @@
                             });
                         } else {
                             const existing = uniqueMap.get(safeKey);
-                            // Sıfır fiyatın gerçek fiyatı ezmesini kesinlikle engelle
+                            // Sıfır fiyatın gerçek fiyatı ezmesini kesin olarak engelle
                             if (existing.price === 0 && price > 0) {
                                 existing.price = price;
                             }
@@ -1856,7 +1873,7 @@
                     if (found) {
                         if (!productName) productName = found.name;
                         if (!finalColor && found.color) finalColor = normalizeColorCode(found.color);
-                        if (price === 0 && found.price > 0) price = found.price;
+                        if (price === 0 && found.price > 0) price = parseCleanPrice(found.price);
                     }
                 }
 
