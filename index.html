@@ -1216,7 +1216,7 @@
             }
         }
 
-        // ================= BULUT KATALOG SENKRONİZASYONU =================
+        // ================= CANLI BULUT KATALOG SENKRONİZASYONU =================
         function listenToCatalogCloud() {
             if (!db) return;
             try {
@@ -1502,7 +1502,7 @@
         }
 
         // ================= KATALOG MOTORU =================
-        const CATALOG_DB_NAME = "CinpaCatalog_2026_PerfectPrice";
+        const CATALOG_DB_NAME = "CinpaCatalog_2026_NoCancel";
         const CATALOG_STORE_NAME = "catalog";
 
         function openCatalogDB() {
@@ -1583,11 +1583,11 @@
             showToast(`${name} (${color || 'Standart'}) kaydedildi!`);
         }
 
-        // ================= KESİN VE DOĞRU EXCEL KATALOG YÜKLEYİCİ =================
+        // ================= İPTAL FİLTRELİ & FİYAT KORUMALI EXCEL YÜKLEME =================
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Ürün Excel dosyası okunuyor, fiyat ve kodlar çekiliyor...");
+            showToast("Ürün Excel dosyası okunuyor, iptal yazıları filtreleniyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -1609,25 +1609,17 @@
                         let row = rawData[r].map(c => String(c || '').toLowerCase().trim());
                         
                         row.forEach((h, colIdx) => {
-                            // Kod Sütunu
                             if ((h === 'itemcode' || h === 'stok kodu' || h === 'stokkodu' || h === 'ürün kodu' || h === 'urunkodu' || h === 'kod' || h === 'barkod' || h === 'barcode') && codeCol === -1) {
                                 codeCol = colIdx;
-                            } 
-                            // Ad Sütunu
-                            else if ((h === 'itemdescription' || h === 'ürün adı' || h === 'urun adi' || h === 'stok adı' || h === 'açıklama' || h === 'tanım' || h === 'tanim' || h === 'ad') && nameCol === -1) {
+                            } else if ((h === 'itemdescription' || h === 'ürün adı' || h === 'urun adi' || h === 'stok adı' || h === 'açıklama' || h === 'tanım' || h === 'tanim' || h === 'ad') && nameCol === -1) {
                                 nameCol = colIdx;
-                            } 
-                            // Renk Sütunu
-                            else if ((h === 'colorcode' || h === 'renk kodu' || h === 'renkkodu' || h === 'color' || h === 'renk' || h === 'renk adı' || h === 'renk tanımı' || h === 'colordescription') && colorCol === -1) {
+                            } else if ((h === 'colorcode' || h === 'renk kodu' || h === 'renkkodu' || h === 'color' || h === 'renk' || h === 'renk adı' || h === 'renk tanımı' || h === 'colordescription') && colorCol === -1) {
                                 colorCol = colIdx;
-                            } 
-                            // Fiyat Sütunu
-                            else if ((h === 'price' || h === 'birim fiyat' || h === 'birimfiyat' || h === 'toptan fiyat' || h === 'satış fiyatı' || h === 'satis fiyati' || h === 'fiyat' || h === 'fiyatı' || h === 'pricevi') && priceCol === -1) {
+                            } else if ((h === 'price' || h === 'birim fiyat' || h === 'birimfiyat' || h === 'toptan fiyat' || h === 'satış fiyatı' || h === 'satis fiyati' || h === 'fiyat' || h === 'fiyatı' || h === 'pricevi') && priceCol === -1) {
                                 priceCol = colIdx;
                             }
                         });
 
-                        // GÜVENLİ INCLUDES KONTROLÜ (HATA GİDERİLDİ)
                         if (priceCol === -1) {
                             row.forEach((h, colIdx) => {
                                 const strH = String(h || '').toLowerCase();
@@ -1670,12 +1662,15 @@
                         if (!code && !name) continue;
                         if (code.toLowerCase() === 'itemcode' || code.toLowerCase() === 'stok kodu') continue;
 
-                        // FİYATI EKSİKSİZ OKU
+                        // KOD VEYA AÇIKLAMADA "İPTAL" GEÇİYORSA KATALOGA DAHİL ETME
+                        const checkText = `${code} ${name}`.toLowerCase();
+                        if (checkText.includes('iptal')) {
+                            continue;
+                        }
+
                         let price = parseCleanPrice(rawPrice);
-                        // RENK KODUNU COLOR.XLSX TABLOSUNDAN EŞLEŞTİR
                         let normColor = normalizeColorCode(color);
 
-                        // BİRİNCİL TEKİL ANAHTAR (StokKodu + RenkKodu)
                         const safeKey = `${String(code || 'URUN').trim().toLowerCase()}_${normColor || 'STANDART'}`;
 
                         if (!uniqueMap.has(safeKey)) {
@@ -1705,7 +1700,7 @@
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
                         populateProductSelects();
-                        showToast(`Başarıyla ${newProducts.length} adet tekil ürün varyantı ve gerçek fiyatları yüklendi!`);
+                        showToast(`Başarıyla ${newProducts.length} adet geçerli ürün yüklendi ("İptal" olanlar filtrelendi)!`);
                     } else {
                         showToast("Excel'den geçerli ürün satırı okunamadı!", true);
                     }
@@ -2099,7 +2094,7 @@
             });
 
             if (excelRows.length === 0) {
-                showToast("Dışa aktarılacak ürün kalemi bulunamadı!", true);
+                showToast("İrsaliye oluşturulacak sevk edilmiş ürün kalemi bulunamadı!", true);
                 return;
             }
 
