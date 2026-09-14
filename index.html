@@ -781,7 +781,7 @@
                         <span>Buluta Gönder & Tüm Cihazlara Eşitle</span>
                     </button>
 
-                    <button type="button" onclick="exportCatalogAsBackup()" class="px-3.5 py-2 bg-slate-800 hover:bg-black text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5 cursor-pointer">
+                    <button type="button" onclick="exportCatalogAsBackup()" class="px-3.5 py-2 bg-slate-800 hover:bg-black text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-1.5 cursor-pointer" title="Kataloğu Excel olarak yedekler">
                         <i class="fa-solid fa-download"></i>
                         <span>Yedek İndir (.xlsx)</span>
                     </button>
@@ -1501,7 +1501,7 @@
         }
 
         // ================= KATALOG MOTORU =================
-        const CATALOG_DB_NAME = "CinpaCatalog_2026_FinalClean";
+        const CATALOG_DB_NAME = "CinpaCatalog_2026_NoCancelStrict";
         const CATALOG_STORE_NAME = "catalog";
 
         function openCatalogDB() {
@@ -1582,11 +1582,11 @@
             showToast(`${name} (${color || 'Standart'}) kaydedildi!`);
         }
 
-        // ================= İPTAL FİLTRELİ & FİYAT KORUMALI EXCEL YÜKLEME =================
+        // ================= KESİN İPTAL FİLTRELİ EXCEL YÜKLEME =================
         function handleCatalogExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            showToast("Ürün Excel dosyası okunuyor, iptal yazıları ve mükerrer kayıtlar filtreleniyor...");
+            showToast("Ürün Excel dosyası okunuyor, kodunda İPTAL geçenler eleniyor...");
 
             const reader = new FileReader();
             reader.onload = async function(e) {
@@ -1661,16 +1661,17 @@
                         if (!code && !name) continue;
                         if (code.toLowerCase() === 'itemcode' || code.toLowerCase() === 'stok kodu') continue;
 
-                        // KOD VEYA AÇIKLAMADA "İPTAL" GEÇİYORSA KATALOGA KESİNLİKLE ALMA
-                        const checkText = `${code} ${name}`.toLowerCase();
-                        if (checkText.includes('iptal')) {
+                        // KOD VEYA İSİM KISMINDA "İPTAL" GEÇİYORSA KESİNLİKLE ALMA
+                        const codeUpper = code.toUpperCase();
+                        const nameUpper = name.toUpperCase();
+                        if (codeUpper.includes('İPTAL') || codeUpper.includes('IPTAL') || nameUpper.includes('İPTAL') || nameUpper.includes('IPTAL')) {
                             continue;
                         }
 
                         let price = parseCleanPrice(rawPrice);
                         let normColor = normalizeColorCode(color);
 
-                        const safeKey = `${String(code || 'URUN').trim().toLowerCase()}_${normColor || 'STANDART'}`;
+                        const safeKey = `${String(code).trim().toLowerCase()}_${normColor || 'STANDART'}`;
 
                         if (!uniqueMap.has(safeKey)) {
                             uniqueMap.set(safeKey, {
