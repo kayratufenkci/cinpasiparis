@@ -1232,7 +1232,10 @@
                                 }
                             }
                             if (loadedItems.length > 0) {
-                                masterProducts = loadedItems;
+                                masterProducts = loadedItems.filter(p => {
+                                    const check = `${p.id || ''} ${p.name || ''}`.toUpperCase();
+                                    return !check.includes('İPTAL') && !check.includes('IPTAL');
+                                });
                                 saveCatalogToLocalDBOnly(masterProducts);
                                 renderCatalogTable();
                                 updateHeaderBadgeCounts();
@@ -1261,23 +1264,28 @@
             }
 
             try {
+                const cleanList = masterProducts.filter(p => {
+                    const check = `${p.id || ''} ${p.name || ''}`.toUpperCase();
+                    return !check.includes('İPTAL') && !check.includes('IPTAL');
+                });
+
                 const chunkSize = 500;
-                const totalChunks = Math.ceil(masterProducts.length / chunkSize);
+                const totalChunks = Math.ceil(cleanList.length / chunkSize);
                 
                 await db.collection("cinpa_catalog_v2").doc("meta").set({
-                    totalCount: masterProducts.length,
+                    totalCount: cleanList.length,
                     totalChunks: totalChunks,
                     updatedAt: Date.now()
                 });
 
                 for (let i = 0; i < totalChunks; i++) {
-                    const slice = masterProducts.slice(i * chunkSize, (i + 1) * chunkSize);
+                    const slice = cleanList.slice(i * chunkSize, (i + 1) * chunkSize);
                     await db.collection("cinpa_catalog_v2").doc(`chunk_${i}`).set({
                         items: slice
                     });
                 }
 
-                showToast(`Başarıyla ${masterProducts.length} ürün buluta eşitlendi!`);
+                showToast(`Başarıyla ${cleanList.length} ürün buluta eşitlendi!`);
             } catch(err) {
                 console.error("Bulut senkronizasyon hatası:", err);
                 showToast("Buluta yüklenirken hata oluştu: " + err.message, true);
@@ -1292,6 +1300,9 @@
                     const store = tx.objectStore(CATALOG_STORE_NAME);
                     store.clear();
                     productsList.forEach((p) => {
+                        const check = `${p.id || ''} ${p.name || ''}`.toUpperCase();
+                        if (check.includes('İPTAL') || check.includes('IPTAL')) return;
+
                         const normColor = normalizeColorCode(p.color);
                         const safeKey = `${String(p.id).trim().toLowerCase()}_${normColor || 'STANDART'}`;
                         store.put({
@@ -1501,7 +1512,7 @@
         }
 
         // ================= KATALOG MOTORU =================
-        const CATALOG_DB_NAME = "CinpaCatalog_2026_Ironclad";
+        const CATALOG_DB_NAME = "CinpaCatalog_2026_StrictNoCancel";
         const CATALOG_STORE_NAME = "catalog";
 
         function openCatalogDB() {
@@ -1529,14 +1540,11 @@
                     if (req.result && req.result.length > 0) {
                         const map = new Map();
                         req.result.forEach(p => {
-                            const rawId = String(p.id || '').trim();
-                            const rawName = String(p.name || '').trim();
-                            // KESİN KONTROL: Veritabanında eskiden kalmış iptal kelimesi varsa yükleme
-                            const fullCheck = `${rawId} ${rawName}`.toUpperCase();
-                            if (fullCheck.includes('İPTAL') || fullCheck.includes('IPTAL')) return;
+                            const check = `${p.id || ''} ${p.name || ''}`.toUpperCase();
+                            if (check.includes('İPTAL') || check.includes('IPTAL')) return;
 
-                            const k = `${rawId.toLowerCase()}_${normalizeColorCode(p.color) || 'STANDART'}`;
-                            map.set(k, { key: k, id: rawId, name: rawName, color: normalizeColorCode(p.color), price: parseCleanPrice(p.price) });
+                            const k = `${String(p.id).trim().toLowerCase()}_${normalizeColorCode(p.color) || 'STANDART'}`;
+                            map.set(k, { key: k, id: p.id, name: p.name, color: normalizeColorCode(p.color), price: parseCleanPrice(p.price) });
                         });
                         masterProducts = Array.from(map.values());
                     } else if (masterProducts.length === 0) {
@@ -1713,7 +1721,7 @@
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
                         populateProductSelects();
-                        showToast(`Başarıyla ${newProducts.length} adet ürün yüklendi (${skippedCount} adet iptal ürün filtrelendi)!`);
+                        showToast(`Başarıyla ${newProducts.length} adet ürün yüklendi (${skippedCount} adet iptal ürün elendi)!`);
                     } else {
                         showToast("Excel'den geçerli ürün satırı okunamadı!", true);
                     }
