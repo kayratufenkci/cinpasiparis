@@ -468,7 +468,7 @@
                     </div>
                 </div>
 
-                <!-- 2. ADIM: DEPO -->
+                <!-- 2. ADIM: DEPO (KAMBER USTA) -->
                 <div id="content-step-2" class="hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl border border-emerald-100 shadow-sm space-y-6">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-emerald-100 pb-4 gap-2">
@@ -882,7 +882,6 @@
 
     <!-- ================= JAVASCRIPT MOTORU ================= -->
     <script>
-        // COLOR.XLSX RESMİ 37 NEBİM RENK KODU SÖZLÜĞÜ VE İSİM MAPPINGİ
         const OFFICIAL_CODE_TO_NAME = {
             "1000": "AÇIK YEŞİL", "1001": "KOYU YEŞİL", "1002": "YEŞİL", "1003": "KIRMIZI", "1004": "PEMBE",
             "1005": "TURUNCU", "1006": "SARI", "1007": "MOR", "1008": "MAVİ", "1009": "BORDO",
@@ -1898,13 +1897,13 @@
                 const sub = item.requestedQty * item.price;
                 previewTotal += sub;
                 const normColor = normalizeColorCode(item.color, item.name);
-                const colorDisplay = normColor ? `${normColor} (${getColorNameFromCode(normColor)})` : '-';
+                const colorDisplayVal = normColor ? normColor : '-';
                 
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td class="p-2 font-mono font-bold text-slate-700">${item.id}</td>
                     <td class="p-2 font-medium text-slate-900">${item.name}</td>
-                    <td class="p-2 text-center font-bold text-emerald-800 bg-emerald-50">${colorDisplay}</td>
+                    <td class="p-2 text-center font-bold text-emerald-800 bg-emerald-50">${colorDisplayVal}</td>
                     <td class="p-2 text-center font-bold">${item.requestedQty} Adet</td>
                     <td class="p-2 text-right font-bold">${Number(item.price).toLocaleString('tr-TR')} ₺</td>
                 `;
@@ -2109,7 +2108,7 @@
         }
 
         // ================= GİRİŞ & ROL İŞLEMLERİ =================
-        function requestPasswordAndLogin(roleKey) {
+        window.requestPasswordAndLogin = function(roleKey) {
             if (roleKey === 'depo') {
                 const pass = prompt("Depocu (Kamber Usta) Giriş Şifresi:");
                 if (pass === null) return;
@@ -2143,9 +2142,9 @@
                     alert("Hatalı Admin şifresi!");
                 }
             }
-        }
+        };
 
-        function loginAsSalesSelected() {
+        window.loginAsSalesSelected = function() {
             const sel = document.getElementById("login-sales-rep-select");
             const selectedRep = sel ? sel.value : "Orhan Özen";
 
@@ -2177,7 +2176,7 @@
 
             USER_ROLES.satis.name = selectedRep;
             loginAs('satis');
-        }
+        };
 
         function loginAs(roleKey) {
             currentUser = USER_ROLES[roleKey];
@@ -2220,19 +2219,19 @@
             showToast(`Hoş geldiniz, ${currentUser.name}!`);
         }
 
-        function logout() {
+        window.logout = function() {
             currentUser = null;
             activeOrder = null;
             document.getElementById("view-app").classList.add("hidden");
             document.getElementById("view-login").classList.remove("hidden");
-        }
+        };
 
-        function returnToDashboard() {
+        window.returnToDashboard = function() {
             activeOrder = null;
             document.getElementById("section-order-detail").classList.add("hidden");
             document.getElementById("section-dashboard").classList.remove("hidden");
             renderOrderList();
-        }
+        };
 
         // ================= SİPARİŞ LİSTESİ & ADIM YÖNETİMİ =================
         function renderOrderList() {
@@ -2426,7 +2425,7 @@
             renderStep1(); renderStep2(); renderStep3(); renderStep4();
         }
 
-        function formatProductNameWithColor(name, color) {
+        window.formatProductNameWithColor = function(name, color) {
             const normColor = normalizeColorCode(color, name);
             if (normColor) {
                 return `${name} <span class="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 text-xs">[${getColorNameFromCode(normColor)}]</span>`;
@@ -2464,7 +2463,7 @@
                     total += sub;
                     const normColor = normalizeColorCode(item.color, item.name);
                     const displayName = formatProductNameWithColor(item.name, item.color);
-                    const colorDisplayVal = normColor ? `${normColor} (${getColorNameFromCode(normColor)})` : '-';
+                    const colorDisplayVal = normColor ? normColor : '-';
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td class="p-3.5 font-bold text-slate-900">
@@ -2472,18 +2471,18 @@
                             <div>${displayName}</div>
                         </td>
                         <td class="p-3.5 text-center">
-                            ${canEdit ? `<input type="text" value="${normColor}" placeholder="Renk Kodu" onchange="updateStep1Color(${index}, this.value)" class="w-28 text-center font-bold border border-emerald-400 bg-emerald-50 text-emerald-950 rounded p-1 text-xs">` : `<span class="font-bold text-xs bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded">${colorDisplayVal}</span>`}
+                            ${canEdit ? `<input type="text" value="${normColor}" placeholder="Renk Kodu" onchange="window.updateStep1Color(${index}, this.value)" class="w-20 text-center font-bold border border-emerald-400 bg-emerald-50 text-emerald-950 rounded p-1 text-xs">` : `<span class="font-bold text-xs bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded">${colorDisplayVal}</span>`}
                         </td>
                         <td class="p-3.5 text-center">
-                            ${canEdit ? `<input type="number" min="1" value="${item.requestedQty}" onchange="updateStep1Qty(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold">${item.requestedQty} Adet</span>`}
+                            ${canEdit ? `<input type="number" min="1" value="${item.requestedQty}" onchange="window.updateStep1Qty(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold">${item.requestedQty} Adet</span>`}
                         </td>
                         ${showPrices ? `
                         <td class="p-3.5 text-right font-medium">
-                            ${canEdit ? `<input type="number" min="0" step="any" value="${itemPr}" onchange="updateStep1Price(${index}, this.value)" class="w-24 text-right font-bold border border-slate-300 rounded p-1"> ₺` : `${Number(itemPr).toLocaleString('tr-TR')} ₺`}
+                            ${canEdit ? `<input type="number" min="0" step="any" value="${itemPr}" onchange="window.updateStep1Price(${index}, this.value)" class="w-24 text-right font-bold border border-slate-300 rounded p-1"> ₺` : `${Number(itemPr).toLocaleString('tr-TR')} ₺`}
                         </td>
                         <td class="p-3.5 text-right font-bold text-slate-900">${Number(sub).toLocaleString('tr-TR')} ₺</td>
                         ` : ''}
-                        ${canEdit ? `<td class="p-3.5 text-center"><button onclick="removeItemStep1(${index})" class="text-slate-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>` : ''}
+                        ${canEdit ? `<td class="p-3.5 text-center"><button onclick="window.removeItemStep1(${index})" class="text-slate-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>` : ''}
                     `;
                     tbody.appendChild(tr);
                 });
@@ -2493,7 +2492,7 @@
             }
         }
 
-        async function forwardToWarehouse() {
+        window.forwardToWarehouse = async function() {
             if (!activeOrder.items || activeOrder.items.length === 0) {
                 showToast("Lütfen önce fişe en az bir ürün ekleyiniz.", true);
                 return;
@@ -2511,7 +2510,7 @@
             returnToDashboard();
         }
 
-        function searchCatalogDropdown(query) {
+        window.searchCatalogDropdown = function(query) {
             const s1 = document.getElementById("step1-select-product");
             if (!s1) return;
             s1.innerHTML = "";
@@ -2548,7 +2547,18 @@
             syncSelectedCatalogDetails();
         }
 
-        async function addItemFromCatalog() {
+        window.syncSelectedCatalogDetails = function() {
+            const s1 = document.getElementById("step1-select-product");
+            if (!s1 || !s1.value) return;
+            const p = masterProducts.find(x => x.key === s1.value);
+            if (p) {
+                document.getElementById("step1-catalog-price").value = parseCleanPrice(p.price);
+                const cInput = document.getElementById("step1-catalog-color");
+                if (cInput) cInput.value = normalizeColorCode(p.color, p.name);
+            }
+        }
+
+        window.addItemFromCatalog = async function() {
             const selectedKey = document.getElementById("step1-select-product").value;
             const customPrice = parseCleanPrice(document.getElementById("step1-catalog-price").value);
             const customColor = document.getElementById("step1-catalog-color").value.trim();
@@ -2577,7 +2587,7 @@
             showToast(`${p.name} fişe eklendi!`);
         }
 
-        async function addItemManual() {
+        window.addItemManual = async function() {
             const code = document.getElementById("manual-code").value.trim() || `ÇNP-${Math.floor(100 + Math.random() * 900)}`;
             const name = document.getElementById("manual-name").value.trim();
             const color = normalizeColorCode(document.getElementById("manual-color").value.trim(), name);
@@ -2614,26 +2624,26 @@
             showToast(`${name} fişe eklendi!`);
         }
 
-        async function updateStep1Color(index, val) {
+        window.updateStep1Color = async function(index, val) {
             activeOrder.items[index].color = normalizeColorCode(val, activeOrder.items[index].name);
             await syncOrderToCloud(activeOrder);
             renderStep1();
         }
 
-        async function updateStep1Qty(index, val) {
+        window.updateStep1Qty = async function(index, val) {
             activeOrder.items[index].requestedQty = parseInt(val) || 1;
             activeOrder.items[index].dispatchedQty = parseInt(val) || 1;
             await syncOrderToCloud(activeOrder);
             renderStep1();
         }
 
-        async function updateStep1Price(index, val) {
+        window.updateStep1Price = async function(index, val) {
             activeOrder.items[index].price = parseCleanPrice(val);
             await syncOrderToCloud(activeOrder);
             renderStep1();
         }
 
-        async function removeItemStep1(index) {
+        window.removeItemStep1 = async function(index) {
             activeOrder.items.splice(index, 1);
             await syncOrderToCloud(activeOrder);
             renderStep1();
@@ -2658,11 +2668,11 @@
                 activeOrder.items.forEach((item, index) => {
                     const normColor = normalizeColorCode(item.color, item.name);
                     const displayName = formatProductNameWithColor(item.name, item.color);
-                    const colorDisplayVal = normColor ? `${normColor} (${getColorNameFromCode(normColor)})` : '-';
+                    const colorDisplayVal = normColor ? normColor : '-';
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td class="p-3.5 text-center">
-                            <input type="checkbox" ${item.checked ? "checked" : ""} ${!canEditWarehouse ? "disabled" : ""} onchange="toggleCheckStep2(${index}, this.checked)" class="w-4 h-4 text-emerald-700 rounded cursor-pointer">
+                            <input type="checkbox" ${item.checked ? "checked" : ""} ${!canEditWarehouse ? "disabled" : ""} onchange="window.toggleCheckStep2(${index}, this.checked)" class="w-4 h-4 text-emerald-700 rounded cursor-pointer">
                         </td>
                         <td class="p-3.5 font-bold text-slate-900">
                             <div class="inline-block px-1.5 py-0.5 mb-0.5 bg-slate-100 rounded text-slate-600 font-mono text-xs font-black tracking-wider border border-slate-200">${item.id || 'ÖZEL'}</div>
@@ -2671,12 +2681,12 @@
                         <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${colorDisplayVal}</td>
                         <td class="p-3.5 text-center font-bold text-slate-500">${item.requestedQty} Adet</td>
                         <td class="p-3.5 text-center">
-                            ${canEditWarehouse ? `<input type="number" min="0" value="${item.dispatchedQty}" onchange="updateStep2Dispatched(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold text-amber-900">${item.dispatchedQty} Adet</span>`}
+                            ${canEditWarehouse ? `<input type="number" min="0" value="${item.dispatchedQty}" onchange="window.updateStep2Dispatched(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold text-amber-900">${item.dispatchedQty} Adet</span>`}
                         </td>
                         <td class="p-3.5">
-                            ${canEditWarehouse ? `<input type="text" value="${item.warehouseNote || ""}" onchange="updateStep2Note(${index}, this.value)" placeholder="İkame / Not..." class="w-full text-xs p-1.5 border border-slate-300 rounded bg-white">` : `<span class="text-xs text-slate-600">${item.warehouseNote || "-"}</span>`}
+                            ${canEditWarehouse ? `<input type="text" value="${item.warehouseNote || ""}" onchange="window.updateStep2Note(${index}, this.value)" placeholder="İkame / Not..." class="w-full text-xs p-1.5 border border-slate-300 rounded bg-white">` : `<span class="text-xs text-slate-600">${item.warehouseNote || "-"}</span>`}
                         </td>
-                        ${canEditWarehouse ? `<td class="p-3.5 text-center"><button onclick="removeItemStep2(${index})" class="text-slate-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>` : ''}
+                        ${canEditWarehouse ? `<td class="p-3.5 text-center"><button onclick="window.removeItemStep2(${index})" class="text-slate-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>` : ''}
                     `;
                     tbody.appendChild(tr);
                 });
@@ -2684,7 +2694,7 @@
             searchDepoCatalogDropdown("");
         }
 
-        function searchDepoCatalogDropdown(query) {
+        window.searchDepoCatalogDropdown = function(query) {
             const sel = document.getElementById("depo-select-product");
             if (!sel) return;
             sel.innerHTML = "";
@@ -2721,7 +2731,7 @@
             syncDepoSelectedColor();
         }
 
-        function syncDepoSelectedColor() {
+        window.syncDepoSelectedColor = function() {
             const sel = document.getElementById("depo-select-product");
             if (!sel || !sel.value) return;
             const p = masterProducts.find(x => x.key === sel.value);
@@ -2731,7 +2741,7 @@
             }
         }
 
-        async function addItemFromDepo() {
+        window.addItemFromDepo = async function() {
             const selectedKey = document.getElementById("depo-select-product").value;
             const customColor = document.getElementById("depo-add-color").value.trim();
             const qty = parseInt(document.getElementById("depo-add-qty").value) || 1;
@@ -2757,18 +2767,18 @@
             showToast(`${p.name} depodan eklendi!`);
         }
 
-        async function removeItemStep2(index) {
+        window.removeItemStep2 = async function(index) {
             activeOrder.items.splice(index, 1);
             await syncOrderToCloud(activeOrder);
             renderStep2();
             showToast("Ürün çıkarıldı.");
         }
 
-        async function toggleCheckStep2(index, chk) { activeOrder.items[index].checked = chk; await syncOrderToCloud(activeOrder); }
-        async function updateStep2Dispatched(index, val) { activeOrder.items[index].dispatchedQty = parseInt(val) || 0; await syncOrderToCloud(activeOrder); }
-        async function updateStep2Note(index, val) { activeOrder.items[index].warehouseNote = val; await syncOrderToCloud(activeOrder); }
+        window.toggleCheckStep2 = async function(index, chk) { activeOrder.items[index].checked = chk; await syncOrderToCloud(activeOrder); }
+        window.updateStep2Dispatched = async function(index, val) { activeOrder.items[index].dispatchedQty = parseInt(val) || 0; await syncOrderToCloud(activeOrder); }
+        window.updateStep2Note = async function(index, val) { activeOrder.items[index].warehouseNote = val; await syncOrderToCloud(activeOrder); }
 
-        async function forwardFromWarehouse() {
+        window.forwardFromWarehouse = async function() {
             const c1 = confirm(`1. ONAY:\n\nDepo sayımı ve kolileme tamamlandı mı?\n\nBu fiş için Sevk İrsaliyesi kesilecek.`);
             if (!c1) return;
 
@@ -2821,7 +2831,7 @@
                         </div>
                         <div class="flex items-center space-x-2">
                             <span class="text-slate-500 font-bold">İade:</span>
-                            ${canEditSaha ? `<input type="number" min="0" max="${item.dispatchedQty}" value="${item.returnedQty || 0}" onchange="updateReturnQty(${index}, this.value)" class="w-16 p-1 text-center font-bold border border-red-300 rounded bg-red-50 text-red-900">` : `<span class="font-bold text-red-800">${item.returnedQty || 0} Adet</span>`}
+                            ${canEditSaha ? `<input type="number" min="0" max="${item.dispatchedQty}" value="${item.returnedQty || 0}" onchange="window.updateReturnQty(${index}, this.value)" class="w-16 p-1 text-center font-bold border border-red-300 rounded bg-red-50 text-red-900">` : `<span class="font-bold text-red-800">${item.returnedQty || 0} Adet</span>`}
                         </div>
                     `;
                     retContainer.appendChild(div);
@@ -2845,10 +2855,10 @@
                             </div>
                             <div class="flex items-center space-x-2">
                                 <label class="flex items-center space-x-1.5 text-[11px] font-bold ${ext.faikApproval ? 'text-emerald-800' : 'text-amber-800'}">
-                                    <input type="checkbox" ${ext.faikApproval ? "checked" : ""} ${!canEditSaha && !isAdmin ? "disabled" : ""} onchange="toggleFaikApproval(${index}, this.checked)" class="w-4 h-4 text-emerald-700 rounded cursor-pointer">
+                                    <input type="checkbox" ${ext.faikApproval ? "checked" : ""} ${!canEditSaha && !isAdmin ? "disabled" : ""} onchange="window.toggleFaikApproval(${index}, this.checked)" class="w-4 h-4 text-emerald-700 rounded cursor-pointer">
                                     <span>Faik Bey Onayı</span>
                                 </label>
-                                ${canEditSaha || isAdmin ? `<button onclick="removeExtraItemStep3(${index})" class="text-slate-400 hover:text-red-500 cursor-pointer ml-2"><i class="fa-solid fa-trash"></i></button>` : ''}
+                                ${canEditSaha || isAdmin ? `<button onclick="window.removeExtraItemStep3(${index})" class="text-slate-400 hover:text-red-500 cursor-pointer ml-2"><i class="fa-solid fa-trash"></i></button>` : ''}
                             </div>
                         `;
                         extContainer.appendChild(div);
@@ -2857,21 +2867,21 @@
             }
         }
 
-        async function updateReturnQty(index, val) {
+        window.updateReturnQty = async function(index, val) {
             if (!activeOrder || !activeOrder.items[index]) return;
             activeOrder.items[index].returnedQty = parseInt(val) || 0;
             await syncOrderToCloud(activeOrder);
             renderStep3();
         }
 
-        async function toggleFaikApproval(index, checked) {
+        window.toggleFaikApproval = async function(index, checked) {
             if (!activeOrder || !activeOrder.extras[index]) return;
             activeOrder.extras[index].faikApproval = checked;
             await syncOrderToCloud(activeOrder);
             renderStep3();
         }
 
-        async function addExtraItemStep3() {
+        window.addExtraItemStep3 = async function() {
             const selectedKey = document.getElementById("step3-extra-select").value;
             const qty = parseInt(document.getElementById("step3-extra-qty").value) || 1;
             const p = masterProducts.find(x => x.key === selectedKey);
@@ -2891,7 +2901,7 @@
             showToast(`İlave talep açıldı: ${p.name}`);
         }
 
-        async function removeExtraItemStep3(index) {
+        window.removeExtraItemStep3 = async function(index) {
             if (!activeOrder || !activeOrder.extras) return;
             activeOrder.extras.splice(index, 1);
             await syncOrderToCloud(activeOrder);
@@ -2899,7 +2909,7 @@
             showToast("İlave ürün talebi silindi.");
         }
 
-        async function forwardToAccounting() {
+        window.forwardToAccounting = async function() {
             const c1 = confirm(`1. ONAY:\n\nSaha montajı ve uygulama tamamen bitti mi?\n\nEvraklar Muhasebeye (Gökhan) faturalandırma için devredilecektir.`);
             if (!c1) return;
 
@@ -2940,7 +2950,7 @@
 
                     const normColor = normalizeColorCode(item.color, item.name);
                     const displayName = formatProductNameWithColor(item.name, item.color);
-                    const colorDisplayVal = normColor ? `${normColor} (${getColorNameFromCode(normColor)})` : '-';
+                    const colorDisplayVal = normColor ? normColor : '-';
 
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
@@ -2957,7 +2967,7 @@
                         <td class="p-3.5 text-right font-medium">${Number(pr).toLocaleString('tr-TR')} ₺</td>
                         <td class="p-3.5 text-right font-bold text-slate-900">${Number(lineTotal).toLocaleString('tr-TR')} ₺</td>
                         <td class="p-3.5 text-center">
-                            ${canDeleteRow ? `<button onclick="removeStep4Item(${index})" class="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition cursor-pointer" title="Bu Satırı Fişten Sil"><i class="fa-solid fa-trash-can"></i></button>` : `<span class="text-slate-300">-</span>`}
+                            ${canDeleteRow ? `<button onclick="window.removeStep4Item(${index})" class="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition cursor-pointer" title="Bu Satırı Fişten Sil"><i class="fa-solid fa-trash-can"></i></button>` : `<span class="text-slate-300">-</span>`}
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -2975,7 +2985,7 @@
 
                         const normColor = normalizeColorCode(ext.color, ext.name);
                         const displayName = formatProductNameWithColor(ext.name, ext.color);
-                        const colorDisplayVal = normColor ? `${normColor} (${getColorNameFromCode(normColor)})` : '-';
+                        const colorDisplayVal = normColor ? normColor : '-';
 
                         const tr = document.createElement("tr");
                         tr.className = "bg-emerald-50/30";
@@ -2993,7 +3003,7 @@
                             <td class="p-3.5 text-right font-medium">${Number(pr).toLocaleString('tr-TR')} ₺</td>
                             <td class="p-3.5 text-right font-bold text-emerald-900">${Number(lineTotal).toLocaleString('tr-TR')} ₺</td>
                             <td class="p-3.5 text-center">
-                                ${canDeleteRow ? `<button onclick="removeStep4Extra(${extIndex})" class="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition cursor-pointer" title="Bu İlave Satırı Sil"><i class="fa-solid fa-trash-can"></i></button>` : `<span class="text-slate-300">-</span>`}
+                                ${canDeleteRow ? `<button onclick="window.removeStep4Extra(${extIndex})" class="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition cursor-pointer" title="Bu İlave Satırı Sil"><i class="fa-solid fa-trash-can"></i></button>` : `<span class="text-slate-300">-</span>`}
                             </td>
                         `;
                         tbody.appendChild(tr);
@@ -3017,7 +3027,7 @@
             if (actionBtns) actionBtns.style.display = (isAdmin || isMuhasebe) ? "block" : "none";
         }
 
-        async function removeStep4Item(index) {
+        window.removeStep4Item = async function(index) {
             if (!activeOrder || !activeOrder.items || !activeOrder.items[index]) return;
             const item = activeOrder.items[index];
             if (!confirm(`"${item.name}" satırını bu fişten tamamen çıkarmak istediğinize emin misiniz?`)) return;
@@ -3028,7 +3038,7 @@
             showToast(`Satır silindi: ${item.name}`);
         }
 
-        async function removeStep4Extra(extIndex) {
+        window.removeStep4Extra = async function(extIndex) {
             if (!activeOrder || !activeOrder.extras || !activeOrder.extras[extIndex]) return;
             const ext = activeOrder.extras[extIndex];
             if (!confirm(`"${ext.name}" ilave ürün satırını silmek istediğinize emin misiniz?`)) return;
@@ -3039,7 +3049,7 @@
             showToast(`İlave satır silindi: ${ext.name}`);
         }
 
-        async function finalizeAndCloseOrder() {
+        window.finalizeAndCloseOrder = async function() {
             if (!activeOrder) return;
             const c1 = confirm(`1. ONAY:\n\n"${activeOrder.id} - ${activeOrder.customer}" dosyasını faturalandırmak istediğinize emin misiniz?`);
             if (!c1) return;
@@ -3055,7 +3065,7 @@
         }
 
         function populateProductSelects() {
-            searchCatalogDropdown("");
+            window.searchCatalogDropdown("");
             const s3 = document.getElementById("step3-extra-select");
             if (!s3) return;
             s3.innerHTML = "";
@@ -3064,7 +3074,7 @@
                 const opt3 = document.createElement("option");
                 const normColor = normalizeColorCode(p.color, p.name);
                 opt3.value = p.key;
-                const cTxt = normColor ? ` [Renk: ${normColor} - ${getColorNameFromCode(normColor)}]` : " [Standart]";
+                const cTxt = normColor ? ` [Renk Kodu: ${normColor}]` : " [Standart]";
                 const priceTxt = showPrices ? ` (${Number(parseCleanPrice(p.price)).toLocaleString('tr-TR')} ₺)` : "";
                 opt3.innerText = `${p.id} - ${p.name}${cTxt}${priceTxt}`;
                 s3.appendChild(opt3);
@@ -3082,7 +3092,7 @@
             }
         }
 
-        function toggleAddMode(mode) {
+        window.toggleAddMode = function(mode) {
             const catBox = document.getElementById("add-mode-catalog-box");
             const manBox = document.getElementById("add-mode-manual-box");
             const btnCat = document.getElementById("btn-mode-catalog");
@@ -3096,27 +3106,6 @@
                 btnMan.className = "px-3 py-1 rounded-md bg-white text-slate-900 shadow-sm cursor-pointer";
                 btnCat.className = "px-3 py-1 rounded-md text-slate-600 cursor-pointer";
             }
-        }
-
-        async function saveNewOrder() {
-            const cust = document.getElementById("new-cust-name").value.trim();
-            if (!cust) { showToast("Lütfen müşteri adını giriniz.", true); return; }
-            const newId = "CNP-2026-" + String(Math.floor(100 + Math.random() * 900));
-            const rep = (currentUser && currentUser.roleId === 'satis') ? currentUser.name : (document.getElementById("new-sales-rep").value || "Orhan Özen");
-            
-            const hasAppSelect = document.getElementById("new-has-application");
-            const hasApplication = hasAppSelect ? (hasAppSelect.value === "true") : true;
-
-            const newOrd = {
-                id: newId, customer: cust, salesRep: rep,
-                date: document.getElementById("new-date").value, notes: document.getElementById("new-notes").value,
-                hasApplication: hasApplication,
-                currentStep: 1, items: [], extras: [], isClosed: false
-            };
-            await syncOrderToCloud(newOrd);
-            closeModal();
-            showToast(`Yeni sipariş açıldı: ${newId}`);
-            openOrderDetail(newId);
         }
 
         function renderCatalogTable(filteredList = null) {
@@ -3135,7 +3124,7 @@
             list.slice(0, 300).forEach((p, idx) => {
                 const tr = document.createElement("tr");
                 const normColor = normalizeColorCode(p.color, p.name);
-                const colorDisplay = normColor ? `${normColor} (${getColorNameFromCode(normColor)})` : '-';
+                const colorDisplay = normColor ? normColor : '-';
                 const pr = parseCleanPrice(p.price);
                 tr.innerHTML = `
                     <td class="p-3 text-center"><input type="checkbox" value="${idx}" class="catalog-row-checkbox w-4 h-4 text-emerald-700 rounded cursor-pointer"></td>
@@ -3143,18 +3132,18 @@
                     <td class="p-3 font-medium">${p.name}</td>
                     <td class="p-3 text-emerald-900 font-bold bg-emerald-50 text-center">${colorDisplay}</td>
                     <td class="p-3 text-right font-bold text-emerald-800">${Number(pr).toLocaleString('tr-TR')} ₺</td>
-                    <td class="p-3 text-center"><button type="button" onclick="removeProductByIndex(${idx})" class="text-slate-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>
+                    <td class="p-3 text-center"><button type="button" onclick="window.removeProductByIndex(${idx})" class="text-slate-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function toggleSelectAllCatalog(checked) {
+        window.toggleSelectAllCatalog = function(checked) {
             const checkboxes = document.querySelectorAll(".catalog-row-checkbox");
             checkboxes.forEach(cb => cb.checked = checked);
         }
 
-        async function deleteSelectedCatalogItems() {
+        window.deleteSelectedCatalogItems = async function() {
             const checkboxes = document.querySelectorAll(".catalog-row-checkbox:checked");
             if (checkboxes.length === 0) { showToast("Silmek için ürün seçiniz.", true); return; }
             if (!confirm(`Seçilen ${checkboxes.length} ürünü silmek istediğinize emin misiniz?`)) return;
@@ -3167,7 +3156,7 @@
             showToast(`${selectedIndices.length} ürün silindi.`);
         }
 
-        async function deleteAllCatalogItems() {
+        window.deleteAllCatalogItems = async function() {
             if (!confirm("Tüm katalog listesi kalıcı olarak silinecek! Emin misiniz?")) return;
             masterProducts = [];
             await saveCatalogToDB(masterProducts);
@@ -3175,7 +3164,7 @@
             showToast("Tüm katalog temizlendi.");
         }
 
-        function filterCatalogTable() {
+        window.filterCatalogTable = function() {
             const q = document.getElementById("cat-search-input").value.toLowerCase();
             const filtered = masterProducts.filter(p => 
                 p.id.toLowerCase().includes(q) || 
@@ -3185,7 +3174,7 @@
             renderCatalogTable(filtered);
         }
 
-        async function removeProductByIndex(idx) {
+        window.removeProductByIndex = async function(idx) {
             masterProducts.splice(idx, 1);
             await saveCatalogToDB(masterProducts);
             renderCatalogTable();
@@ -3276,13 +3265,13 @@
             });
         }
 
-        function filterOrders() {
+        window.filterOrders = function() {
             const q = document.getElementById("search-input").value.toLowerCase();
             const rows = document.querySelectorAll("#orders-table-body tr");
             rows.forEach(r => { r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; });
         }
 
-        function sendWhatsAppNotification() {
+        window.sendWhatsAppNotification = function() {
             if (!activeOrder) return;
             const text = `Sayın İlgili, ${activeOrder.customer} projesine ait ${activeOrder.id} kodlu sipariş işlemi güncellenmiştir. Durum: ${activeOrder.currentStep}. Aşama.`;
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
@@ -3301,7 +3290,7 @@
             const btnCatalog = document.getElementById("btn-header-catalog");
             if (btnCatalog) btnCatalog.addEventListener("click", window.openCatalogModal);
 
-            if (firebase && firebase.auth) {
+            if (typeof firebase !== 'undefined' && firebase.auth) {
                 firebase.auth().signInAnonymously()
                     .then(() => {
                         const st = document.getElementById("cloud-status-text");
