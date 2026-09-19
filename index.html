@@ -3307,6 +3307,55 @@
                 listenToOrdersCloud();
             }
         });
+        // ================= TÜM CİHAZLARDA BUTONLARI VE PENCERELERİ KESİN ÇALIŞTIRMA =================
+document.addEventListener("click", function(e) {
+    // 1. Tıklanan öğeyi veya en yakın butonu bul
+    const btn = e.target.closest("button");
+    if (!btn) return;
+
+    const btnText = btn.innerText || "";
+    const btnId = btn.id || "";
+    const btnOnclick = btn.getAttribute("onclick") || "";
+
+    // 2. "Nebim / Excel Fişi Çek" butonu tıklandıysa
+    if (btnText.includes("Nebim") || btnText.includes("Excel") || btnId === "btn-header-import-excel" || btnOnclick.includes("openExcelImportModal")) {
+        e.preventDefault();
+        e.stopPropagation();
+        const m = document.getElementById("modal-excel-import");
+        if (m) {
+            m.classList.remove("hidden");
+            m.style.setProperty("display", "flex", "important");
+            m.style.zIndex = "99999";
+        }
+    }
+
+    // 3. "Yeni Sipariş" butonu tıklandıysa
+    else if (btnText.includes("Yeni Sipariş") || btnId === "btn-header-new-order" || btnOnclick.includes("createNewOrderModal")) {
+        e.preventDefault();
+        e.stopPropagation();
+        const m = document.getElementById("modal-new-order");
+        if (m) {
+            m.classList.remove("hidden");
+            m.style.setProperty("display", "flex", "important");
+            m.style.zIndex = "99999";
+            const dInput = document.getElementById("new-date");
+            if (dInput && !dInput.value) dInput.value = new Date().toISOString().split("T")[0];
+        }
+    }
+
+    // 4. "Katalog" butonu tıklandıysa
+    else if (btnText.includes("Katalog") || btnId === "btn-header-catalog" || btnOnclick.includes("openCatalogModal")) {
+        e.preventDefault();
+        e.stopPropagation();
+        const m = document.getElementById("modal-catalog");
+        if (m) {
+            m.classList.remove("hidden");
+            m.style.setProperty("display", "flex", "important");
+            m.style.zIndex = "99999";
+            if (typeof renderCatalogTable === "function") renderCatalogTable();
+        }
+    }
+}, true);
     </script>
 </body>
 </html>
