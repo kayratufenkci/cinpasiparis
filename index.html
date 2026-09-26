@@ -3526,6 +3526,26 @@ document.addEventListener("click", function(e) {
         }
     }, true);
 })();
+       // ================= KATALOGDAN FİŞE EKLE BUTONUNU DÜZELTME =================
+document.addEventListener("click", function(e) {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+
+    const btnText = (btn.innerText || "").trim();
+
+    // Eğer tıklanan buton "Katalogdan Fişe Ekle" butonu ise katalog penceresini açmasını engelle
+    if (btnText.includes("Katalogdan Fişe Ekle")) {
+        e.preventDefault();
+        e.stopPropagation(); // Katalog modalını açan genel tetikleyiciyi durdurur
+
+        // Doğrudan fişe ekleme fonksiyonunu çalıştır
+        if (typeof addItemFromCatalog === "function") {
+            addItemFromCatalog();
+        } else if (typeof window.addItemFromCatalog === "function") {
+            window.addItemFromCatalog();
+        }
+    }
+}, true); // "true" sayesinde katalog açıcıdan önce devreye girip engeller
         
     </script>
 </body>
