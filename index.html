@@ -3749,14 +3749,15 @@ document.addEventListener("click", function(e) {
         window.applyExcelImportToOrder();
     }
 }, true);
-// ================= EXCEL MODALINI AKTARIMDAN SONRA SIFIRLAMA =================
+// ================= NEBİM EXCEL PENCERESİNİ HER AÇILIŞTA ZORLA SIFIRLAMA =================
 (function() {
-    // Modal içindeki tüm alanları ve önizleme tablosunu temizleyen fonksiyon
-    window.resetExcelImportModal = function() {
-        // 1. Okunan kalem hafızasını boşalt
-        parsedExcelItems = [];
+    function forceClearExcelModal() {
+        // 1. Hafızadaki geçici ürün listesini boşalt
+        if (typeof parsedExcelItems !== "undefined") {
+            parsedExcelItems = [];
+        }
 
-        // 2. Önizleme kutusunu gizle ve içeriğini temizle
+        // 2. Önizleme tablosunu ve kutusunu DOM üzerinden gizle/boşalt
         const prevBox = document.getElementById("excel-preview-box");
         if (prevBox) {
             prevBox.classList.add("hidden");
@@ -3764,57 +3765,55 @@ document.addEventListener("click", function(e) {
         }
 
         const tbody = document.getElementById("excel-preview-tbody");
-        if (tbody) tbody.innerHTML = "";
+        if (tbody) {
+            tbody.innerHTML = "";
+        }
 
         const countEl = document.getElementById("excel-preview-count");
-        if (countEl) countEl.innerText = "0 Kalem Ürün";
+        if (countEl) {
+            countEl.innerText = "0 Kalem Ürün";
+        }
 
         const totalEl = document.getElementById("excel-preview-total");
-        if (totalEl) totalEl.innerText = "0 ₺";
+        if (totalEl) {
+            totalEl.innerText = "0 ₺";
+        }
 
-        // 3. Dosya seçici ve metin yapıştırma alanlarını sıfırla
+        // 3. Dosya seçici inputu ve yapıştırma alanını sıfırla
         const fileInput = document.getElementById("excel-file-input");
-        if (fileInput) fileInput.value = "";
+        if (fileInput) {
+            fileInput.value = "";
+        }
 
         const pasteInput = document.getElementById("excel-paste-input");
-        if (pasteInput) pasteInput.value = "";
+        if (pasteInput) {
+            pasteInput.value = "";
+        }
 
-        // 4. "Panele Aktar" butonunu tekrar pasif (gri) yap
+        // 4. "Yeni Sipariş Olarak Panele Aktar" butonunu devre dışı bırak
         const applyBtn = document.getElementById("btn-apply-excel");
         if (applyBtn) {
             applyBtn.disabled = true;
             applyBtn.className = "px-5 py-2.5 rounded-xl bg-slate-300 text-white font-bold text-xs cursor-not-allowed transition flex items-center space-x-2";
         }
-    };
+    }
 
-    // "Yeni Sipariş Olarak Panele Aktar" butonuna basıldığı an sıfırlamayı tetikle
+    // A) Üst bardaki "Nebim / Excel Fişi Çek" butonuna tıklandığı an ÖNCE sıfırla, SONRA aç
     document.addEventListener("click", function(e) {
         const btn = e.target.closest("button");
         if (!btn) return;
         const txt = (btn.innerText || "").trim();
+        const bId = btn.id || "";
 
-        if (btn.id === "btn-apply-excel" || txt.includes("Panele Aktar")) {
-            // Sipariş oluşturulduktan hemen sonra modalı sıfırla
-            setTimeout(function() {
-                window.resetExcelImportModal();
-            }, 300);
+        if (bId === "btn-header-import-excel" || txt.includes("Nebim / Excel Fişi Çek") || (txt.includes("Nebim") && txt.includes("Excel"))) {
+            forceClearExcelModal();
         }
-    }, true);
 
-    // Modal her açıldığında da temiz başlamasını garantiye al
-    const origOpenExcel = window.openExcelImportModal;
-    window.openExcelImportModal = function() {
-        window.resetExcelImportModal();
-        if (typeof origOpenExcel === "function") {
-            origOpenExcel();
-        } else {
-            const m = document.getElementById("modal-excel-import");
-            if (m) {
-                m.classList.remove("hidden");
-                m.style.setProperty("display", "flex", "important");
-            }
+        // B) "Yeni Sipariş Olarak Panele Aktar" butonuna basıldığı an da arkasını temizle
+        if (bId === "btn-apply-excel" || txt.includes("Panele Aktar")) {
+            setTimeout(forceClearExcelModal, 300);
         }
-    };
+    }, true); // "true" sayesinde pencereyi açan diğer kodlardan önce çalışıp temizler
 })();
         
     </script>
