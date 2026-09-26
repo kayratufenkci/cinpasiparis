@@ -3546,6 +3546,78 @@ document.addEventListener("click", function(e) {
         }
     }
 }, true); // "true" sayesinde katalog açıcıdan önce devreye girip engeller
+ // ================= SAHA İLAVE ÜRÜN CANLI ARAMA MOTORU =================
+(function() {
+    // 1. Saha arama kutusunu arayüze dinamik olarak yerleştir
+    function injectSahaSearchInput() {
+        const selectEl = document.getElementById("step3-extra-select");
+        if (!selectEl || document.getElementById("saha-extra-search-input")) return;
+
+        const searchInput = document.createElement("input");
+        searchInput.type = "text";
+        searchInput.id = "saha-extra-search-input";
+        searchInput.placeholder = "Ürün ara (Kod, Tanım veya Renk)...";
+        searchInput.className = "w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white mb-2";
+
+        // Arama yapıldığında listeyi anında filtrele
+        searchInput.addEventListener("input", function() {
+            filterSahaExtraSelect(this.value);
+        });
+
+        selectEl.parentNode.insertBefore(searchInput, selectEl);
+    }
+
+    // 2. Arama girdisine göre açılır listeyi filtrele
+    function filterSahaExtraSelect(query) {
+        const selectEl = document.getElementById("step3-extra-select");
+        if (!selectEl || typeof masterProducts === "undefined") return;
+
+        selectEl.innerHTML = "";
+        const q = (query || "").trim().toLocaleLowerCase('tr-TR');
+
+        let matched = [];
+        if (!q) {
+            matched = masterProducts.slice(0, 100);
+        } else {
+            matched = masterProducts.filter(p => {
+                const pId = String(p.id || '').toLocaleLowerCase('tr-TR');
+                const pName = String(p.name || '').toLocaleLowerCase('tr-TR');
+                const pColor = String(p.color || '').toLocaleLowerCase('tr-TR');
+                const cName = typeof getColorNameFromCode === "function" ? getColorNameFromCode(p.color).toLocaleLowerCase('tr-TR') : "";
+
+                return pId.includes(q) || pName.includes(q) || pColor.includes(q) || cName.includes(q);
+            }).slice(0, 100);
+        }
+
+        if (matched.length === 0) {
+            const opt = document.createElement("option");
+            opt.value = "";
+            opt.innerText = "Eşleşen ürün bulunamadı";
+            selectEl.appendChild(opt);
+            return;
+        }
+
+        const showPrices = typeof currentUser !== "undefined" && currentUser && currentUser.canSeePrices === true;
+
+        matched.forEach(p => {
+            const opt = document.createElement("option");
+            const normColor = typeof normalizeColorCode === "function" ? normalizeColorCode(p.color, p.name) : p.color;
+            opt.value = p.key;
+            const cTxt = normColor ? ` [Renk: ${normColor}]` : " [Standart]";
+            const priceTxt = showPrices ? ` (${Number(typeof parseCleanPrice === "function" ? parseCleanPrice(p.price) : p.price).toLocaleString('tr-TR')} ₺)` : "";
+            opt.innerText = `${p.id} - ${p.name}${cTxt}${priceTxt}`;
+            selectEl.appendChild(opt);
+        });
+    }
+
+    // Sayfa hazır olduğunda veya 3. Adım (Saha) açıldığında arama kutusunu bağla
+    document.addEventListener("DOMContentLoaded", injectSahaSearchInput);
+
+    // Sekme geçişlerini ve modal açılışlarını dinle
+    document.addEventListener("click", function() {
+        setTimeout(injectSahaSearchInput, 100);
+    });
+})();
         
     </script>
 </body>
