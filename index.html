@@ -3815,6 +3815,32 @@ document.addEventListener("click", function(e) {
         }
     }, true); // "true" sayesinde pencereyi açan diğer kodlardan önce çalışıp temizler
 })();
+      // ================= NEBİM AKTARIMINDAN SONRA YENİ SİPARİŞ MODALINI ENGELLEME =================
+document.addEventListener("click", function(e) {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    const txt = (btn.innerText || "").trim();
+    const btnId = btn.id || "";
+
+    // Eğer tıklanan buton "Yeni Sipariş Olarak Panele Aktar" butonu ise:
+    if (btnId === "btn-apply-excel" || txt.includes("Panele Aktar") || (txt.includes("Yeni Sipariş") && txt.includes("Aktar"))) {
+        // "Yeni Sipariş Formu Başlat" modalının kesinlikle açılmasını engelle ve kapat
+        setTimeout(function() {
+            const newOrderModal = document.getElementById("modal-new-order");
+            if (newOrderModal) {
+                newOrderModal.classList.add("hidden");
+                newOrderModal.style.setProperty("display", "none", "important");
+            }
+        }, 10);
+        setTimeout(function() {
+            const newOrderModal = document.getElementById("modal-new-order");
+            if (newOrderModal) {
+                newOrderModal.classList.add("hidden");
+                newOrderModal.style.setProperty("display", "none", "important");
+            }
+        }, 100);
+    }
+}, true);
         
     </script>
 </body>
