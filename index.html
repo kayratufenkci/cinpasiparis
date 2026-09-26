@@ -3637,6 +3637,155 @@ document.addEventListener("click", function(e) {
         }
     }
 }, true); // "true" sayesinde genel dinleyiciden önce devreye girer
+// ================= NEBİM EXCEL FİŞİ OKUYUCU (KESİN ÇÖZÜM) =================
+(function() {
+    window.handleExcelFileUpload = function(event) {
+        const file = event.target.files ? event.target.files[0] : null;
+        if (!file) return;
+
+        if (typeof showToast === "function") showToast("Nebim fişi okunuyor...");
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: "array" });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+
+                if (!rows || rows.length === 0) {
+                    alert("Seçilen Excel dosyası boş!");
+                    return;
+                }
+
+                // Sütun başlıklarını esnek şekilde tespit et
+                let itemCodeCol = -1, colorCodeCol = -1, nameCol = -1, qtyCol = -1, priceCol = -1;
+                let startRow = 0;
+
+                for (let r = 0; r < Math.min(15, rows.length); r++) {
+                    const row = rows[r].map(c => String(c || '').trim().toLowerCase());
+                    row.forEach((h, idx) => {
+                        if (['itemcode', 'stok kodu', 'stokkodu', 'ürün kodu', 'urunkodu', 'malzeme kodu', 'kod'].includes(h)) itemCodeCol = idx;
+                        if (['colorcode', 'renk kodu', 'renkkodu', 'renk', 'color'].includes(h)) colorCodeCol = idx;
+                        if (['itemdescription', 'ürün adı', 'urun adi', 'malzeme adı', 'stok adı', 'açıklama', 'tanım'].includes(h)) nameCol = idx;
+                        if (['qty1', 'miktar', 'adet', 'sipariş miktarı', 'sevk miktarı', 'talep'].includes(h)) qtyCol = idx;
+                        if (['price', 'birim fiyat', 'birimfiyat', 'fiyat', 'tutar'].includes(h)) priceCol = idx;
+                    });
+
+                    if (itemCodeCol !== -1) {
+                        startRow = r + 1;
+                        break;
+                    }
+                }
+
+                // Başlık bulunamadıysa standart varsayılan indeksler
+                if (itemCodeCol === -1) itemCodeCol = 0;
+                if (nameCol === -1) nameCol = 1;
+                if (colorCodeCol === -1) colorCodeCol = 2;
+                if (qtyCol === -1) qtyCol = 3;
+                if (priceCol === -1) priceCol = 4;
+
+                parsedExcelItems = [];
+
+                for (let i = startRow; i < rows.length; i++) {
+                    const row = rows[i];
+                    if (!row || row.length === 0) continue;
+
+                    let code = String(row[itemCodeCol] || '').trim();
+                    let name = String(row[nameCol] || '').trim();
+                    let color = String(row[colorCodeCol] || '').trim();
+                    let qtyRaw = row[qtyCol];
+                    let priceRaw = row[priceCol];
+
+                    // Başlık satırı veya boş satırları atla
+                    if (!code || code.toLowerCase() === 'itemcode' || code.toLowerCase() === 'stok kodu') continue;
+
+                    let qty = parseFloat(String(qtyRaw || 1).replace(/[^0-9,.-]/g, '').replace(',', '.')) || 1;
+                    let price = typeof parseCleanPrice === "function" ? parseCleanPrice(priceRaw) : (parseFloat(priceRaw) || 0);
+
+                    // İptal kontrolü
+                    const checkStr = (code + " " + name).toUpperCase();
+                    if (checkStr.includes("İPTAL") || checkStr.includes("IPTAL")) continue;
+
+                    let normColor = typeof normalizeColorCode === "function" ? normalizeColorCode(color, name) : color;
+
+                    // Katalogdan isim ve fiyat tamamlama
+                    if (typeof masterProducts !== "undefined" && masterProducts.length > 0) {
+                        const found = masterProducts.find(p => String(p.id).trim().toLowerCase() === code.toLowerCase());
+                        if (found) {
+                            if (!name) name = found.name;
+                            if (!normColor && found.color) normColor = found.color;
+                            if (price === 0 && found.price > 0) price = found.price;
+                        }
+                    }
+
+                    parsedExcelItems.push({
+                        id: code,
+                        name: name || code,
+                        color: normColor,
+                        requestedQty: qty,
+                        dispatchedQty: qty,
+                        returnedQty: 0,
+                        price: price,
+                        warehouseNote: "",
+                        checked: true
+                    });
+                }
+
+                if (parsedExcelItems.length === 0) {
+                    alert("Excel dosyasından geçerli ürün satırı okunamadı! Sütun başlıklarını kontrol ediniz.");
+                    return;
+                }
+
+                // Önizleme Tablosunu Doldur
+                const tbody = document.getElementById("excel-preview-tbody");
+                if (tbody) {
+                    tbody.innerHTML = "";
+                    let total = 0;
+                    parsedExcelItems.forEach(item => {
+                        const sub = item.requestedQty * item.price;
+                        total += sub;
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td class="p-2 font-mono font-bold text-slate-700">${item.id}</td>
+                            <td class="p-2 font-medium text-slate-900">${item.name}</td>
+                            <td class="p-2 text-center font-bold text-emerald-800 bg-emerald-50">${item.color || '-'}</td>
+                            <td class="p-2 text-center font-bold">${item.requestedQty} Adet</td>
+                            <td class="p-2 text-right font-bold">${Number(item.price).toLocaleString('tr-TR')} ₺</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+
+                    // Önizleme alanını ve aktarma butonunu görünür yap
+                    const prevBox = document.getElementById("excel-preview-box");
+                    if (prevBox) {
+                        prevBox.classList.remove("hidden");
+                        prevBox.style.setProperty("display", "block", "important");
+                    }
+                    const countEl = document.getElementById("excel-preview-count");
+                    if (countEl) countEl.innerText = parsedExcelItems.length + " Kalem Ürün";
+                    const totalEl = document.getElementById("excel-preview-total");
+                    if (totalEl) totalEl.innerText = "Toplam: " + total.toLocaleString('tr-TR') + " ₺";
+                }
+
+                const applyBtn = document.getElementById("btn-apply-excel");
+                if (applyBtn) {
+                    applyBtn.disabled = false;
+                    applyBtn.className = "px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition flex items-center space-x-2 cursor-pointer";
+                }
+
+                if (typeof showToast === "function") showToast(parsedExcelItems.length + " kalem ürün başarıyla okundu!");
+
+            } catch(err) {
+                console.error("Excel okuma hatası:", err);
+                alert("Excel dosyası okunurken hata oluştu: " + err.message);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+        event.target.value = "";
+    };
+})();
         
     </script>
 </body>
