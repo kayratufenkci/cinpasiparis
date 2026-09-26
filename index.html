@@ -3418,6 +3418,114 @@ document.addEventListener("click", function(e) {
         alert("Hata oluştu: " + err.message);
     }
 };
+  // ================= BAŞKA CİHAZLARDA KİLİTLENMEYİ ÖNLEYEN KESİN ÇÖZÜM =================
+(function() {
+    window.saveNewOrder = function() {
+        try {
+            var custEl = document.getElementById("new-cust-name");
+            var custVal = custEl ? custEl.value.trim() : "";
+
+            if (!custVal) {
+                alert("Lütfen Müşteri / Proje Adı giriniz!");
+                if (custEl) custEl.focus();
+                return;
+            }
+
+            var newId = "CNP-2026-" + Math.floor(100 + Math.random() * 900);
+            
+            var repSelect = document.getElementById("new-sales-rep");
+            var repVal = "Orhan Özen";
+            if (typeof currentUser !== "undefined" && currentUser && currentUser.name) {
+                repVal = currentUser.name;
+            } else if (repSelect && repSelect.value) {
+                repVal = repSelect.value;
+            }
+
+            var dateEl = document.getElementById("new-date");
+            var dateVal = (dateEl && dateEl.value) ? dateEl.value : new Date().toISOString().split("T")[0];
+
+            var appEl = document.getElementById("new-has-application");
+            var appVal = appEl ? (appEl.value === "true") : true;
+
+            var noteEl = document.getElementById("new-notes");
+            var noteVal = noteEl ? noteEl.value : "";
+
+            var newOrd = {
+                id: newId,
+                customer: custVal,
+                salesRep: repVal,
+                date: dateVal,
+                notes: noteVal,
+                hasApplication: appVal,
+                currentStep: 1,
+                items: [],
+                extras: [],
+                isClosed: false
+            };
+
+            // 1. DİĞER CİHAZDA HEMEN ÇALIŞMASI İÇİN ÖNCE LİSTEYE VE LOCALSTORAGE'A AL
+            if (typeof orders !== "undefined" && Array.isArray(orders)) {
+                orders.unshift(newOrd);
+            }
+            try {
+                var localList = JSON.parse(localStorage.getItem("cinpa_cached_orders") || "[]");
+                localList.unshift(newOrd);
+                localStorage.setItem("cinpa_cached_orders", JSON.stringify(localList));
+            } catch(e) {}
+
+            // 2. MODAL PENCERESİNİ ANINDA KAPAT
+            var modalEl = document.getElementById("modal-new-order");
+            if (modalEl) {
+                modalEl.classList.add("hidden");
+                modalEl.style.setProperty("display", "none", "important");
+            }
+            if (typeof closeModal === "function") {
+                try { closeModal(); } catch(e) {}
+            }
+
+            // 3. EKRANI DİĞER CİHAZDA ANINDA SİPARİŞİN İÇİNE SOK
+            activeOrder = newOrd;
+            if (typeof renderOrderList === "function") {
+                try { renderOrderList(); } catch(e) {}
+            }
+            if (typeof openOrderDetail === "function") {
+                try { openOrderDetail(newId); } catch(e) {}
+            }
+
+            // 4. BULUT SENKRONİZASYONUNU ARKA PLANDA ÇALIŞTIR (EKRANI ASLA DONDURMAZ)
+            setTimeout(function() {
+                try {
+                    if (typeof db !== "undefined" && db) {
+                        db.collection("orders").doc(newOrd.id).set(newOrd);
+                    }
+                } catch(e) {
+                    console.warn("Bulut arka plan kaydı:", e);
+                }
+            }, 100);
+
+            if (typeof showToast === "function") {
+                showToast("Yeni sipariş açıldı: #" + newId);
+            }
+
+        } catch(err) {
+            console.error("Cihaz başlatma hatası:", err);
+            alert("Hata: " + err.message);
+        }
+    };
+
+    // Butona mobil/dokunmatik cihazlarda tıklandığında doğrudan bu fonksiyonu çalıştır
+    document.addEventListener("click", function(e) {
+        var t = e.target;
+        var btn = t.closest ? t.closest("button") : null;
+        if (!btn) return;
+        var txt = (btn.innerText || "").trim();
+        if (txt === "Siparişi Başlat" || txt.indexOf("Siparişi Başlat") !== -1) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.saveNewOrder();
+        }
+    }, true);
+})();
         
     </script>
 </body>
