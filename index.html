@@ -3359,3 +3359,90 @@ document.addEventListener("click", function(e) {
     </script>
 </body>
 </html>
+// ================= SİPARİŞİ BAŞLAT TUŞUNU GARANTİYE ALMA =================
+window.saveNewOrder = async function() {
+    try {
+        const custInput = document.getElementById("new-cust-name");
+        const cust = custInput ? custInput.value.trim() : "";
+        
+        if (!cust) {
+            alert("Lütfen Müşteri / Proje Adı giriniz!");
+            if (custInput) custInput.focus();
+            return;
+        }
+
+        // Rastgele Benzersiz İş No Üret
+        const newId = "CNP-2026-" + Math.floor(100 + Math.random() * 900);
+        
+        // Satış Temsilcisini Bul (currentUser yoksa bile formu oku)
+        const repSelect = document.getElementById("new-sales-rep");
+        let repName = "Orhan Özen";
+        if (currentUser && currentUser.name) {
+            repName = currentUser.name;
+        } else if (repSelect && repSelect.value) {
+            repName = repSelect.value;
+        }
+
+        // Tarih ve Uygulama Durumu
+        const dateInput = document.getElementById("new-date");
+        const orderDate = (dateInput && dateInput.value) ? dateInput.value : new Date().toISOString().split("T")[0];
+        
+        const hasAppSelect = document.getElementById("new-has-application");
+        const hasApp = hasAppSelect ? (hasAppSelect.value === "true") : true;
+        
+        const notesInput = document.getElementById("new-notes");
+        const orderNotes = notesInput ? notesInput.value : "";
+
+        // Yeni Sipariş Nesnesi
+        const newOrd = {
+            id: newId,
+            customer: cust,
+            salesRep: repName,
+            date: orderDate,
+            notes: orderNotes,
+            hasApplication: hasApp,
+            currentStep: 1,
+            items: [],
+            extras: [],
+            isClosed: false
+        };
+
+        // 1. Yerel hafızaya ve listeye ekle
+        if (typeof orders !== 'undefined' && Array.isArray(orders)) {
+            orders.unshift(newOrd);
+            try { localStorage.setItem("cinpa_cached_orders", JSON.stringify(orders)); } catch(e) {}
+        }
+
+        // 2. Buluta senkronize et
+        if (typeof syncOrderToCloud === 'function') {
+            syncOrderToCloud(newOrd);
+        }
+
+        // 3. Modalı Kapat
+        if (typeof closeModal === 'function') {
+            closeModal();
+        } else {
+            const m = document.getElementById("modal-new-order");
+            if (m) {
+                m.classList.add("hidden");
+                m.style.setProperty("display", "none", "important");
+            }
+        }
+
+        // 4. Listeyi yenile ve detay ekranına geç
+        if (typeof renderOrderList === 'function') renderOrderList();
+        if (typeof openOrderDetail === 'function') {
+            openOrderDetail(newId);
+        }
+
+        if (typeof showToast === 'function') {
+            showToast(`Yeni sipariş açıldı: #${newId}`);
+        } else {
+            alert(`Sipariş #${newId} başarıyla açıldı!`);
+        }
+
+    } catch (err) {
+        console.error("Sipariş başlatma hatası:", err);
+        alert("Sipariş başlatılırken bir hata oluştu: " + err.message);
+    }
+};
