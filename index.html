@@ -3356,50 +3356,31 @@ document.addEventListener("click", function(e) {
         }
     }
 }, true);
-    </script>
-</body>
-</html>
-// ================= SİPARİŞİ BAŞLAT TUŞUNU GARANTİYE ALMA =================
-window.saveNewOrder = async function() {
+        window.saveNewOrder = function() {
     try {
         const custInput = document.getElementById("new-cust-name");
         const cust = custInput ? custInput.value.trim() : "";
-        
         if (!cust) {
             alert("Lütfen Müşteri / Proje Adı giriniz!");
             if (custInput) custInput.focus();
             return;
         }
 
-        // Rastgele Benzersiz İş No Üret
         const newId = "CNP-2026-" + Math.floor(100 + Math.random() * 900);
-        
-        // Satış Temsilcisini Bul (currentUser yoksa bile formu oku)
         const repSelect = document.getElementById("new-sales-rep");
-        let repName = "Orhan Özen";
-        if (currentUser && currentUser.name) {
-            repName = currentUser.name;
-        } else if (repSelect && repSelect.value) {
-            repName = repSelect.value;
-        }
+        let rep = (typeof currentUser !== 'undefined' && currentUser && currentUser.name) ? currentUser.name : (repSelect ? repSelect.value : "Orhan Özen");
 
-        // Tarih ve Uygulama Durumu
-        const dateInput = document.getElementById("new-date");
-        const orderDate = (dateInput && dateInput.value) ? dateInput.value : new Date().toISOString().split("T")[0];
-        
         const hasAppSelect = document.getElementById("new-has-application");
         const hasApp = hasAppSelect ? (hasAppSelect.value === "true") : true;
-        
-        const notesInput = document.getElementById("new-notes");
-        const orderNotes = notesInput ? notesInput.value : "";
+        const dateVal = document.getElementById("new-date") ? document.getElementById("new-date").value : new Date().toISOString().split("T")[0];
+        const notesVal = document.getElementById("new-notes") ? document.getElementById("new-notes").value : "";
 
-        // Yeni Sipariş Nesnesi
         const newOrd = {
             id: newId,
             customer: cust,
-            salesRep: repName,
-            date: orderDate,
-            notes: orderNotes,
+            salesRep: rep,
+            date: dateVal,
+            notes: notesVal,
             hasApplication: hasApp,
             currentStep: 1,
             items: [],
@@ -3407,42 +3388,37 @@ window.saveNewOrder = async function() {
             isClosed: false
         };
 
-        // 1. Yerel hafızaya ve listeye ekle
+        // 1. Bekletmeden doğrudan listeye ve tarayıcı hafızasına al
         if (typeof orders !== 'undefined' && Array.isArray(orders)) {
             orders.unshift(newOrd);
             try { localStorage.setItem("cinpa_cached_orders", JSON.stringify(orders)); } catch(e) {}
         }
 
-        // 2. Buluta senkronize et
+        // 2. Buluta arka planda gönder (await ile kilitleme yapmaz)
         if (typeof syncOrderToCloud === 'function') {
             syncOrderToCloud(newOrd);
+        } else if (typeof db !== 'undefined' && db) {
+            db.collection("orders").doc(newOrd.id).set(newOrd).catch(function(err){ console.error(err); });
         }
 
-        // 3. Modalı Kapat
-        if (typeof closeModal === 'function') {
-            closeModal();
-        } else {
-            const m = document.getElementById("modal-new-order");
-            if (m) {
-                m.classList.add("hidden");
-                m.style.setProperty("display", "none", "important");
-            }
+        // 3. Modalı anında kapat
+        const modal = document.getElementById("modal-new-order");
+        if (modal) {
+            modal.classList.add("hidden");
+            modal.style.setProperty("display", "none", "important");
         }
 
-        // 4. Listeyi yenile ve detay ekranına geç
+        // 4. Tabloyu yenile ve doğrudan siparişi aç
         if (typeof renderOrderList === 'function') renderOrderList();
-        if (typeof openOrderDetail === 'function') {
-            openOrderDetail(newId);
-        }
-
-        if (typeof showToast === 'function') {
-            showToast(`Yeni sipariş açıldı: #${newId}`);
-        } else {
-            alert(`Sipariş #${newId} başarıyla açıldı!`);
-        }
+        if (typeof openOrderDetail === 'function') openOrderDetail(newId);
+        if (typeof showToast === 'function') showToast("Yeni sipariş açıldı: #" + newId);
 
     } catch (err) {
-        console.error("Sipariş başlatma hatası:", err);
-        alert("Sipariş başlatılırken bir hata oluştu: " + err.message);
+        console.error("Sipariş hatası:", err);
+        alert("Hata oluştu: " + err.message);
     }
 };
+        
+    </script>
+</body>
+</html>
