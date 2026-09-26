@@ -3618,6 +3618,25 @@ document.addEventListener("click", function(e) {
         setTimeout(injectSahaSearchInput, 100);
     });
 })();
+// ================= KATALOG EXCEL YÜKLEME BUTONUNU DÜZELTME =================
+document.addEventListener("click", function(e) {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+
+    const btnText = (btn.innerText || "").trim();
+
+    // Katalog penceresindeki "Excel Seç & Yükle" butonuna tıklandığında:
+    if (btnText.includes("Excel Seç & Yükle") || btnText.includes("Excel Seç")) {
+        e.preventDefault();
+        e.stopPropagation(); // Sipariş açma penceresini tetikleyen genel dinleyiciyi durdurur
+
+        // Doğrudan katalog Excel dosya seçicisini tetikle
+        const fileInput = document.getElementById("catalog-excel-file");
+        if (fileInput) {
+            fileInput.click();
+        }
+    }
+}, true); // "true" sayesinde genel dinleyiciden önce devreye girer
         
     </script>
 </body>
