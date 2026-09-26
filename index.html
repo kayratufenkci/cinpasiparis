@@ -3637,115 +3637,116 @@ document.addEventListener("click", function(e) {
         }
     }
 }, true); // "true" sayesinde genel dinleyiciden önce devreye girer
-// ================= KATALOGDAN FİŞE EKLE (TAM VE KESİN ÇÖZÜM) =================
-window.addItemFromCatalog = function() {
+// ================= EXCEL'DEN SİPARİŞE ÜRÜN AKTARMA MOTORU (KESİN ÇÖZÜM) =================
+window.applyExcelImportToOrder = async function() {
     try {
-        if (!activeOrder) {
-            alert("Lütfen önce bir sipariş dosyası seçiniz!");
+        if (!parsedExcelItems || parsedExcelItems.length === 0) {
+            alert("Lütfen önce geçerli bir Excel dosyası seçiniz!");
             return;
         }
 
-        const sel = document.getElementById("step1-select-product");
-        const priceInput = document.getElementById("step1-catalog-price");
-        const colorInput = document.getElementById("step1-catalog-color");
-        const qtyInput = document.getElementById("step1-catalog-qty");
+        const custName = prompt("Müşteri / Proje Adı giriniz:", "Yeni Excel Projesi");
+        if (!custName || !custName.trim()) return;
 
-        const qty = parseInt(qtyInput ? qtyInput.value : 1) || 1;
-        const price = typeof parseCleanPrice === "function" 
-            ? parseCleanPrice(priceInput ? priceInput.value : 0) 
-            : (parseFloat(priceInput ? priceInput.value : 0) || 0);
+        const newId = "CNP-2026-" + Math.floor(100 + Math.random() * 900);
+        const hasAppSelect = document.getElementById("excel-import-has-application");
+        const hasApplication = hasAppSelect ? (hasAppSelect.value === "true") : true;
 
-        let color = colorInput ? colorInput.value.trim() : "";
-        let prodId = "";
-        let prodName = "";
-
-        // 1. Önce masterProducts içinden eşleştirmeyi dene
-        let p = null;
-        if (typeof masterProducts !== "undefined" && sel && sel.value) {
-            p = masterProducts.find(x => x.key === sel.value || x.id === sel.value);
+        // Satış temsilcisini oturumdan al
+        let repName = "Orhan Özen";
+        if (typeof currentUser !== "undefined" && currentUser && currentUser.name) {
+            repName = currentUser.name;
         }
 
-        if (p) {
-            prodId = p.id;
-            prodName = p.name;
-            if (!color) color = p.color;
-        } else if (sel && sel.selectedIndex >= 0 && sel.options[sel.selectedIndex]) {
-            // 2. Bulamazsa doğrudan ekranda seçili duran metinden (0101007 - YUCCA BUSH...) çek
-            const fullText = sel.options[sel.selectedIndex].text || "";
-            const parts = fullText.split(" - ");
-            prodId = parts[0] ? parts[0].trim() : "0101007";
-            
-            let remaining = parts[1] || "";
-            if (remaining.includes("[")) {
-                prodName = remaining.split("[")[0].trim();
-            } else if (remaining.includes("(")) {
-                prodName = remaining.split("(")[0].trim();
-            } else {
-                prodName = remaining.trim();
-            }
-        }
-
-        if (!prodName) {
-            alert("Lütfen listeden bir ürün seçiniz!");
-            return;
-        }
-
-        // Renk kodunu temizle (sadece sayısal kod kalsın)
-        const finalColor = typeof normalizeColorCode === "function" 
-            ? normalizeColorCode(color, prodName) 
-            : color;
-
-        if (!activeOrder.items) activeOrder.items = [];
-
-        // Yeni kalemi fişe ekle
-        activeOrder.items.push({
-            id: prodId,
-            name: prodName,
-            color: finalColor,
-            requestedQty: qty,
-            dispatchedQty: qty,
-            returnedQty: 0,
-            price: price,
-            warehouseNote: "",
-            checked: true
+        // Excel kalemlerini kalıcı ve eksiksiz klonla
+        const formattedItems = parsedExcelItems.map(function(i) {
+            return {
+                id: String(i.id || '').trim(),
+                name: String(i.name || i.id || '').trim(),
+                color: String(i.color || '').trim(),
+                requestedQty: parseFloat(i.requestedQty) || 1,
+                dispatchedQty: parseFloat(i.dispatchedQty !== undefined ? i.dispatchedQty : i.requestedQty) || 1,
+                returnedQty: 0,
+                price: parseFloat(i.price) || 0,
+                warehouseNote: "",
+                checked: true
+            };
         });
 
-        // Siparişler listesini ve localStorage'ı güncelle
+        const newOrd = {
+            id: newId,
+            customer: custName.trim(),
+            salesRep: repName,
+            date: new Date().toISOString().split("T")[0],
+            notes: "Excel üzerinden aktarıldı (" + formattedItems.length + " Kalem).",
+            hasApplication: hasApplication,
+            currentStep: 1,
+            items: formattedItems,
+            extras: [],
+            isClosed: false
+        };
+
+        // 1. orders dizisine ve localStorage'a kesin olarak ekle
         if (typeof orders !== "undefined" && Array.isArray(orders)) {
-            const idx = orders.findIndex(o => o.id === activeOrder.id);
-            if (idx >= 0) orders[idx] = activeOrder;
+            orders.unshift(newOrd);
             try { localStorage.setItem("cinpa_cached_orders", JSON.stringify(orders)); } catch(e) {}
         }
 
-        // Buluta arka planda yaz
-        if (typeof syncOrderToCloud === "function") {
-            try { syncOrderToCloud(activeOrder); } catch(e) {}
+        // 2. Aktif siparişi hemen bu yeni sipariş yap
+        activeOrder = newOrd;
+
+        // 3. Modalı zorla kapat
+        const modal = document.getElementById("modal-excel-import");
+        if (modal) {
+            modal.classList.add("hidden");
+            modal.style.setProperty("display", "none", "important");
+        }
+        if (typeof closeExcelImportModal === "function") {
+            try { closeExcelImportModal(); } catch(e) {}
         }
 
-        // 1. Adım tablosunu anında tazele (Ürün yukarıdaki listeye düşer)
-        if (typeof renderStep1 === "function") {
-            renderStep1();
+        // 4. Ana listeyi ve sipariş ekranını hemen aç
+        if (typeof renderOrderList === "function") {
+            try { renderOrderList(); } catch(e) {}
+        }
+        if (typeof openOrderDetail === "function") {
+            openOrderDetail(newId);
+        }
+
+        // 5. 1. Adım tablosunu zorla doldur
+        setTimeout(function() {
+            activeOrder = newOrd;
+            if (typeof renderStep1 === "function") {
+                renderStep1();
+            }
+        }, 50);
+
+        // 6. Buluta arka planda yaz (ekranı bekletmez)
+        if (typeof syncOrderToCloud === "function") {
+            try { syncOrderToCloud(newOrd); } catch(e) {}
+        } else if (typeof db !== "undefined" && db) {
+            try { db.collection("orders").doc(newOrd.id).set(newOrd); } catch(e) {}
         }
 
         if (typeof showToast === "function") {
-            showToast(`${prodName} başarıyla fişe eklendi!`);
+            showToast("Excel'den " + formattedItems.length + " kalem ürün aktarıldı!");
         }
 
-    } catch (err) {
-        console.error("Katalog fişe ekleme hatası:", err);
-        alert("Ürün eklenirken bir hata oluştu: " + err.message);
+    } catch(err) {
+        console.error("Excel aktarım hatası:", err);
+        alert("Aktarma sırasında hata oluştu: " + err.message);
     }
 };
 
-// Butona tıklandığında kesin olarak bu fonksiyonun çalışmasını sağla
+// Modal içerisindeki "Yeni Sipariş Olarak Panele Aktar" butonuna basıldığında doğrudan bunu çalıştır
 document.addEventListener("click", function(e) {
     const btn = e.target.closest("button");
     if (!btn) return;
     const txt = (btn.innerText || "").trim();
-    if (txt === "+ Katalogdan Fişe Ekle" || txt.includes("Katalogdan Fişe Ekle")) {
+    if (btn.id === "btn-apply-excel" || txt.includes("Panele Aktar")) {
         e.preventDefault();
         e.stopPropagation();
-        window.addItemFromCatalog();
+        window.applyExcelImportToOrder();
     }
 }, true);
         
