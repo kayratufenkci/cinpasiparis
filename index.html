@@ -3749,6 +3749,73 @@ document.addEventListener("click", function(e) {
         window.applyExcelImportToOrder();
     }
 }, true);
+// ================= EXCEL MODALINI AKTARIMDAN SONRA SIFIRLAMA =================
+(function() {
+    // Modal içindeki tüm alanları ve önizleme tablosunu temizleyen fonksiyon
+    window.resetExcelImportModal = function() {
+        // 1. Okunan kalem hafızasını boşalt
+        parsedExcelItems = [];
+
+        // 2. Önizleme kutusunu gizle ve içeriğini temizle
+        const prevBox = document.getElementById("excel-preview-box");
+        if (prevBox) {
+            prevBox.classList.add("hidden");
+            prevBox.style.setProperty("display", "none", "important");
+        }
+
+        const tbody = document.getElementById("excel-preview-tbody");
+        if (tbody) tbody.innerHTML = "";
+
+        const countEl = document.getElementById("excel-preview-count");
+        if (countEl) countEl.innerText = "0 Kalem Ürün";
+
+        const totalEl = document.getElementById("excel-preview-total");
+        if (totalEl) totalEl.innerText = "0 ₺";
+
+        // 3. Dosya seçici ve metin yapıştırma alanlarını sıfırla
+        const fileInput = document.getElementById("excel-file-input");
+        if (fileInput) fileInput.value = "";
+
+        const pasteInput = document.getElementById("excel-paste-input");
+        if (pasteInput) pasteInput.value = "";
+
+        // 4. "Panele Aktar" butonunu tekrar pasif (gri) yap
+        const applyBtn = document.getElementById("btn-apply-excel");
+        if (applyBtn) {
+            applyBtn.disabled = true;
+            applyBtn.className = "px-5 py-2.5 rounded-xl bg-slate-300 text-white font-bold text-xs cursor-not-allowed transition flex items-center space-x-2";
+        }
+    };
+
+    // "Yeni Sipariş Olarak Panele Aktar" butonuna basıldığı an sıfırlamayı tetikle
+    document.addEventListener("click", function(e) {
+        const btn = e.target.closest("button");
+        if (!btn) return;
+        const txt = (btn.innerText || "").trim();
+
+        if (btn.id === "btn-apply-excel" || txt.includes("Panele Aktar")) {
+            // Sipariş oluşturulduktan hemen sonra modalı sıfırla
+            setTimeout(function() {
+                window.resetExcelImportModal();
+            }, 300);
+        }
+    }, true);
+
+    // Modal her açıldığında da temiz başlamasını garantiye al
+    const origOpenExcel = window.openExcelImportModal;
+    window.openExcelImportModal = function() {
+        window.resetExcelImportModal();
+        if (typeof origOpenExcel === "function") {
+            origOpenExcel();
+        } else {
+            const m = document.getElementById("modal-excel-import");
+            if (m) {
+                m.classList.remove("hidden");
+                m.style.setProperty("display", "flex", "important");
+            }
+        }
+    };
+})();
         
     </script>
 </body>
