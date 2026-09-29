@@ -4007,7 +4007,30 @@ document.addEventListener("click", function(e) {
         }, 100);
     }
 }, true);
+// İADE KONTROL VE LİSTELEME MOTORU (Mağaza & Atölye İade Masası)
+function checkReturnApprovalAccess() {
+    var u = (window.currentUser ? (window.currentUser.name || window.currentUser.role || window.currentUser) : (localStorage.getItem('currentUser') || ''));
+    if (typeof u !== 'string') u = JSON.stringify(u);
+    
+    var isReturnUser = (u.indexOf('İade') > -1 || u.indexOf('iade') > -1 || u.indexOf('magaza') > -1 || u.indexOf('atolye') > -1);
+    
+    var pnl = document.getElementById('panel-return-approval');
+    var sahaBtn = document.getElementById('step3-action-buttons');
+    
+    if (isReturnUser) {
+        // İade yetkilisi girdiğinde mor kutuyu aç, saha montaj bitir butonunu gizle
+        if (pnl) { pnl.classList.remove('hidden'); pnl.style.display = 'flex'; }
+        if (sahaBtn) { sahaBtn.style.display = 'none'; }
+    } else {
+        // Saha ekibi veya diğer rollerde mor kutuyu kesinlikle gizle
+        if (pnl) { pnl.classList.add('hidden'); pnl.style.display = 'none'; }
+        if (sahaBtn) { sahaBtn.style.display = 'block'; }
+    }
+}
 
+// Periyodik kontrol ve yükleme kontrolü
+window.addEventListener('load', checkReturnApprovalAccess);
+setInterval(checkReturnApprovalAccess, 1000);
     </script>
 </body>
 </html>
