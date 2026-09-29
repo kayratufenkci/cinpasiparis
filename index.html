@@ -3841,6 +3841,49 @@ document.addEventListener("click", function(e) {
         }, 100);
     }
 }, true);
+    // ================= KULLANICI / ROL İSİMLERİNİ SADELEŞTİRME =================
+function updateRoleLabels() {
+    // Sayfadaki tüm metin düğümlerini veya butonları tara
+    const elements = document.querySelectorAll("button, div, span, h3, h4, p");
+    elements.forEach(function(el) {
+        if (el.children.length === 0 || el.innerText) {
+            // Depo güncellemesi
+            if (el.innerText.includes("Depocu (Kamber Usta)")) {
+                el.innerText = el.innerText.replace("Depocu (Kamber Usta)", "Depo");
+            }
+            // Saha Ekibi güncellemesi
+            if (el.innerText.includes("Saha Ekibi (Sefa Usta)")) {
+                el.innerText = el.innerText.replace("Saha Ekibi (Sefa Usta)", "Saha Ekibi");
+            }
+            // Muhasebe güncellemesi
+            if (el.innerText.includes("Muhasebe (Gökhan)")) {
+                el.innerText = el.innerText.replace("Muhasebe (Gökhan)", "Muhasebe");
+            }
+        }
+    });
+
+    // users dizisi varsa oradaki isimleri de güncelle
+    if (typeof users !== "undefined" && Array.isArray(users)) {
+        users.forEach(function(u) {
+            if (u.name === "Kamber Usta" || (u.title && u.title.includes("Kamber"))) {
+                u.title = "Depo";
+            }
+            if (u.name === "Sefa Usta" || (u.title && u.title.includes("Sefa"))) {
+                u.title = "Saha Ekibi";
+            }
+            if (u.name === "Gökhan" || (u.title && u.title.includes("Gökhan"))) {
+                u.title = "Muhasebe";
+            }
+        });
+    }
+}
+
+// Sayfa ilk yüklendiğinde ve her modal / profil açıldığında çalıştır
+document.addEventListener("DOMContentLoaded", updateRoleLabels);
+document.addEventListener("click", function() {
+    setTimeout(updateRoleLabels, 50);
+});
+setInterval(updateRoleLabels, 500);
         
     </script>
 </body>
