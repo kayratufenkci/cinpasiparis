@@ -610,35 +610,48 @@
                         </div>
                         <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
                             <div class="text-xs text-slate-500"><i class="fa-solid fa-clipboard-check mr-1 text-slate-400"></i> Montaj tamamlandıktan sonra tüm evraklar birleşir.</div>
-                         <div id="step3-action-buttons">
+                       <div id="step3-action-buttons">
                     <button type="button" onclick="
+                        // 1. İade girilmiş mi kontrol et
                         var returnInputs = document.querySelectorAll('#content-step-3 input[type=number]');
                         var totalReturn = 0;
                         returnInputs.forEach(function(inp){
-                            var val = parseInt(inp.value, 10);
-                            if(!isNaN(val) && val > 0) totalReturn += val;
+                            var v = parseInt(inp.value, 10);
+                            if(!isNaN(v) && v > 0) totalReturn += v;
                         });
 
-                        var orders = JSON.parse(localStorage.getItem('orders') || '[]');
-                        var currentId = (window.currentOrder ? window.currentOrder.id : window.currentOrderId);
-                        var target = orders.find(function(o){ return o.id == currentId; }) || window.currentOrder;
+                        // 2. Siparişi bul
+                        var rawOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+                        var currentId = (window.activeOrder && window.activeOrder.id) || (window.currentOrder && window.currentOrder.id) || window.currentOrderId;
+                        
+                        var targetIdx = rawOrders.findIndex(function(o){ return o.id == currentId; });
 
                         if(totalReturn > 0) {
-                            if(confirm('Sahada ' + totalReturn + ' adet iade girildi. Fiş kontrol ve kabul için Mağaza & Atölye İade sorumlusuna aktarılsın mı?')) {
-                                if(target) {
-                                    target.status = 'İade Onayı Bekliyor';
-                                    target.stage = 'İade Onayı';
-                                    target.needsReturnApproval = true;
-                                    target.hasReturns = true;
+                            if(confirm('Sahada ' + totalReturn + ' adet iade tespit edildi. Fiş kontrol ve onay için İade Masasına devredilsin mi?')) {
+                                if(targetIdx > -1) {
+                                    rawOrders[targetIdx].status = 'İade Onayı Bekliyor';
+                                    rawOrders[targetIdx].stage = 'İade Onayı';
+                                    rawOrders[targetIdx].currentStep = 3.5;
+                                    rawOrders[targetIdx].needsReturnApproval = true;
+                                    rawOrders[targetIdx].hasReturns = true;
+                                }
+                                if(window.activeOrder) {
+                                    window.activeOrder.status = 'İade Onayı Bekliyor';
+                                    window.activeOrder.currentStep = 3.5;
+                                    window.activeOrder.needsReturnApproval = true;
                                 }
                                 if(window.currentOrder) {
                                     window.currentOrder.status = 'İade Onayı Bekliyor';
-                                    window.currentOrder.stage = 'İade Onayı';
+                                    window.currentOrder.currentStep = 3.5;
                                     window.currentOrder.needsReturnApproval = true;
                                 }
-                                localStorage.setItem('orders', JSON.stringify(orders));
+
+                                localStorage.setItem('orders', JSON.stringify(rawOrders));
+                                if(window.orders) window.orders = rawOrders;
                                 if(typeof saveOrders === 'function') saveOrders();
-                                alert('İadeli fiş Mağaza & Atölye İade masasına devredildi.');
+
+                                alert('İade kaydedildi! Fiş Saha masasından kaldırıldı, İade Masasına aktarıldı.');
+                                
                                 if(typeof returnToDashboard === 'function') {
                                     returnToDashboard();
                                 } else {
@@ -646,23 +659,23 @@
                                 }
                             }
                         } else {
-                            // İade yoksa doğrudan muhasebeye devret
-                            if(target) {
-                                target.status = 'Muhasebe';
-                                target.stage = 'Muhasebe';
-                                target.step = 4;
+                            if(targetIdx > -1) {
+                                rawOrders[targetIdx].status = 'Muhasebe';
+                                rawOrders[targetIdx].stage = 'Muhasebe';
+                                rawOrders[targetIdx].currentStep = 4;
                             }
-                            if(window.currentOrder) {
-                                window.currentOrder.step = 4;
-                                window.currentOrder.status = 'Muhasebe';
-                            }
-                            localStorage.setItem('orders', JSON.stringify(orders));
+                            if(window.activeOrder) { window.activeOrder.status = 'Muhasebe'; window.activeOrder.currentStep = 4; }
+                            if(window.currentOrder) { window.currentOrder.status = 'Muhasebe'; window.currentOrder.currentStep = 4; }
+
+                            localStorage.setItem('orders', JSON.stringify(rawOrders));
+                            if(window.orders) window.orders = rawOrders;
                             if(typeof saveOrders === 'function') saveOrders();
-                            var step3 = document.getElementById('content-step-3');
-                            var step4 = document.getElementById('content-step-4');
-                            if(step3 && step4) {
-                                step3.classList.add('hidden');
-                                step4.classList.remove('hidden');
+
+                            var s3 = document.getElementById('content-step-3');
+                            var s4 = document.getElementById('content-step-4');
+                            if(s3 && s4) {
+                                s3.classList.add('hidden');
+                                s4.classList.remove('hidden');
                             }
                             if(typeof renderStep === 'function') renderStep(4);
                         }
@@ -671,9 +684,6 @@
                         <span class="pointer-events-none">Montajı Bitir & Muhasebeye (Gökhan) Gönder</span>
                     </button>
                 </div>
-            </div>
-        </div>
-    </div>
 
     <!-- İADE ONAY KONTROL BİLGİSİ (Sadece Mağaza ve Atölye İade Kullanıcıları İçin) -->
    <div id="panel-return-approval" class="hidden p-4 bg-purple-50 border border-purple-200 rounded-2xl items-center justify-between mt-3" style="display:none;">
