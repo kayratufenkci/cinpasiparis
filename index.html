@@ -216,9 +216,9 @@
                     </div>
 
                     <div class="flex items-center space-x-2 sm:space-x-3">
-                       <button onclick="localStorage.removeItem('currentUser'); location.reload();" title="Giriş Ekranına Dön" class="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center space-x-1.5 transition">
-    <i class="fa-solid fa-arrow-left"></i>
-    <span>Kullanıcı Değiştir</span>
+                     <button type="button" onclick="location.reload();" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-800 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold whitespace-nowrap cursor-pointer">
+    <i class="fa-solid fa-arrow-left text-[11px] pointer-events-none"></i>
+    <span class="pointer-events-none">Kullanıcı Değiştir</span>
 </button>
                         <button onclick="openExcelImportModal()" id="btn-header-import-excel" class="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl border border-emerald-700 transition flex items-center space-x-1.5 shadow-sm cursor-pointer">
                             <i class="fa-solid fa-file-excel text-emerald-300 pointer-events-none"></i>
