@@ -2419,11 +2419,15 @@
             } else if (currentUser.roleId === 'saha') {
                 visibleOrders = orders.filter(ord => ord.currentStep >= 3 && ord.hasApplication !== false);
                 document.getElementById("dashboard-table-title").innerText = `Saha Montaj & Uygulama Masası`;
-                document.getElementById("dashboard-table-subtitle").innerText = `Yalnızca montaj/uygulaması yapılacak işler listelenmektedir.`;
-            } else if (currentUser.roleId === 'muhasebe') {
-                visibleOrders = orders.filter(ord => ord.currentStep >= 2);
-                document.getElementById("dashboard-table-title").innerText = `Muhasebe Fatura Onay Kuyruğu`;
-                document.getElementById("dashboard-table-subtitle").innerText = `Depo veya Saha onayı tamamlanmış, faturalandırılmayı bekleyen fişler.`;
+           document.getElementById("dashboard-table-subtitle").innerText = `Yalnızca montaj/uygulaması yapılacak işler listelenmektedir.`;
+    } else if (currentUser.roleId === 'magaza-iade' || currentUser.roleId === 'atolye-iade' || (currentUser.roleId && currentUser.roleId.includes('iade')) || (currentUser.name && currentUser.name.toLowerCase().includes('iade'))) {
+        visibleOrders = orders.filter(ord => ord.needsReturnApproval === true || ord.status === 'İade Onayı Bekliyor' || ord.stage === 'İade Onayı' || ord.hasReturns === true);
+        document.getElementById("dashboard-table-title").innerText = `İade Onay Masası (${currentUser.name})`;
+        document.getElementById("dashboard-table-subtitle").innerText = `Saha ekibi tarafından iadesi girilmiş ve onay bekleyen siparişler listelenmektedir.`;
+    } else if (currentUser.roleId === 'muhasebe') {
+        visibleOrders = orders.filter(ord => ord.currentStep >= 2 && ord.status !== 'İade Onayı Bekliyor' && ord.needsReturnApproval !== true);
+        document.getElementById("dashboard-table-title").innerText = `Muhasebe Fatura Onay Kuyruğu`;
+        document.getElementById("dashboard-table-subtitle").innerText = `Depo veya Saha onayı tamamlanmış, faturalandırılmayı bekleyen fişler.`;
             } else {
                 visibleOrders = orders;
                 document.getElementById("dashboard-table-title").innerText = `Tüm Sipariş Dosyaları (Admin)`;
