@@ -3847,7 +3847,101 @@ document.addEventListener("click", function(e) {
     display: none !important;
   }
 </style>
-         
-    </script>
+    <script>
+// ================= GİRİŞ BUTONLARINI ZORLA KURTARMA MOTORU =================
+(function() {
+    function bindLoginButtons() {
+        // 1. Satış Uzmanı Giriş Butonu ("Giriş ->")
+        document.querySelectorAll("button").forEach(function(btn) {
+            const txt = (btn.innerText || "").trim();
+            if (txt.includes("Giriş") && !txt.includes("Kullanıcı Değiştir")) {
+                btn.onclick = function(e) {
+                    e.preventDefault();
+                    const sel = document.querySelector("#modal-login select, select");
+                    const salesName = sel ? sel.value : "Orhan Özen (106)";
+                    const cleanName = salesName.split("(")[0].trim();
+                    
+                    window.currentUser = {
+                        name: cleanName,
+                        roleId: 'satis',
+                        roleTitle: 'Satış Uzmanı',
+                        canSeePrices: true
+                    };
+                    closeLoginAndEnter();
+                };
+            }
+        });
+
+        // 2. Depo, Saha, Muhasebe ve Admin Kartları
+        const roleCards = document.querySelectorAll("#modal-login .cursor-pointer, #modal-login [onclick], .space-y-3 > div");
+        roleCards.forEach(function(card) {
+            const t = (card.innerText || "").trim();
+
+            if (t.includes("Depo") && !t.includes("Admin")) {
+                card.onclick = function() {
+                    const pass = prompt("Depo Giriş Şifresi:");
+                    if (pass === "1234" || pass === "depo" || pass === "106") {
+                        window.currentUser = { name: "Depo", roleId: "depo", roleTitle: "Depo Sorumlusu", canSeePrices: false };
+                        closeLoginAndEnter();
+                    } else if (pass !== null) {
+                        alert("Hatalı şifre!");
+                    }
+                };
+            } else if (t.includes("Saha")) {
+                card.onclick = function() {
+                    const pass = prompt("Saha Ekibi Şifresi:");
+                    if (pass === "1234" || pass === "saha" || pass === "106") {
+                        window.currentUser = { name: "Saha Ekibi", roleId: "saha", roleTitle: "Saha Uygulama", canSeePrices: false };
+                        closeLoginAndEnter();
+                    } else if (pass !== null) {
+                        alert("Hatalı şifre!");
+                    }
+                };
+            } else if (t.includes("Muhasebe")) {
+                card.onclick = function() {
+                    const pass = prompt("Muhasebe Şifresi:");
+                    if (pass === "1234" || pass === "muhasebe" || pass === "106") {
+                        window.currentUser = { name: "Muhasebe", roleId: "muhasebe", roleTitle: "Muhasebe & Finans", canSeePrices: true };
+                        closeLoginAndEnter();
+                    } else if (pass !== null) {
+                        alert("Hatalı şifre!");
+                    }
+                };
+            } else if (t.includes("Admin") || t.includes("Sistem Yöneticisi")) {
+                card.onclick = function() {
+                    const pass = prompt("Admin Şifresi:");
+                    if (pass === "admin" || pass === "1234" || pass === "106") {
+                        window.currentUser = { name: "Sistem Yöneticisi", roleId: "admin", roleTitle: "Admin", canSeePrices: true };
+                        closeLoginAndEnter();
+                    } else if (pass !== null) {
+                        alert("Hatalı şifre!");
+                    }
+                };
+            }
+        });
+    }
+
+    function closeLoginAndEnter() {
+        const loginModal = document.getElementById("modal-login");
+        if (loginModal) {
+            loginModal.classList.add("hidden");
+            loginModal.style.setProperty("display", "none", "important");
+        }
+        if (typeof updateHeaderUserInfo === "function") updateHeaderUserInfo();
+        if (typeof renderOrderList === "function") renderOrderList();
+        if (typeof showToast === "function") showToast("Giriş yapıldı: " + window.currentUser.name);
+    }
+
+    // Sayfa hazır olunca ve dinamik yüklemelerde bağla
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", bindLoginButtons);
+    } else {
+        bindLoginButtons();
+    }
+    setTimeout(bindLoginButtons, 300);
+})();
+        
+</script>
+    
 </body>
 </html>
