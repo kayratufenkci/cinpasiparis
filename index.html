@@ -4033,273 +4033,47 @@ document.addEventListener("click", function(e) {
             }
         }, 100);
     }
-}, true);
 // İADE KONTROL VE LİSTELEME MOTORU (Mağaza & Atölye İade Masası)
-function checkReturnApprovalAccess() {
-    var u = (window.currentUser ? (window.currentUser.name || window.currentUser.role || window.currentUser) : (localStorage.getItem('currentUser') || ''));
-    if (typeof u !== 'string') u = JSON.stringify(u);
-    
-    var isReturnUser = (u.indexOf('İade') > -1 || u.indexOf('iade') > -1 || u.indexOf('magaza') > -1 || u.indexOf('atolye') > -1);
-    
-    var pnl = document.getElementById('panel-return-approval');
-    var sahaBtn = document.getElementById('step3-action-buttons');
-    
-    if (isReturnUser) {
-        // İade yetkilisi girdiğinde mor kutuyu aç, saha montaj bitir butonunu gizle
-        if (pnl) { pnl.classList.remove('hidden'); pnl.style.display = 'flex'; }
-        if (sahaBtn) { sahaBtn.style.display = 'none'; }
+})();
+       
+           // SAHA VE İADE İŞLEM KİLİDİ
+window.completeSahaStep = function() {
+    var inputs = document.querySelectorAll('#content-step-3 input[type=number]');
+    var totalReturn = 0;
+    inputs.forEach(function(i) {
+        var v = parseInt(i.value, 10);
+        if (!isNaN(v) && v > 0) totalReturn += v;
+    });
+
+    var orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    var activeId = (window.activeOrder && window.activeOrder.id) || (window.currentOrder && window.currentOrder.id) || window.currentOrderId;
+    var idx = orders.findIndex(function(o) { return o.id == activeId; });
+
+    if (totalReturn > 0) {
+        if (confirm('Sahada ' + totalReturn + ' adet iade girildi. Fiş İade Masasına devredilsin mi?')) {
+            if (idx > -1) {
+                orders[idx].currentStep = 3.5;
+                orders[idx].status = 'İade Onayı Bekliyor';
+                orders[idx].needsReturnApproval = true;
+            }
+            localStorage.setItem('orders', JSON.stringify(orders));
+            window.orders = orders;
+            alert('Fiş İade Masasına aktarıldı.');
+            if (typeof returnToDashboard === 'function') returnToDashboard();
+            else location.reload();
+        }
     } else {
-        // Saha ekibi veya diğer rollerde mor kutuyu kesinlikle gizle
-        if (pnl) { pnl.classList.add('hidden'); pnl.style.display = 'none'; }
-        if (sahaBtn) { sahaBtn.style.display = 'block'; }
+        if (idx > -1) {
+            orders[idx].currentStep = 4;
+            orders[idx].status = 'Muhasebe';
+            orders[idx].needsReturnApproval = false;
+        }
+        localStorage.setItem('orders', JSON.stringify(orders));
+        window.orders = orders;
+        if (typeof returnToDashboard === 'function') returnToDashboard();
+        else location.reload();
     }
-}
-
-// Periyodik kontrol ve yükleme kontrolü
-window.addEventListener('load', checkReturnApprovalAccess);
-setInterval(checkReturnApprovalAccess, 1000);
-        // ==========================================
-// KESİN İADE MOTORU VE LİSTE YÖNETİCİSİ
-// ==========================================
-(function() {
-    // 1. Sipariş listesi çizilirken iade kurallarını zorla
-    const originalRenderOrderList = window.renderOrderList;
-    window.renderOrderList = function() {
-        const u = window.currentUser;
-        if (u) {
-            const role = (u.roleId || '').toLowerCase();
-            const name = (u.name || '').toLowerCase();
-            const isReturnUser = role.includes('iade') || name.includes('iade') || role === 'magaza' || role === 'atolye';
-
-            if (isReturnUser) {
-                const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-                // İade kullanıcılarına İade bekleyen tüm siparişleri zorla göster
-                window.orders = allOrders;
-                const visible = allOrders.filter(ord => 
-                    ord.status === 'İade Onayı Bekliyor' || 
-                    ord.needsReturnApproval === true || 
-                    ord.currentStep === 3.5 || 
-                    ord.stage === 'İade Onayı'
-                );
-                
-                const tbody = document.getElementById("orders-table-body");
-                if (tbody) {
-                    tbody.innerHTML = "";
-                    document.getElementById("dashboard-table-title").innerText = `İade Onay Masası (${u.name})`;
-                    document.getElementById("dashboard-table-subtitle").innerText = `Saha ekibi tarafından iade girilmiş ve onay bekleyen dosyalar.`;
-                    
-                    if (visible.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-semibold">Onay bekleyen iadeli sipariş bulunmamaktadır.</td></tr>`;
-                        return;
-                    }
-                    // Tabloyu zorla iadeli siparişlerle doldur
-                    visible.forEach(ord => {
-                        const tr = document.createElement("tr");
-                        tr.className = "hover:bg-purple-50/50 transition cursor-pointer border-b border-purple-100";
-                        tr.innerHTML = `
-                            <td class="p-4 font-bold text-purple-950">${ord.id || ord.orderCode || '-'}</td>
-                            <td class="p-4 font-bold text-slate-800">${ord.customer || '-'}</td>
-                            <td class="p-4 text-slate-600">${ord.salesRep || '-'}</td>
-                            <td class="p-4 text-slate-500 text-xs">${ord.date || '-'}</td>
-                            <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">İade İnceleme</span></td>
-                            <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 animate-pulse">İade Onayı Bekliyor</span></td>
-                            <td class="p-4 text-right">
-                                <button onclick="openOrderDetail('${ord.id || ord.orderCode}')" class="px-3 py-1.5 bg-purple-700 hover:bg-purple-800 text-white rounded-lg text-xs font-bold shadow">
-                                    İncele & Onayla &gt;
-                                </button>
-                            </td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                    return;
-                }
-            } else if (role === 'saha') {
-                // Saha kullanıcısının masasından iadeli ve bitmiş olanları MUTLAK SİL
-                const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-                window.orders = allOrders.filter(ord => 
-                    ord.status !== 'İade Onayı Bekliyor' && 
-                    !ord.needsReturnApproval && 
-                    ord.currentStep !== 3.5
-                );
-            }
-        }
-        if (typeof originalRenderOrderList === 'function') {
-            originalRenderOrderList();
-        }
-    };
-
-    // 2. Her 500ms'de bir butonları ve panelleri yetkiye göre zorla kilitle/aç
-    setInterval(function() {
-        const u = window.currentUser;
-        if (!u) return;
-        const role = (u.roleId || '').toLowerCase();
-        const name = (u.name || '').toLowerCase();
-        const isReturnUser = role.includes('iade') || name.includes('iade') || role === 'magaza' || role === 'atolye';
-
-        const pnl = document.getElementById('panel-return-approval');
-        const sahaBtn = document.getElementById('step3-action-buttons');
-
-        if (isReturnUser) {
-            if (pnl) { pnl.classList.remove('hidden'); pnl.style.display = 'flex'; }
-            if (sahaBtn) { sahaBtn.style.display = 'none'; }
-        } else {
-            if (pnl) { pnl.classList.add('hidden'); pnl.style.display = 'none'; }
-            if (sahaBtn) { sahaBtn.style.display = 'block'; }
-        }
-    }, 400);
-})();
-        // ========================================================
-// GLOBAL İADE İŞLEM VE YETKİ KONTROL MOTORU (KESİN ÇÖZÜM)
-// ========================================================
-(function() {
-    // 1. Saha Ekibi Butona Bastığında Çalışacak Mantık
-    window.processReturnApprovalWorkflow = function() {
-        var returnInputs = document.querySelectorAll('#content-step-3 input[type=number]');
-        var totalReturn = 0;
-        returnInputs.forEach(function(inp){
-            var val = parseInt(inp.value, 10);
-            if(!isNaN(val) && val > 0) totalReturn += val;
-        });
-
-        var rawOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-        var currentId = (window.activeOrder && window.activeOrder.id) || (window.currentOrder && window.currentOrder.id) || window.currentOrderId;
-        var orderIndex = rawOrders.findIndex(function(o){ return o.id == currentId; });
-
-        if(totalReturn > 0) {
-            if(confirm('Sahada ' + totalReturn + ' adet iade girildi. Fiş İade Masasına devredilecek, onaylıyor musunuz?')) {
-                if(orderIndex > -1) {
-                    rawOrders[orderIndex].status = 'İade Onayı Bekliyor';
-                    rawOrders[orderIndex].stage = 'İade Onayı';
-                    rawOrders[orderIndex].needsReturnApproval = true;
-                    rawOrders[orderIndex].hasReturns = true;
-                }
-                if(window.activeOrder) {
-                    window.activeOrder.status = 'İade Onayı Bekliyor';
-                    window.activeOrder.stage = 'İade Onayı';
-                    window.activeOrder.needsReturnApproval = true;
-                }
-                if(window.currentOrder) {
-                    window.currentOrder.status = 'İade Onayı Bekliyor';
-                    window.currentOrder.stage = 'İade Onayı';
-                    window.currentOrder.needsReturnApproval = true;
-                }
-
-                localStorage.setItem('orders', JSON.stringify(rawOrders));
-                if(window.orders) window.orders = rawOrders;
-
-                alert('İadeli fiş başarıyla İade Masasına devredildi.');
-                if(typeof returnToDashboard === 'function') {
-                    returnToDashboard();
-                } else {
-                    location.reload();
-                }
-            }
-        } else {
-            // İade yoksa doğrudan Muhasebeye devret
-            if(orderIndex > -1) {
-                rawOrders[orderIndex].status = 'Muhasebe';
-                rawOrders[orderIndex].stage = 'Muhasebe';
-                rawOrders[orderIndex].currentStep = 4;
-            }
-            if(window.activeOrder) { window.activeOrder.status = 'Muhasebe'; window.activeOrder.currentStep = 4; }
-            if(window.currentOrder) { window.currentOrder.status = 'Muhasebe'; window.currentOrder.currentStep = 4; }
-
-            localStorage.setItem('orders', JSON.stringify(rawOrders));
-            if(window.orders) window.orders = rawOrders;
-
-            var s3 = document.getElementById('content-step-3');
-            var s4 = document.getElementById('content-step-4');
-            if(s3 && s4) {
-                s3.classList.add('hidden');
-                s4.classList.remove('hidden');
-            }
-            if(typeof renderStep === 'function') renderStep(4);
-        }
-    };
-
-    // 2. İade Kullanıcısı Onayladığında Muhasebeye Aktarma
-    window.confirmReturnAndForwardToAccounting = function() {
-        if(!confirm('İade ürünleri teslim aldığınızı onaylayıp dosyayı Muhasebeye aktarmak istiyor musunuz?')) return;
-
-        var rawOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-        var currentId = (window.activeOrder && window.activeOrder.id) || (window.currentOrder && window.currentOrder.id) || window.currentOrderId;
-        var orderIndex = rawOrders.findIndex(function(o){ return o.id == currentId; });
-
-        if(orderIndex > -1) {
-            rawOrders[orderIndex].status = 'Muhasebe';
-            rawOrders[orderIndex].stage = 'Muhasebe';
-            rawOrders[orderIndex].currentStep = 4;
-            rawOrders[orderIndex].needsReturnApproval = false;
-            rawOrders[orderIndex].returnApproved = true;
-        }
-        if(window.activeOrder) {
-            window.activeOrder.status = 'Muhasebe';
-            window.activeOrder.currentStep = 4;
-            window.activeOrder.needsReturnApproval = false;
-            window.activeOrder.returnApproved = true;
-        }
-        if(window.currentOrder) {
-            window.currentOrder.status = 'Muhasebe';
-            window.currentOrder.currentStep = 4;
-            window.currentOrder.needsReturnApproval = false;
-            window.currentOrder.returnApproved = true;
-        }
-
-        localStorage.setItem('orders', JSON.stringify(rawOrders));
-        if(window.orders) window.orders = rawOrders;
-
-        alert('İade kabul edildi, fiş Muhasebeye (Gökhan) iletildi.');
-        if(typeof returnToDashboard === 'function') {
-            returnToDashboard();
-        } else {
-            location.reload();
-        }
-    };
-
-    // 3. Saha butonu ve İade paneli butonunu otomatik kenetle
-    setInterval(function() {
-        var u = window.currentUser;
-        if (!u) return;
-
-        var role = (u.roleId || '').toLowerCase();
-        var name = (u.name || '').toLowerCase();
-        var isReturnRole = role.indexOf('iade') > -1 || name.indexOf('iade') > -1;
-
-        var sahaActionDiv = document.getElementById('step3-action-buttons');
-        var returnPanel = document.getElementById('panel-return-approval');
-
-        // Saha butonuna iade mekanizmasını bağla
-        if (sahaActionDiv) {
-            var btn = sahaActionDiv.querySelector('button');
-            if (btn && !btn.getAttribute('data-return-bound')) {
-                btn.setAttribute('onclick', 'processReturnApprovalWorkflow()');
-                btn.setAttribute('data-return-bound', 'true');
-            }
-        }
-
-        // Mor iade paneline onay mekanizmasını bağla
-        if (returnPanel) {
-            var rBtn = returnPanel.querySelector('button');
-            if (rBtn && !rBtn.getAttribute('data-return-bound')) {
-                rBtn.setAttribute('onclick', 'confirmReturnAndForwardToAccounting()');
-                rBtn.setAttribute('data-return-bound', 'true');
-            }
-
-            // Saha personeline mor kutuyu KESİNLİKLE GİZLE, sadece İade personeline göster
-            if (isReturnRole) {
-                returnPanel.classList.remove('hidden');
-                returnPanel.style.display = 'flex';
-                if (sahaActionDiv) sahaActionDiv.style.display = 'none';
-            } else {
-                returnPanel.classList.add('hidden');
-                returnPanel.style.display = 'none';
-                if (sahaActionDiv) sahaActionDiv.style.display = 'block';
-            }
-        }
-    }, 500);
-})();
-        
-    </script>
-                       
+};
+    </script>             
 </body>
 </html>
