@@ -2416,19 +2416,18 @@
                 visibleOrders = orders.filter(ord => ord.currentStep >= 2);
                 document.getElementById("dashboard-table-title").innerText = `Depo Sevkiyat & Hazırlık Masası`;
                 document.getElementById("dashboard-table-subtitle").innerText = `Satış ekibinden gelen ve araç yüklemesi yapılacak aktif siparişler.`;
-            } else if (currentUser.roleId === 'saha') {
-                visibleOrders = orders.filter(ord => ord.currentStep >= 3 && ord.hasApplication !== false);
-                document.getElementById("dashboard-table-title").innerText = `Saha Montaj & Uygulama Masası`;
-           document.getElementById("dashboard-table-subtitle").innerText = `Yalnızca montaj/uygulaması yapılacak işler listelenmektedir.`;
+          } else if (currentUser.roleId === 'saha') {
+        visibleOrders = orders.filter(ord => ord.currentStep === 3 && ord.hasApplication !== false && ord.status !== 'İade Onayı Bekliyor' && !ord.needsReturnApproval);
+        document.getElementById("dashboard-table-title").innerText = `Saha Montaj & Uygulama Masası`;
+        document.getElementById("dashboard-table-subtitle").innerText = `Yalnızca montaj/uygulaması yapılacak aktif işler listelenmektedir.`;
     } else if (currentUser.roleId === 'magaza-iade' || currentUser.roleId === 'atolye-iade' || (currentUser.roleId && currentUser.roleId.includes('iade')) || (currentUser.name && currentUser.name.toLowerCase().includes('iade'))) {
-        visibleOrders = orders.filter(ord => ord.needsReturnApproval === true || ord.status === 'İade Onayı Bekliyor' || ord.stage === 'İade Onayı' || ord.hasReturns === true);
+        visibleOrders = orders.filter(ord => ord.needsReturnApproval === true || ord.status === 'İade Onayı Bekliyor' || ord.currentStep === 3.5);
         document.getElementById("dashboard-table-title").innerText = `İade Onay Masası (${currentUser.name})`;
-        document.getElementById("dashboard-table-subtitle").innerText = `Saha ekibi tarafından iadesi girilmiş ve onay bekleyen siparişler listelenmektedir.`;
+        document.getElementById("dashboard-table-subtitle").innerText = `Saha ekibi tarafından iadesi girilmiş ve onay bekleyen siparişler.`;
     } else if (currentUser.roleId === 'muhasebe') {
-        visibleOrders = orders.filter(ord => ord.currentStep >= 2 && ord.status !== 'İade Onayı Bekliyor' && ord.needsReturnApproval !== true);
+        visibleOrders = orders.filter(ord => ord.currentStep >= 4 && ord.status !== 'İade Onayı Bekliyor' && !ord.needsReturnApproval);
         document.getElementById("dashboard-table-title").innerText = `Muhasebe Fatura Onay Kuyruğu`;
         document.getElementById("dashboard-table-subtitle").innerText = `Depo veya Saha onayı tamamlanmış, faturalandırılmayı bekleyen fişler.`;
-            } else {
                 visibleOrders = orders;
                 document.getElementById("dashboard-table-title").innerText = `Tüm Sipariş Dosyaları (Admin)`;
                 document.getElementById("dashboard-table-subtitle").innerText = `Sistemde kayıtlı olan tüm birimlere ait aktif dosyalar.`;
