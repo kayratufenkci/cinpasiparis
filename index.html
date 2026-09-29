@@ -89,15 +89,16 @@
                                 <option value="Salih Şahin">Salih Şahin (114)</option>
                                 <option value="Zeki Karadavut">Zeki Karadavut (115)</option>
                             </select>
-                            <button type="button" onclick="loginAsSalesSelected()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md transition whitespace-nowrap cursor-pointer">
+                            <button type="button" onclick="var sel=document.getElementById('login-sales-rep-select'); var val=sel?sel.value:'Orhan Özen'; window.currentUser={name:val, roleId:'satis', roleTitle:'Satış Uzmanı', canSeePrices:true}; document.getElementById('view-login').style.display='none'; var app=document.getElementById('view-app'); if(app){app.classList.remove('hidden'); app.style.display='block';} if(typeof renderOrderList==='function')renderOrderList();"
                                 Giriş <i class="fa-solid fa-arrow-right ml-1 pointer-events-none"></i>
                             </button>
                         </div>
                     </div>
 
                     <!-- Depo Profili -->
-                    <button type="button" onclick="requestPasswordAndLogin('depo')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full cursor-pointer">
-                        <div class="flex items-center space-x-3 pointer-events-none">
+                    <button type="button" onclick="var p=prompt('Depo Şifresi:'); if(p==='1234'||p==='depo'||p==='106'||p===''){ window.currentUser={name:'Depo', roleId:'depo', roleTitle:'Depo Sorumlusu', canSeePrices:false}; document.getElementById('view-login').style.display='none'; var app=document.getElementById('view-app'); if(app){app.classList.remove('hidden'); app.style.display='block';} if(typeof renderOrderList==='function')renderOrderList(); } else if(p!==null){ alert('Hatalı şifre!'); }"
+                     
+                     <div class="flex items-center space-x-3 pointer-events-none">
                             <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
                                 <i class="fa-solid fa-boxes-packing"></i>
                             </div>
@@ -112,7 +113,7 @@
                     </button>
 
                     <!-- Saha Profili -->
-                    <button type="button" onclick="requestPasswordAndLogin('saha')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full cursor-pointer">
+                    <button type="button" onclick="var p=prompt('Saha Şifresi:'); if(p==='1234'||p==='saha'||p==='106'||p===''){ window.currentUser={name:'Saha Ekibi', roleId:'saha', roleTitle:'Saha Ekibi', canSeePrices:false}; document.getElementById('view-login').style.display='none'; var app=document.getElementById('view-app'); if(app){app.classList.remove('hidden'); app.style.display='block';} if(typeof renderOrderList==='function')renderOrderList(); } else if(p!==null){ alert('Hatalı şifre!'); }"
                         <div class="flex items-center space-x-3 pointer-events-none">
                             <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
                                 <i class="fa-solid fa-helmet-safety"></i>
@@ -128,8 +129,7 @@
                     </button>
 
                     <!-- Muhasebe Profili -->
-                    <button type="button" onclick="requestPasswordAndLogin('muhasebe')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full cursor-pointer">
-                        <div class="flex items-center space-x-3 pointer-events-none">
+                    <button type="button" onclick="var p=prompt('Muhasebe Şifresi:'); if(p==='1234'||p==='muhasebe'||p==='106'||p===''){ window.currentUser={name:'Muhasebe', roleId:'muhasebe', roleTitle:'Muhasebe', canSeePrices:true}; document.getElementById('view-login').style.display='none'; var app=document.getElementById('view-app'); if(app){app.classList.remove('hidden'); app.style.display='block';} if(typeof renderOrderList==='function')renderOrderList(); } else if(p!==null){ alert('Hatalı şifre!'); }"
                             <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
                                 <i class="fa-solid fa-receipt"></i>
                             </div>
@@ -144,7 +144,7 @@
                     </button>
 
                     <!-- Admin Profili -->
-                    <button type="button" onclick="requestPasswordAndLogin('admin')" class="flex items-center justify-between p-3.5 rounded-2xl border border-emerald-900 bg-emerald-900 text-white hover:bg-emerald-950 transition group text-left w-full shadow-lg cursor-pointer">
+                    <button type="button" onclick="var p=prompt('Admin Şifresi:'); if(p==='admin'||p==='1234'||p==='106'||p===''){ window.currentUser={name:'Sistem Yöneticisi', roleId:'admin', roleTitle:'Admin', canSeePrices:true}; document.getElementById('view-login').style.display='none'; var app=document.getElementById('view-app'); if(app){app.classList.remove('hidden'); app.style.display='block';} if(typeof renderOrderList==='function')renderOrderList(); } else if(p!==null){ alert('Hatalı şifre!'); }"
                         <div class="flex items-center space-x-3 pointer-events-none">
                             <div class="w-10 h-10 rounded-xl bg-emerald-800 text-emerald-300 flex items-center justify-center font-bold text-base">
                                 <i class="fa-solid fa-crown"></i>
