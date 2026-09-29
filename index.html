@@ -610,7 +610,7 @@
                         </div>
                         <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
                             <div class="text-xs text-slate-500"><i class="fa-solid fa-clipboard-check mr-1 text-slate-400"></i> Montaj tamamlandıktan sonra tüm evraklar birleşir.</div>
-                           <div id="step3-action-buttons">
+                         <div id="step3-action-buttons">
                     <button type="button" onclick="
                         var returnInputs = document.querySelectorAll('#content-step-3 input[type=number]');
                         var totalReturn = 0;
@@ -619,31 +619,50 @@
                             if(!isNaN(val) && val > 0) totalReturn += val;
                         });
 
+                        var orders = JSON.parse(localStorage.getItem('orders') || '[]');
+                        var currentId = (window.currentOrder ? window.currentOrder.id : window.currentOrderId);
+                        var target = orders.find(function(o){ return o.id == currentId; }) || window.currentOrder;
+
                         if(totalReturn > 0) {
-                            if(confirm('Sahada toplam ' + totalReturn + ' adet iade tespit edildi. İade onay sürecine aktarılsın mı?')) {
+                            if(confirm('Sahada ' + totalReturn + ' adet iade girildi. Fiş kontrol ve kabul için Mağaza & Atölye İade sorumlusuna aktarılsın mı?')) {
+                                if(target) {
+                                    target.status = 'İade Onayı Bekliyor';
+                                    target.stage = 'İade Onayı';
+                                    target.needsReturnApproval = true;
+                                    target.hasReturns = true;
+                                }
                                 if(window.currentOrder) {
                                     window.currentOrder.status = 'İade Onayı Bekliyor';
                                     window.currentOrder.stage = 'İade Onayı';
                                     window.currentOrder.needsReturnApproval = true;
                                 }
-                                var pnl = document.getElementById('panel-return-approval');
-                                if(pnl) {
-                                    pnl.classList.remove('hidden');
-                                    pnl.style.display = 'flex';
+                                localStorage.setItem('orders', JSON.stringify(orders));
+                                if(typeof saveOrders === 'function') saveOrders();
+                                alert('İadeli fiş Mağaza & Atölye İade masasına devredildi.');
+                                if(typeof returnToDashboard === 'function') {
+                                    returnToDashboard();
+                                } else {
+                                    location.reload();
                                 }
-                                this.style.display = 'none';
-                                alert('İade onay adımı aktif edildi. Lütfen aşağıdaki iade onay butonunu kullanınız.');
                             }
                         } else {
+                            // İade yoksa doğrudan muhasebeye devret
+                            if(target) {
+                                target.status = 'Muhasebe';
+                                target.stage = 'Muhasebe';
+                                target.step = 4;
+                            }
+                            if(window.currentOrder) {
+                                window.currentOrder.step = 4;
+                                window.currentOrder.status = 'Muhasebe';
+                            }
+                            localStorage.setItem('orders', JSON.stringify(orders));
+                            if(typeof saveOrders === 'function') saveOrders();
                             var step3 = document.getElementById('content-step-3');
                             var step4 = document.getElementById('content-step-4');
                             if(step3 && step4) {
                                 step3.classList.add('hidden');
                                 step4.classList.remove('hidden');
-                            }
-                            if(window.currentOrder) {
-                                window.currentOrder.step = 4;
-                                window.currentOrder.status = 'Muhasebe';
                             }
                             if(typeof renderStep === 'function') renderStep(4);
                         }
@@ -656,35 +675,51 @@
         </div>
     </div>
 
-    <!-- İADE ONAY KONTROL BİLGİSİ (Mağaza ve Atölye İçin) -->
-    <div id="panel-return-approval" class="p-4 bg-purple-50 border border-purple-200 rounded-2xl flex items-center justify-between mt-3 hidden">
+    <!-- İADE ONAY KONTROL BİLGİSİ (Sadece Mağaza ve Atölye İade Kullanıcıları İçin) -->
+    <div id="panel-return-approval" class="p-4 bg-purple-50 border border-purple-200 rounded-2xl flex items-center justify-between mt-3">
         <div class="flex items-center space-x-3">
             <div class="w-9 h-9 rounded-xl bg-purple-200 text-purple-800 flex items-center justify-center font-bold text-sm">
                 <i class="fa-solid fa-boxes-packing"></i>
             </div>
             <div>
-                <div class="text-xs font-bold text-purple-900">İade Edilen Ürün Onayı Gerekli</div>
-                <div class="text-[11px] text-purple-600">Bu fişte sahada iade girilen ürünler bulunmaktadır. İadeyi onaylayarak muhasebeye aktarabilirsiniz.</div>
+                <div class="text-xs font-bold text-purple-900">İade Edilen Ürün Onayı Gerekli (Mağaza & Atölye)</div>
+                <div class="text-[11px] text-purple-600">Sahada iade girilen ürünler teslim alınmışsa onaylayıp Muhasebeye aktarabilirsiniz.</div>
             </div>
         </div>
         <button type="button" onclick="
-            if(confirm('İade ürünleri kabul edip Muhasebeye aktarmak istiyor musunuz?')){
+            if(confirm('İade edilen ürünleri teslim aldığınızı onaylayıp dosyayı Muhasebeye aktarmak istiyor musunuz?')){
+                var orders = JSON.parse(localStorage.getItem('orders') || '[]');
+                var currentId = (window.currentOrder ? window.currentOrder.id : window.currentOrderId);
+                var target = orders.find(function(o){ return o.id == currentId; }) || window.currentOrder;
+                if(target){
+                    target.status = 'Muhasebe';
+                    target.stage = 'Muhasebe';
+                    target.step = 4;
+                    target.returnApproved = true;
+                    target.needsReturnApproval = false;
+                }
+                if(window.currentOrder){
+                    window.currentOrder.step = 4;
+                    window.currentOrder.status = 'Muhasebe';
+                    window.currentOrder.returnApproved = true;
+                    window.currentOrder.needsReturnApproval = false;
+                }
+                localStorage.setItem('orders', JSON.stringify(orders));
+                if(typeof saveOrders === 'function') saveOrders();
+                
                 var step3 = document.getElementById('content-step-3');
                 var step4 = document.getElementById('content-step-4');
                 if(step3 && step4){
                     step3.classList.add('hidden');
                     step4.classList.remove('hidden');
                 }
-                if(window.currentOrder){
-                    window.currentOrder.step = 4;
-                    window.currentOrder.status = 'Muhasebe';
-                    window.currentOrder.returnApproved = true;
-                }
                 if(typeof renderStep === 'function') renderStep(4);
-                alert('İade onaylandı, fiş Muhasebe ekranına aktarıldı.');
+                alert('İade onaylandı ve dosya Muhasebeye (Gökhan) iletildi.');
+                if(typeof returnToDashboard === 'function') returnToDashboard();
             }
-        " class="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white font-bold rounded-xl text-xs transition cursor-pointer">
-            İadeyi Onayla & Muhasebeye İlet
+        " class="px-5 py-2.5 bg-purple-700 hover:bg-purple-800 text-white font-bold rounded-xl text-xs transition cursor-pointer flex items-center space-x-1.5">
+            <i class="fa-solid fa-check-double"></i>
+            <span>İadeyi Onayla & Muhasebeye İlet</span>
         </button>
     </div>
 <!-- İADE ONAY KONTROL BİLGİSİ (Mağaza ve Atölye İçin) -->
