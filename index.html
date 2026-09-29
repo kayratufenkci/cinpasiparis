@@ -3840,16 +3840,85 @@ document.addEventListener("click", function(e) {
 }, true);
 <style>
     <style>
-  /* Giriş penceresinin tıklanmasını engelleyen katmanları sıfırla */
-  #modal-login {
-    pointer-events: auto !important;
-    z-index: 999999 !important;
-  }
-  #modal-login * {
-    pointer-events: auto !important;
-    cursor: pointer !important;
-  }
-</style>
+  // ================= KULLANICI GİRİŞ FONKSİYONLARI (KESİN ÇÖZÜM) =================
+
+// 1. Satış Uzmanı Girişi ("Giriş ->" butonu için)
+window.loginSales = function() {
+    var selectEl = document.querySelector("#modal-login select");
+    var chosen = selectEl ? selectEl.value : "Orhan Özen (106)";
+    var cleanName = chosen.split("(")[0].trim();
+
+    window.currentUser = {
+        name: cleanName,
+        roleId: "satis",
+        roleTitle: "Satış Uzmanı",
+        canSeePrices: true
+    };
+    finishLogin();
+};
+
+// 2. Depo, Saha, Muhasebe, Admin Girişleri (Kartlar için)
+window.selectRole = function(roleId) {
+    if (roleId === 'satis') {
+        window.loginSales();
+        return;
+    }
+
+    var pass = prompt("Lütfen şifrenizi giriniz:");
+    if (pass === null) return; // İptal'e basıldıysa çık
+
+    // Şifre kontrolleri
+    if (roleId === 'depo') {
+        if (pass === "1234" || pass === "depo" || pass === "106") {
+            window.currentUser = { name: "Depo", roleId: "depo", roleTitle: "Depo Sorumlusu", canSeePrices: false };
+            finishLogin();
+        } else {
+            alert("Hatalı Depo şifresi!");
+        }
+    } else if (roleId === 'saha') {
+        if (pass === "1234" || pass === "saha" || pass === "106") {
+            window.currentUser = { name: "Saha Ekibi", roleId: "saha", roleTitle: "Saha Ekibi", canSeePrices: false };
+            finishLogin();
+        } else {
+            alert("Hatalı Saha Ekibi şifresi!");
+        }
+    } else if (roleId === 'muhasebe') {
+        if (pass === "1234" || pass === "muhasebe" || pass === "106") {
+            window.currentUser = { name: "Muhasebe", roleId: "muhasebe", roleTitle: "Muhasebe", canSeePrices: true };
+            finishLogin();
+        } else {
+            alert("Hatalı Muhasebe şifresi!");
+        }
+    } else if (roleId === 'admin') {
+        if (pass === "admin" || pass === "1234" || pass === "106") {
+            window.currentUser = { name: "Sistem Yöneticisi", roleId: "admin", roleTitle: "Admin", canSeePrices: true };
+            finishLogin();
+        } else {
+            alert("Hatalı Admin şifresi!");
+        }
+    }
+};
+
+// Ortak Giriş Tamamlama Fonksiyonu
+function finishLogin() {
+    var modal = document.getElementById("modal-login");
+    if (modal) {
+        modal.classList.add("hidden");
+        modal.style.setProperty("display", "none", "important");
+    }
+
+    // Ekran başlıklarını ve listeyi ilgili role göre çiz
+    if (typeof updateHeaderUserInfo === "function") {
+        try { updateHeaderUserInfo(); } catch(e) {}
+    }
+    if (typeof renderOrderList === "function") {
+        try { renderOrderList(); } catch(e) {}
+    }
+    if (typeof showToast === "function") {
+        try { showToast("Giriş yapıldı: " + window.currentUser.name); } catch(e) {}
+    }
+}
+        
     <script> 
 </body>
 </html>
