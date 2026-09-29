@@ -126,7 +126,40 @@
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs pointer-events-none"></i>
                     </button>
+<!-- Mağaza İade Profili -->
+            <button type="button" onclick="var p=prompt('Mağaza İade Şifresi:'); if(p==='1234'||p==='magaza'||p==='106'||p===''){ window.currentUser={name:'Mağaza İade', roleId:'magaza_iade', roleTitle:'Mağaza İade Sorumlusu', canSeePrices:false}; document.getElementById('view-login').style.display='none'; var app=document.getElementById('view-app'); if(app){app.classList.remove('hidden'); app.style.display='block';} if(typeof renderOrderList==='function')renderOrderList(); } else if(p!==null){ alert('Hatalı şifre!'); }" class="w-full flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-purple-500 bg-white transition cursor-pointer">
+                <div class="flex items-center space-x-3 pointer-events-none">
+                    <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-base">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs font-black text-slate-900 flex items-center space-x-1.5">
+                            <span>Mağaza İade</span>
+                            <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
+                        </div>
+                        <div class="text-[10px] font-semibold text-slate-400">İade Ürün Kabul & Onay</div>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+            </button>
 
+            <!-- Atölye İade Profili -->
+            <button type="button" onclick="var p=prompt('Atölye İade Şifresi:'); if(p==='1234'||p==='atolye'||p==='106'||p===''){ window.currentUser={name:'Atölye İade', roleId:'atolye_iade', roleTitle:'Atölye İade Sorumlusu', canSeePrices:false}; document.getElementById('view-login').style.display='none'; var app=document.getElementById('view-app'); if(app){app.classList.remove('hidden'); app.style.display='block';} if(typeof renderOrderList==='function')renderOrderList(); } else if(p!==null){ alert('Hatalı şifre!'); }" class="w-full flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-orange-500 bg-white transition cursor-pointer">
+                <div class="flex items-center space-x-3 pointer-events-none">
+                    <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-base">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs font-black text-slate-900 flex items-center space-x-1.5">
+                            <span>Atölye İade</span>
+                            <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
+                        </div>
+                        <div class="text-[10px] font-semibold text-slate-400">Atölye İade Kabul & Onay</div>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+            </button>
+                    
                     <!-- Muhasebe Profili -->
                     <button type="button" onclick="requestPasswordAndLogin('muhasebe')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full cursor-pointer">
                         <div class="flex items-center space-x-3 pointer-events-none">
