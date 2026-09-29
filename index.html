@@ -611,7 +611,54 @@
                         <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
                             <div class="text-xs text-slate-500"><i class="fa-solid fa-clipboard-check mr-1 text-slate-400"></i> Montaj tamamlandıktan sonra tüm evraklar birleşir.</div>
                             <div id="step3-action-buttons">
-                              <button type="button" onclick="var returnInputs=document.querySelectorAll('#content-step-3 input[type=number], input[id*=\'return\'], input[id*=\'iade\']'); var hasReturn=false; returnInputs.forEach(function(inp){ if(parseInt(inp.value,10)>0) hasReturn=true; }); if(hasReturn){ if(confirm('İade girilmiş ürünler tespit edildi. Fiş Mağaza / Atölye İade onayına aktarılsın mı?')){ if(window.currentOrder){ window.currentOrder.status='İade Onayı Bekliyor'; window.currentOrder.needsReturnApproval=true; window.currentOrder.step=3.5; } if(typeof saveOrders==='function') saveOrders(); if(typeof returnToDashboard==='function'){ returnToDashboard(); } else if(typeof renderOrderList==='function'){ renderOrderList(); } alert('Sipariş İade Onayı Bekliyor durumuna alındı ve listeye aktarıldı.'); } } else { forwardToAccounting(); }" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-2xl shadow-lg transition flex items-center space-x-2 text-sm cursor-pointer">
+                             <button type="button" onclick="
+            var returnInputs = document.querySelectorAll('#content-step-3 input[type=number]');
+            var hasReturn = false;
+            returnInputs.forEach(function(inp){
+                if(parseInt(inp.value, 10) > 0) hasReturn = true;
+            });
+
+            var orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            var orderId = window.currentOrderId || (window.currentOrder ? window.currentOrder.id : null);
+            var targetOrder = window.currentOrder || (orderId ? orders.find(function(o){ return o.id == orderId; }) : orders[0]);
+
+            if(hasReturn) {
+                if(confirm('İade girilmiş ürünler tespit edildi. Fiş Mağaza / Atölye İade onayına aktarılsın mı?')) {
+                    if(targetOrder) {
+                        targetOrder.status = 'İade Onayı Bekliyor';
+                        targetOrder.stage = 'İade Onayı';
+                        targetOrder.needsReturnApproval = true;
+                        targetOrder.returnStatus = 'Beklemede';
+                    }
+                    localStorage.setItem('orders', JSON.stringify(orders));
+                    if(typeof saveOrders === 'function') saveOrders();
+                    alert('Sipariş Mağaza & Atölye İade Onayı sırasına aktarıldı.');
+                    if(typeof returnToDashboard === 'function') {
+                        returnToDashboard();
+                    } else if(typeof renderOrderList === 'function') {
+                        renderOrderList();
+                    } else {
+                        location.reload();
+                    }
+                }
+            } else {
+                if(targetOrder) {
+                    targetOrder.status = 'Muhasebe';
+                    targetOrder.stage = 'Muhasebe';
+                    targetOrder.currentStep = 4;
+                }
+                localStorage.setItem('orders', JSON.stringify(orders));
+                if(typeof saveOrders === 'function') saveOrders();
+                var step3 = document.getElementById('content-step-3');
+                var step4 = document.getElementById('content-step-4');
+                if(step3 && step4) {
+                    step3.classList.add('hidden');
+                    step4.classList.remove('hidden');
+                }
+                if(typeof renderStep === 'function') renderStep(4);
+                if(typeof updateStepUI === 'function') updateStepUI(4);
+            }
+        " class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-2xl shadow-lg transition flex items-center space-x-2 text-sm cursor-pointer">
             <i class="fa-solid fa-file-invoice-dollar pointer-events-none"></i>
             <span class="pointer-events-none">Montajı Bitir & Muhasebeye (Gökhan) Gönder</span>
         </button>
