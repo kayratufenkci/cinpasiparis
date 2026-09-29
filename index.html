@@ -3838,7 +3838,33 @@ document.addEventListener("click", function(e) {
         }, 100);
     }
 }, true);
+<!-- DEPO VE SAHA BİLGİLENDİRME KUTULARINI GİZLEME -->
+<script>
+  function hideRoleNoticeBoxes() {
+    document.querySelectorAll("div, p, span").forEach(function(el) {
+      if (!el.innerText) return;
+      const txt = el.innerText.trim();
 
+      // Depo bilgilendirme kutusunu gizle
+      if (txt.includes("Fiyatlar gizlidir") || txt.includes("Sadece Depo Hazırlık")) {
+        el.style.setProperty("display", "none", "important");
+      }
+
+      // Saha ekibi bilgilendirme kutusunu gizle
+      if (txt.includes("Sadece Saha") || txt.includes("Saha Uygulama aşamasındaki") || txt.includes("Saha Uygulama/Montaj")) {
+        el.style.setProperty("display", "none", "important");
+      }
+    });
+  }
+
+  // Sayfa yüklendiğinde ve her tıklamada gizlemeyi sürdür
+  document.addEventListener("DOMContentLoaded", hideRoleNoticeBoxes);
+  document.addEventListener("click", function() {
+    setTimeout(hideRoleNoticeBoxes, 50);
+  });
+  setInterval(hideRoleNoticeBoxes, 500);
+        
+</script>        
     </script>
 </body>
 </html>
