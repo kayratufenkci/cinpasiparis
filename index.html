@@ -216,11 +216,10 @@
                     </div>
 
                     <div class="flex items-center space-x-2 sm:space-x-3">
-                        <button onclick="window.currentUser=null; var app=document.getElementById('view-app'); if(app){app.classList.add('hidden'); app.style.display='none';} var login=document.getElementById('view-login'); if(login){login.classList.remove('hidden'); login.style.display='flex';}"
-                            <i class="fa-solid fa-arrow-left pointer-events-none"></i>
-                            <span class="hidden sm:inline pointer-events-none">Kullanıcı Değiştir</span>
-                        </button>
-
+                       <button onclick="localStorage.removeItem('currentUser'); location.reload();" title="Giriş Ekranına Dön" class="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center space-x-1.5 transition">
+    <i class="fa-solid fa-arrow-left"></i>
+    <span>Kullanıcı Değiştir</span>
+</button>
                         <button onclick="openExcelImportModal()" id="btn-header-import-excel" class="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl border border-emerald-700 transition flex items-center space-x-1.5 shadow-sm cursor-pointer">
                             <i class="fa-solid fa-file-excel text-emerald-300 pointer-events-none"></i>
                             <span class="hidden sm:inline pointer-events-none">Nebim / Excel Fişi Çek</span>
