@@ -89,16 +89,15 @@
                                 <option value="Salih Şahin">Salih Şahin (114)</option>
                                 <option value="Zeki Karadavut">Zeki Karadavut (115)</option>
                             </select>
-                            <button type="button" onclick="var sel=document.getElementById('login-sales-rep-select'); var val=sel?sel.value:'Orhan Özen'; window.currentUser={name:val, roleId:'satis', roleTitle:'Satış Uzmanı', canSeePrices:true}; document.getElementById('view-login').style.display='none'; var app=document.getElementById('view-app'); if(app){app.classList.remove('hidden'); app.style.display='block';} if(typeof renderOrderList==='function')renderOrderList();"
+                            <button type="button" onclick="loginAsSalesSelected()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md transition whitespace-nowrap cursor-pointer">
                                 Giriş <i class="fa-solid fa-arrow-right ml-1 pointer-events-none"></i>
                             </button>
                         </div>
                     </div>
 
                     <!-- Depo Profili -->
-                    <button type="button" onclick="var p=prompt('Depo Şifresi:'); if(p==='1234'||p==='depo'||p==='106'||p===''){ window.currentUser={name:'Depo', roleId:'depo', roleTitle:'Depo Sorumlusu', canSeePrices:false}; document.getElementById('view-login').style.display='none'; var app=document.getElementById('view-app'); if(app){app.classList.remove('hidden'); app.style.display='block';} if(typeof renderOrderList==='function')renderOrderList(); } else if(p!==null){ alert('Hatalı şifre!'); }"
-                     
-                     <div class="flex items-center space-x-3 pointer-events-none">
+                    <button type="button" onclick="requestPasswordAndLogin('depo')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full cursor-pointer">
+                        <div class="flex items-center space-x-3 pointer-events-none">
                             <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
                                 <i class="fa-solid fa-boxes-packing"></i>
                             </div>
@@ -113,7 +112,7 @@
                     </button>
 
                     <!-- Saha Profili -->
-                    <button type="button" onclick="var p=prompt('Saha Şifresi:'); if(p==='1234'||p==='saha'||p==='106'||p===''){ window.currentUser={name:'Saha Ekibi', roleId:'saha', roleTitle:'Saha Ekibi', canSeePrices:false}; document.getElementById('view-login').style.display='none'; var app=document.getElementById('view-app'); if(app){app.classList.remove('hidden'); app.style.display='block';} if(typeof renderOrderList==='function')renderOrderList(); } else if(p!==null){ alert('Hatalı şifre!'); }"
+                    <button type="button" onclick="requestPasswordAndLogin('saha')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full cursor-pointer">
                         <div class="flex items-center space-x-3 pointer-events-none">
                             <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
                                 <i class="fa-solid fa-helmet-safety"></i>
@@ -129,7 +128,8 @@
                     </button>
 
                     <!-- Muhasebe Profili -->
-                    <button type="button" onclick="var p=prompt('Muhasebe Şifresi:'); if(p==='1234'||p==='muhasebe'||p==='106'||p===''){ window.currentUser={name:'Muhasebe', roleId:'muhasebe', roleTitle:'Muhasebe', canSeePrices:true}; document.getElementById('view-login').style.display='none'; var app=document.getElementById('view-app'); if(app){app.classList.remove('hidden'); app.style.display='block';} if(typeof renderOrderList==='function')renderOrderList(); } else if(p!==null){ alert('Hatalı şifre!'); }"
+                    <button type="button" onclick="requestPasswordAndLogin('muhasebe')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full cursor-pointer">
+                        <div class="flex items-center space-x-3 pointer-events-none">
                             <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
                                 <i class="fa-solid fa-receipt"></i>
                             </div>
@@ -144,7 +144,7 @@
                     </button>
 
                     <!-- Admin Profili -->
-                    <button type="button" onclick="var p=prompt('Admin Şifresi:'); if(p==='admin'||p==='1234'||p==='106'||p===''){ window.currentUser={name:'Sistem Yöneticisi', roleId:'admin', roleTitle:'Admin', canSeePrices:true}; document.getElementById('view-login').style.display='none'; var app=document.getElementById('view-app'); if(app){app.classList.remove('hidden'); app.style.display='block';} if(typeof renderOrderList==='function')renderOrderList(); } else if(p!==null){ alert('Hatalı şifre!'); }"
+                    <button type="button" onclick="requestPasswordAndLogin('admin')" class="flex items-center justify-between p-3.5 rounded-2xl border border-emerald-900 bg-emerald-900 text-white hover:bg-emerald-950 transition group text-left w-full shadow-lg cursor-pointer">
                         <div class="flex items-center space-x-3 pointer-events-none">
                             <div class="w-10 h-10 rounded-xl bg-emerald-800 text-emerald-300 flex items-center justify-center font-bold text-base">
                                 <i class="fa-solid fa-crown"></i>
@@ -335,7 +335,10 @@
                             <i class="fa-solid fa-truck-ramp-box text-blue-200 text-sm pointer-events-none"></i>
                             <span class="pointer-events-none">İrsaliye Oluştur (.xlsx)</span>
                         </button>
-                        
+                        <button onclick="sendWhatsAppNotification()" class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold flex items-center space-x-1.5 transition cursor-pointer">
+                            <i class="fa-brands fa-whatsapp text-emerald-600 text-sm pointer-events-none"></i>
+                            <span class="pointer-events-none">WhatsApp Durum Gönder</span>
+                        </button>
                         <button onclick="window.print()" class="px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs font-bold flex items-center space-x-1.5 transition cursor-pointer">
                             <i class="fa-solid fa-print text-sm pointer-events-none"></i>
                             <span class="pointer-events-none">Yazdır</span>
@@ -3838,165 +3841,7 @@ document.addEventListener("click", function(e) {
         }, 100);
     }
 }, true);
-<style>
-    <style>
-  // ================= KULLANICI GİRİŞ FONKSİYONLARI (KESİN ÇÖZÜM) =================
 
-// 1. Satış Uzmanı Girişi ("Giriş ->" butonu için)
-window.loginSales = function() {
-    var selectEl = document.querySelector("#modal-login select");
-    var chosen = selectEl ? selectEl.value : "Orhan Özen (106)";
-    var cleanName = chosen.split("(")[0].trim();
-
-    window.currentUser = {
-        name: cleanName,
-        roleId: "satis",
-        roleTitle: "Satış Uzmanı",
-        canSeePrices: true
-    };
-    finishLogin();
-};
-
-// 2. Depo, Saha, Muhasebe, Admin Girişleri (Kartlar için)
-window.selectRole = function(roleId) {
-    if (roleId === 'satis') {
-        window.loginSales();
-        return;
-    }
-
-    var pass = prompt("Lütfen şifrenizi giriniz:");
-    if (pass === null) return; // İptal'e basıldıysa çık
-
-    // Şifre kontrolleri
-    if (roleId === 'depo') {
-        if (pass === "1234" || pass === "depo" || pass === "106") {
-            window.currentUser = { name: "Depo", roleId: "depo", roleTitle: "Depo Sorumlusu", canSeePrices: false };
-            finishLogin();
-        } else {
-            alert("Hatalı Depo şifresi!");
-        }
-    } else if (roleId === 'saha') {
-        if (pass === "1234" || pass === "saha" || pass === "106") {
-            window.currentUser = { name: "Saha Ekibi", roleId: "saha", roleTitle: "Saha Ekibi", canSeePrices: false };
-            finishLogin();
-        } else {
-            alert("Hatalı Saha Ekibi şifresi!");
-        }
-    } else if (roleId === 'muhasebe') {
-        if (pass === "1234" || pass === "muhasebe" || pass === "106") {
-            window.currentUser = { name: "Muhasebe", roleId: "muhasebe", roleTitle: "Muhasebe", canSeePrices: true };
-            finishLogin();
-        } else {
-            alert("Hatalı Muhasebe şifresi!");
-        }
-    } else if (roleId === 'admin') {
-        if (pass === "admin" || pass === "1234" || pass === "106") {
-            window.currentUser = { name: "Sistem Yöneticisi", roleId: "admin", roleTitle: "Admin", canSeePrices: true };
-            finishLogin();
-        } else {
-            alert("Hatalı Admin şifresi!");
-        }
-    }
-};
-
-// Ortak Giriş Tamamlama Fonksiyonu
-function finishLogin() {
-    var modal = document.getElementById("modal-login");
-    if (modal) {
-        modal.classList.add("hidden");
-        modal.style.setProperty("display", "none", "important");
-    }
-
-    // Ekran başlıklarını ve listeyi ilgili role göre çiz
-    if (typeof updateHeaderUserInfo === "function") {
-        try { updateHeaderUserInfo(); } catch(e) {}
-    }
-    if (typeof renderOrderList === "function") {
-        try { renderOrderList(); } catch(e) {}
-    }
-    if (typeof showToast === "function") {
-        try { showToast("Giriş yapıldı: " + window.currentUser.name); } catch(e) {}
-    }
-}
-  // ================= GİRİŞ FONKSİYONLARI (ORİJİNAL ÇALIŞAN HALİ) =================
-
-// 1. Satış Uzmanı Girişi
-window.loginAsSalesSelected = function() {
-    var selectEl = document.getElementById("login-sales-rep-select");
-    var chosenName = selectEl ? selectEl.value : "Orhan Özen";
-
-    window.currentUser = {
-        name: chosenName,
-        roleId: "satis",
-        roleTitle: "Satış Uzmanı",
-        canSeePrices: true
-    };
-    completeUserLogin();
-};
-
-// 2. Depo, Saha, Muhasebe ve Admin Girişleri
-window.requestPasswordAndLogin = function(roleId) {
-    var pass = prompt("Lütfen şifrenizi giriniz:");
-    if (pass === null) return; // İptal dendiğinde çık
-
-    if (roleId === 'depo') {
-        if (pass === "1234" || pass === "depo" || pass === "106") {
-            window.currentUser = { name: "Depo", roleId: "depo", roleTitle: "Depo Sorumlusu", canSeePrices: false };
-            completeUserLogin();
-        } else {
-            alert("Hatalı Depo şifresi!");
-        }
-    } else if (roleId === 'saha') {
-        if (pass === "1234" || pass === "saha" || pass === "106") {
-            window.currentUser = { name: "Saha Ekibi", roleId: "saha", roleTitle: "Saha Ekibi", canSeePrices: false };
-            completeUserLogin();
-        } else {
-            alert("Hatalı Saha Ekibi şifresi!");
-        }
-    } else if (roleId === 'muhasebe') {
-        if (pass === "1234" || pass === "muhasebe" || pass === "106") {
-            window.currentUser = { name: "Muhasebe", roleId: "muhasebe", roleTitle: "Muhasebe", canSeePrices: true };
-            completeUserLogin();
-        } else {
-            alert("Hatalı Muhasebe şifresi!");
-        }
-    } else if (roleId === 'admin') {
-        if (pass === "admin" || pass === "1234" || pass === "106") {
-            window.currentUser = { name: "Sistem Yöneticisi", roleId: "admin", roleTitle: "Admin", canSeePrices: true };
-            completeUserLogin();
-        } else {
-            alert("Hatalı Admin şifresi!");
-        }
-    }
-};
-
-// Girişi Tamamlama ve Giriş Ekranını Kapatma
-function completeUserLogin() {
-    // Giriş ekranı olan view-login'i gizle
-    var viewLogin = document.getElementById("view-login");
-    if (viewLogin) {
-        viewLogin.classList.add("hidden");
-        viewLogin.style.setProperty("display", "none", "important");
-    }
-
-    // Ana uygulama ekranını (view-app) görünür yap
-    var viewApp = document.getElementById("view-app");
-    if (viewApp) {
-        viewApp.classList.remove("hidden");
-        viewApp.style.setProperty("display", "block", "important");
-    }
-
-    // Ekran başlıklarını ve sipariş listesini doldur
-    if (typeof updateHeaderUserInfo === "function") {
-        try { updateHeaderUserInfo(); } catch(e) {}
-    }
-    if (typeof renderOrderList === "function") {
-        try { renderOrderList(); } catch(e) {}
-    }
-    if (typeof showToast === "function") {
-        try { showToast("Hoş geldiniz, " + window.currentUser.name); } catch(e) {}
-    }
-}      
-    <script> 
+    </script>
 </body>
 </html>
