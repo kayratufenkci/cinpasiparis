@@ -4021,6 +4021,11 @@ document.addEventListener("click", function(e) {
             }
         }, 100);
     }
+    window.handleSahaFinish = handleSahaFinish;
+document.addEventListener("DOMContentLoaded", function() {
+    var btn = document.getElementById("btn-complete-step-3") || document.querySelector("button:has(.fa-file-invoice-dollar)");
+    if (btn) btn.onclick = handleSahaFinish;
+});
 function handleSahaFinish() {
     var raw = localStorage.getItem('orders');
     var orders = raw ? JSON.parse(raw) : [];
