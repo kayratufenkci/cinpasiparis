@@ -3839,7 +3839,17 @@ document.addEventListener("click", function(e) {
     }
 }, true);
 <style>
-    
+    <style>
+  /* Giriş penceresinin tıklanmasını engelleyen katmanları sıfırla */
+  #modal-login {
+    pointer-events: auto !important;
+    z-index: 999999 !important;
+  }
+  #modal-login * {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+  }
+</style>
     <script> 
 </body>
 </html>
