@@ -3918,7 +3918,85 @@ function finishLogin() {
         try { showToast("Giriş yapıldı: " + window.currentUser.name); } catch(e) {}
     }
 }
-        
+  // ================= GİRİŞ FONKSİYONLARI (ORİJİNAL ÇALIŞAN HALİ) =================
+
+// 1. Satış Uzmanı Girişi
+window.loginAsSalesSelected = function() {
+    var selectEl = document.getElementById("login-sales-rep-select");
+    var chosenName = selectEl ? selectEl.value : "Orhan Özen";
+
+    window.currentUser = {
+        name: chosenName,
+        roleId: "satis",
+        roleTitle: "Satış Uzmanı",
+        canSeePrices: true
+    };
+    completeUserLogin();
+};
+
+// 2. Depo, Saha, Muhasebe ve Admin Girişleri
+window.requestPasswordAndLogin = function(roleId) {
+    var pass = prompt("Lütfen şifrenizi giriniz:");
+    if (pass === null) return; // İptal dendiğinde çık
+
+    if (roleId === 'depo') {
+        if (pass === "1234" || pass === "depo" || pass === "106") {
+            window.currentUser = { name: "Depo", roleId: "depo", roleTitle: "Depo Sorumlusu", canSeePrices: false };
+            completeUserLogin();
+        } else {
+            alert("Hatalı Depo şifresi!");
+        }
+    } else if (roleId === 'saha') {
+        if (pass === "1234" || pass === "saha" || pass === "106") {
+            window.currentUser = { name: "Saha Ekibi", roleId: "saha", roleTitle: "Saha Ekibi", canSeePrices: false };
+            completeUserLogin();
+        } else {
+            alert("Hatalı Saha Ekibi şifresi!");
+        }
+    } else if (roleId === 'muhasebe') {
+        if (pass === "1234" || pass === "muhasebe" || pass === "106") {
+            window.currentUser = { name: "Muhasebe", roleId: "muhasebe", roleTitle: "Muhasebe", canSeePrices: true };
+            completeUserLogin();
+        } else {
+            alert("Hatalı Muhasebe şifresi!");
+        }
+    } else if (roleId === 'admin') {
+        if (pass === "admin" || pass === "1234" || pass === "106") {
+            window.currentUser = { name: "Sistem Yöneticisi", roleId: "admin", roleTitle: "Admin", canSeePrices: true };
+            completeUserLogin();
+        } else {
+            alert("Hatalı Admin şifresi!");
+        }
+    }
+};
+
+// Girişi Tamamlama ve Giriş Ekranını Kapatma
+function completeUserLogin() {
+    // Giriş ekranı olan view-login'i gizle
+    var viewLogin = document.getElementById("view-login");
+    if (viewLogin) {
+        viewLogin.classList.add("hidden");
+        viewLogin.style.setProperty("display", "none", "important");
+    }
+
+    // Ana uygulama ekranını (view-app) görünür yap
+    var viewApp = document.getElementById("view-app");
+    if (viewApp) {
+        viewApp.classList.remove("hidden");
+        viewApp.style.setProperty("display", "block", "important");
+    }
+
+    // Ekran başlıklarını ve sipariş listesini doldur
+    if (typeof updateHeaderUserInfo === "function") {
+        try { updateHeaderUserInfo(); } catch(e) {}
+    }
+    if (typeof renderOrderList === "function") {
+        try { renderOrderList(); } catch(e) {}
+    }
+    if (typeof showToast === "function") {
+        try { showToast("Hoş geldiniz, " + window.currentUser.name); } catch(e) {}
+    }
+}      
     <script> 
 </body>
 </html>
