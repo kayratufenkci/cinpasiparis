@@ -667,9 +667,21 @@
                             if(window.activeOrder) { window.activeOrder.status = 'Muhasebe'; window.activeOrder.currentStep = 4; }
                             if(window.currentOrder) { window.currentOrder.status = 'Muhasebe'; window.currentOrder.currentStep = 4; }
 
-                          <button type="button" onclick="handleSahaFinish()" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-2xl shadow-lg transition flex items-center space-x-2 text-sm">
+                            localStorage.setItem('orders', JSON.stringify(rawOrders));
+                            if(window.orders) window.orders = rawOrders;
+                            if(typeof saveOrders === 'function') saveOrders();
+
+                            var s3 = document.getElementById('content-step-3');
+                            var s4 = document.getElementById('content-step-4');
+                            if(s3 && s4) {
+                                s3.classList.add('hidden');
+                                s4.classList.remove('hidden');
+                            }
+                            if(typeof renderStep === 'function') renderStep(4);
+                        }
+                    " class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-2xl shadow-lg transition flex items-center space-x-2 text-sm cursor-pointer">
                         <i class="fa-solid fa-file-invoice-dollar pointer-events-none"></i>
-                        <span class="pointer-events-none">Montajı Bitir</span>
+                        <span class="pointer-events-none">Montajı Bitir & Muhasebeye (Gökhan) Gönder</span>
                     </button>
                 </div>
 
@@ -4021,38 +4033,35 @@ document.addEventListener("click", function(e) {
             }
         }, 100);
     }
-function handleSahaFinish() {
-    var raw = localStorage.getItem('orders');
-    var orders = raw ? JSON.parse(raw) : [];
-    
-    var cur = window.currentOrder || window.activeOrder;
-    if (!cur && window.currentOrderId) {
-        cur = orders.find(function(o) { return o.id == window.currentOrderId; });
-    }
-    if (!cur && orders.length > 0) cur = orders[0];
-
-    if (!cur) {
-        alert("Sipariş bulunamadı!");
-        return;
-    }
-
-    var returnInputs = document.querySelectorAll('#step3-returns-container input[type=number]');
+// İADE KONTROL VE LİSTELEME MOTORU (Mağaza & Atölye İade Masası)
+})();
+       
+           // SAHA VE İADE İŞLEM KİLİDİ
+window.completeSahaStep = function() {
+    var inputs = document.querySelectorAll('#content-step-3 input[type=number]');
     var totalReturn = 0;
-    returnInputs.forEach(function(inp) {
-        var val = parseInt(inp.value, 10);
-        if (!isNaN(val) && val > 0) totalReturn += val;
+    inputs.forEach(function(i) {
+        var v = parseInt(i.value, 10);
+        if (!isNaN(v) && v > 0) totalReturn += v;
     });
 
-    var idx = orders.findIndex(function(o) { return o.id == cur.id; });
+    var orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    var activeId = (window.activeOrder && window.activeOrder.id) || (window.currentOrder && window.currentOrder.id) || window.currentOrderId;
+    var idx = orders.findIndex(function(o) { return o.id == activeId; });
 
     if (totalReturn > 0) {
-        if (idx > -1) {
-            orders[idx].currentStep = 3.5;
-            orders[idx].status = 'İade Onayı Bekliyor';
-            orders[idx].needsReturnApproval = true;
+        if (confirm('Sahada ' + totalReturn + ' adet iade girildi. Fiş İade Masasına devredilsin mi?')) {
+            if (idx > -1) {
+                orders[idx].currentStep = 3.5;
+                orders[idx].status = 'İade Onayı Bekliyor';
+                orders[idx].needsReturnApproval = true;
+            }
+            localStorage.setItem('orders', JSON.stringify(orders));
+            window.orders = orders;
+            alert('Fiş İade Masasına aktarıldı.');
+            if (typeof returnToDashboard === 'function') returnToDashboard();
+            else location.reload();
         }
-        localStorage.setItem('orders', JSON.stringify(orders));
-        alert('Sahada ' + totalReturn + ' adet iade girildi. Fiş İade Masasına devredildi.');
     } else {
         if (idx > -1) {
             orders[idx].currentStep = 4;
@@ -4060,16 +4069,11 @@ function handleSahaFinish() {
             orders[idx].needsReturnApproval = false;
         }
         localStorage.setItem('orders', JSON.stringify(orders));
-        alert('Montaj tamamlandı, Muhasebeye aktarıldı.');
+        window.orders = orders;
+        if (typeof returnToDashboard === 'function') returnToDashboard();
+        else location.reload();
     }
-
-    if (typeof returnToDashboard === 'function') {
-        returnToDashboard();
-    } else {
-        window.location.reload();
-    }
-}
-        
+};
     </script>             
 </body>
 </html>
