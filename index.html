@@ -2880,26 +2880,80 @@
             await syncOrderToCloud(activeOrder);
             renderStep3();
         }
+window.addExtraItemStep3 = async function () {
+    if (!activeOrder) {
+        showToast("Aktif sipariş bulunamadı.", true);
+        return;
+    }
 
-        window.addExtraItemStep3 = async function() {
-            const selectedKey = document.getElementById("step3-extra-select").value;
-            const qty = parseInt(document.getElementById("step3-extra-qty").value) || 1;
-            const p = masterProducts.find(x => x.key === selectedKey);
-            if (!p) { showToast("Lütfen ürün seçiniz.", true); return; }
+    const selectedKey = document.getElementById("step3-extra-select").value;
+    const destination =
+        document.getElementById("step3-extra-destination").value;
 
-            if (!activeOrder.extras) activeOrder.extras = [];
-            activeOrder.extras.push({
-                id: p.id,
-                name: p.name,
-                color: normalizeColorCode(p.color, p.name),
-                qty: qty,
-                price: parseCleanPrice(p.price),
-                faikApproval: false
-            });
-            await syncOrderToCloud(activeOrder);
-            renderStep3();
-            showToast(`İlave talep açıldı: ${p.name}`);
-        }
+    const qty = parseInt(
+        document.getElementById("step3-extra-qty").value,
+        10
+    ) || 0;
+
+    if (!destination) {
+        showToast("Lütfen Mağaza veya Atölye seçiniz.", true);
+        return;
+    }
+
+    if (qty <= 0) {
+        showToast("İlave miktarı 0'dan büyük olmalıdır.", true);
+        return;
+    }
+
+    const product = masterProducts.find(
+        product => product.key === selectedKey
+    );
+
+    if (!product) {
+        showToast("Lütfen ilave ürün seçiniz.", true);
+        return;
+    }
+
+    if (!activeOrder.extras) {
+        activeOrder.extras = [];
+    }
+
+    const queue =
+        destination === "MAGAZA"
+            ? "MAGAZA_ILAVE"
+            : "ATOLYE_ILAVE";
+
+    activeOrder.extras.push({
+        id: product.id,
+        name: product.name,
+        color: normalizeColorCode(product.color, product.name),
+        qty: qty,
+        price: parseCleanPrice(product.price),
+
+        // Yeni yönlendirme bilgileri
+        destination: destination,
+        queue: queue,
+        approvalStatus: "PENDING",
+        createdBy: currentUser ? currentUser.name : "Saha",
+        createdAt: new Date().toISOString(),
+
+        // Eski hesaplama sistemiyle uyumluluk için
+        faikApproval: false
+    });
+
+    await syncOrderToCloud(activeOrder);
+
+    document.getElementById("step3-extra-destination").value = "";
+    document.getElementById("step3-extra-qty").value = "1";
+
+    renderStep3();
+
+    showToast(
+        `${product.name} ürünü ${
+            destination === "MAGAZA" ? "Mağaza" : "Atölye"
+        } kuyruğuna gönderildi.`
+    );
+};
 
         window.removeExtraItemStep3 = async function(index) {
             if (!activeOrder || !activeOrder.extras) return;
