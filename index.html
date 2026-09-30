@@ -544,10 +544,7 @@
                             </div>
                             <div class="text-xs text-slate-500 font-medium">Saha Sorumlusu: <strong class="text-slate-800">Sefa Usta</strong></div>
                         </div>
-                        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl text-xs text-red-950 space-y-1">
-                            <div class="font-extrabold flex items-center"><i class="fa-solid fa-shield-halved mr-1.5 text-red-600"></i> FAİK BEY ONAY KURALI:</div>
-                            <div>Faik Bey'in onayı olmadan mağazadan veya depodan hiçbir ilave ürün personele, müşteriye veya kargoya verilemez.</div>
-                        </div>
+                      
                         <div id="step3-lock-alert" class="hidden bg-slate-100 border-l-4 border-slate-500 p-3.5 rounded-r-xl text-xs text-slate-700 flex items-center space-x-2">
                             <i class="fa-solid fa-lock text-slate-500 text-sm"></i>
                             <div><strong>Saha Tamamlandı:</strong> Evraklar muhasebeye devredildiği için kilitlidir (Salt Okunur).</div>
@@ -568,6 +565,12 @@
                                 <div id="step3-extras-container" class="space-y-2"></div>
                                 <div id="step3-add-extra-panel" class="pt-3 border-t border-emerald-200 space-y-2">
                                     <div class="grid grid-cols-12 gap-2">
+                                        <select id="step3-extra-destination"
+                                            class="col-span-12 text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white">
+    <option value="">İlavenin geleceği birimi seçin</option>
+    <option value="MAGAZA">Mağaza</option>
+    <option value="ATOLYE">Atölye</option>
+</select>
                                         <select id="step3-extra-select" class="col-span-8 text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white"></select>
                                         <input type="number" id="step3-extra-qty" value="1" min="1" class="col-span-4 text-xs p-2.5 rounded-xl border border-emerald-300 font-bold text-center" placeholder="Adet">
                                     </div>
