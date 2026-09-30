@@ -2867,13 +2867,50 @@
             }
         }
 
-        window.updateReturnQty = async function(index, val) {
-            if (!activeOrder || !activeOrder.items[index]) return;
-            activeOrder.items[index].returnedQty = parseInt(val) || 0;
-            await syncOrderToCloud(activeOrder);
-            renderStep3();
-        }
+       window.updateReturnQty = async function (index, val) {
+    if (!activeOrder || !activeOrder.items[index]) {
+        return;
+    }
 
+    const item = activeOrder.items[index];
+    const quantity = parseInt(val, 10) || 0;
+    const dispatchedQty = parseInt(item.dispatchedQty, 10) || 0;
+
+    if (quantity < 0) {
+        showToast("İade miktarı negatif olamaz.", true);
+        return;
+    }
+
+    if (quantity > dispatchedQty) {
+        showToast(
+            "İade miktarı sevk edilen miktardan fazla olamaz.",
+            true
+        );
+        return;
+    }
+
+    item.returnedQty = quantity;
+
+    if (quantity > 0) {
+        item.returnRequest = {
+            quantity: quantity,
+            queue: "ATOLYE_IADE",
+            destination: "ATOLYE",
+            approvalStatus: "PENDING",
+            createdBy: currentUser ? currentUser.name : "Saha",
+            createdAt: new Date().toISOString()
+        };
+    } else {
+        item.returnRequest = null;
+    }
+
+    await syncOrderToCloud(activeOrder);
+    renderStep3();
+
+    if (quantity > 0) {
+        showToast("İade kaydı Atölye İade kuyruğuna gönderildi.");
+    }
+};
         window.toggleFaikApproval = async function(index, checked) {
             if (!activeOrder || !activeOrder.extras[index]) return;
             activeOrder.extras[index].faikApproval = checked;
@@ -3895,7 +3932,36 @@ document.addEventListener("click", function(e) {
         }, 100);
     }
 }, true);
+(function removeFaikApprovalFromScreen() {
+    function hideFaikApprovalElements() {
+        const allElements = document.querySelectorAll("*");
 
+        allElements.forEach(function (element) {
+            const text = (element.innerText || "").trim();
+
+            if (
+                text.includes("Faik Bey Onayı") ||
+                text.includes("FAİK BEY ONAY KURALI")
+            ) {
+                element.style.display = "none";
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        hideFaikApprovalElements();
+
+        const observer = new MutationObserver(function () {
+            hideFaikApprovalElements();
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+})();
+        
     </script>
 </body>
 </html>
