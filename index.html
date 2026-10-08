@@ -352,7 +352,7 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-2">
+                    <div id="detail-action-buttons" class="flex flex-wrap items-center gap-2">
                         <button onclick="exportFinalOrderToExcel()" id="btn-action-export-siparis" class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center space-x-1.5 shadow transition cursor-pointer">
                             <i class="fa-solid fa-file-excel text-emerald-300 text-sm pointer-events-none"></i>
                             <span class="pointer-events-none">Sipariş Oluştur</span>
@@ -565,15 +565,14 @@
                     <div class="bg-white p-6 rounded-2xl border border-emerald-100 shadow-sm space-y-6">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-emerald-100 pb-4 gap-2">
                             <div>
-                                <span class="bg-purple-100 text-purple-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">Evrak 3 & 4: Saha Uygulama</span>
-                                <h3 class="text-lg font-black text-slate-900 mt-1">Saha Mal Kabul, İade ve Ek Talep</h3>
+                                <span id="step3-badge" class="bg-purple-100 text-purple-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">Evrak 3 & 4: Saha Uygulama</span>
+                                <h3 id="step3-title" class="text-lg font-black text-slate-900 mt-1">Saha Mal Kabul, İade ve Ek Talep</h3>
                             </div>
-                            <div class="text-xs text-slate-500 font-medium">Saha Sorumlusu: <strong class="text-slate-800">Sefa Usta</strong></div>
+                            <div id="step3-owner" class="text-xs text-slate-500 font-medium">Saha Sorumlusu: <strong class="text-slate-800">Sefa Usta</strong></div>
                         </div>
-                        <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl text-xs text-amber-950 space-y-1">
+                        <div id="step3-rule-box" class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl text-xs text-amber-950 space-y-1">
                             <div class="font-extrabold flex items-center"><i class="fa-solid fa-shield-halved mr-1.5 text-amber-600"></i> ONAY KURALI:</div>
                             <div>İade edilen ürünler <strong>Atölye İade</strong> onayına düşer. İlave ürünlerde alındığı yer (Mağaza / Atölye) seçilir; talep ilgili ilave sorumlusunun onayına düşer. Onaylanmayan iade ve ilaveler muhasebeye devredilemez.</div>
-                        </div>
                         </div>
                         <div id="step3-lock-alert" class="hidden bg-slate-100 border-l-4 border-slate-500 p-3.5 rounded-r-xl text-xs text-slate-700 flex items-center space-x-2">
                             <i class="fa-solid fa-lock text-slate-500 text-sm"></i>
@@ -607,7 +606,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
+                        <div id="step3-footer" class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
                             <div class="text-xs text-slate-500"><i class="fa-solid fa-clipboard-check mr-1 text-slate-400"></i> Montaj tamamlandıktan sonra tüm evraklar birleşir.</div>
                             <div id="step3-action-buttons">
                                 <button type="button" onclick="forwardToAccounting()" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2 cursor-pointer">
@@ -1117,6 +1116,7 @@
             atolye: { label: 'Atölye', approverRole: 'atolye_ilave', cls: 'bg-teal-100 text-teal-800 border-teal-200' }
         };
         const SOURCE_BY_ROLE = { magaza_ilave: 'magaza', atolye_ilave: 'atolye' };
+        const APPROVER_ROLES = ['atolye_iade', 'atolye_ilave', 'magaza_ilave']; // yalnızca onay ekranı gören roller
         // Yeni rollerin giriş şifreleri (canlıya almadan önce değiştirin)
         const NEW_ROLE_PASSWORDS = { atolye_iade: '1234', atolye_ilave: '1234', magaza_ilave: '1234' };
 
@@ -1531,8 +1531,11 @@
                     await db.collection("orders").doc(orderObj.id).set(orderObj);
                 } catch(e) {
                     console.error("Bulut sipariş kaydetme:", e);
+                    showToast("Buluta kaydedilemedi: " + (e && e.message ? e.message : e), true);
+                    return false;
                 }
             }
+            return true;
         }
 
         // ================= KATALOG MOTORU =================
@@ -2432,7 +2435,14 @@
             }
 
             buildDynamicStepperTabs();
-            
+
+            // Onay rolleri için aşama sekmeleri ve fiş çıktı butonları gösterilmez
+            const approverView = APPROVER_ROLES.includes(currentUser.roleId);
+            const navBar = document.getElementById("stepper-nav-bar");
+            if (navBar) navBar.style.display = approverView ? "none" : "";
+            const detailBtns = document.getElementById("detail-action-buttons");
+            if (detailBtns) detailBtns.style.display = approverView ? "none" : "";
+
             const defaultStep = currentUser.visibleSteps[0] || 1;
             switchStepTab(defaultStep);
             populateProductSelects();
@@ -2891,6 +2901,31 @@
             const canApproveReturn = isAdmin || (isIadeApprover && isAtStep3);
             const showPrices = currentUser && currentUser.canSeePrices === true;
 
+            // Onay rolleri saha fişini değil, yalnızca kendi onay listesini görür
+            const isApprover = APPROVER_ROLES.includes(role);
+            const setDisp = (id, show) => { const el = document.getElementById(id); if (el) el.style.display = show ? "" : "none"; };
+            setDisp("step3-rule-box", !isApprover);
+            setDisp("step3-footer", !isApprover);
+            setDisp("step3-owner", !isApprover);
+            const badgeEl = document.getElementById("step3-badge");
+            const titleEl = document.getElementById("step3-title");
+            if (badgeEl && titleEl) {
+                if (isIadeApprover) {
+                    badgeEl.className = "bg-red-100 text-red-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase";
+                    badgeEl.innerText = "Atölye İade Onayı";
+                    titleEl.innerText = "Onay Bekleyen İadeler";
+                } else if (mySource) {
+                    const lbl = EXTRA_SOURCE_INFO[mySource].label;
+                    badgeEl.className = "bg-sky-100 text-sky-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase";
+                    badgeEl.innerText = lbl + " İlave Onayı";
+                    titleEl.innerText = "Onay Bekleyen " + lbl + " İlaveleri";
+                } else {
+                    badgeEl.className = "bg-purple-100 text-purple-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase";
+                    badgeEl.innerText = "Evrak 3 & 4: Saha Uygulama";
+                    titleEl.innerText = "Saha Mal Kabul, İade ve Ek Talep";
+                }
+            }
+
             // Role göre hangi kutular görünür
             const showReturnsBox = isAdmin || isSaha || isIadeApprover;
             const showExtrasBox = isAdmin || isSaha || !!mySource;
@@ -3047,8 +3082,9 @@
                 requestedBy: currentUser.name,
                 faikApproval: false
             });
-            await syncOrderToCloud(activeOrder);
+            const saved = await syncOrderToCloud(activeOrder);
             renderStep3();
+            if (saved === false) return; // hata mesajı zaten gösterildi
             showToast(`İlave talep açıldı (${EXTRA_SOURCE_INFO[source].label} onayına gönderildi): ${p.name}`);
         }
 
@@ -3723,7 +3759,7 @@ document.addEventListener("click", function(e) {
         searchInput.type = "text";
         searchInput.id = "saha-extra-search-input";
         searchInput.placeholder = "Ürün ara (Kod, Tanım veya Renk)...";
-        searchInput.className = "w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white mb-2";
+        searchInput.className = "col-span-12 w-full text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white";
 
         // Arama yapıldığında listeyi anında filtrele
         searchInput.addEventListener("input", function() {
