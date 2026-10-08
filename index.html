@@ -347,6 +347,7 @@
                                 <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-md bg-emerald-900 text-white font-mono" id="detail-order-code">-</span>
                                 <span class="text-xs font-bold text-slate-500" id="detail-order-date">-</span>
                                 <span class="text-[10px] font-black px-2 py-0.5 rounded-md" id="detail-order-application-badge">-</span>
+                                <span class="hidden text-[10px] font-black px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200" id="detail-order-invoice-badge"></span>
                             </div>
                             <h2 class="text-lg font-black text-slate-900 mt-1" id="detail-customer-name">-</h2>
                         </div>
@@ -726,6 +727,19 @@
                     <select id="excel-import-has-application" class="w-full text-xs font-bold p-2.5 rounded-xl border border-amber-300 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
                         <option value="true">Evet, Sahada Uygulama / Montaj Yapılacak (Saha Ekibine Düşsün)</option>
                         <option value="false">Hayır, Yalnızca Ürün Teslimatı (Saha Yok, Depodan Direkt Muhasebeye)</option>
+                    </select>
+                </div>
+
+                <div class="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200 space-y-2">
+                    <label class="block text-xs font-black text-emerald-950 uppercase flex items-center space-x-1.5">
+                        <i class="fa-solid fa-file-invoice text-emerald-700"></i>
+                        <span>Fatura Tipi <span class="text-red-600">*</span></span>
+                    </label>
+                    <select id="excel-import-invoice-type" class="w-full text-xs font-bold p-2.5 rounded-xl border border-emerald-300 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                        <option value="">-- Fatura tipini seçiniz (zorunlu) --</option>
+                        <option value="Fatura 1">Fatura 1</option>
+                        <option value="Fatura 2">Fatura 2</option>
+                        <option value="Fatura S">Fatura S</option>
                     </select>
                 </div>
 
@@ -1989,6 +2003,10 @@
 
         async function applyExcelImportToOrder() {
             if (parsedExcelItems.length === 0) return;
+            const invSelect = document.getElementById("excel-import-invoice-type");
+            const invoiceType = invSelect ? invSelect.value : "";
+            if (!invoiceType) { alert("Lütfen Fatura Tipini seçiniz (Fatura 1 / Fatura 2 / Fatura S)."); return; }
+
             const custName = prompt("Müşteri / Proje Adı giriniz:", "Yeni Excel Sipariş Projesi");
             if (!custName) return;
 
@@ -2015,6 +2033,7 @@
                 salesRep: currentUser ? currentUser.name : "Orhan Özen",
                 date: new Date().toISOString().split("T")[0],
                 notes: "Excel üzerinden aktarıldı.",
+                invoiceType: invoiceType,
                 hasApplication: hasApplication,
                 currentStep: 1,
                 items: formattedItems,
@@ -2371,7 +2390,7 @@
 
                 tr.innerHTML = `
                     <td class="p-4 font-mono font-bold text-slate-900">${ord.id}</td>
-                    <td class="p-4 font-bold text-slate-800">${ord.customer}</td>
+                    <td class="p-4 font-bold text-slate-800">${ord.customer}${ord.invoiceType ? `<div class="mt-1"><span class="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-extrabold px-2 py-0.5 rounded-md"><i class="fa-solid fa-file-invoice mr-1"></i>${ord.invoiceType}</span></div>` : ""}</td>
                     <td class="p-4 font-medium text-slate-600">${ord.salesRep || "Satış Ekibi"}</td>
                     <td class="p-4 text-xs font-medium text-slate-500">${ord.date || "-"}</td>
                     <td class="p-4">${appBadge}</td>
@@ -2412,6 +2431,16 @@
             const btnSiparis = document.getElementById("btn-action-export-siparis");
             if (btnSiparis) {
                 btnSiparis.style.display = showPrices ? "flex" : "none";
+            }
+
+            const invBadge = document.getElementById("detail-order-invoice-badge");
+            if (invBadge) {
+                if (activeOrder.invoiceType) {
+                    invBadge.innerText = activeOrder.invoiceType;
+                    invBadge.classList.remove("hidden");
+                } else {
+                    invBadge.classList.add("hidden");
+                }
             }
 
             const appBadge = document.getElementById("detail-order-application-badge");
@@ -3847,6 +3876,14 @@ window.applyExcelImportToOrder = async function() {
             return;
         }
 
+        const invSelect = document.getElementById("excel-import-invoice-type");
+        const invoiceType = invSelect ? invSelect.value : "";
+        if (!invoiceType) {
+            alert("Lütfen Fatura Tipini seçiniz (Fatura 1 / Fatura 2 / Fatura S).");
+            if (invSelect) invSelect.focus();
+            return;
+        }
+
         const custName = prompt("Müşteri / Proje Adı giriniz:", "Yeni Excel Projesi");
         if (!custName || !custName.trim()) return;
 
@@ -3881,6 +3918,7 @@ window.applyExcelImportToOrder = async function() {
             salesRep: repName,
             date: new Date().toISOString().split("T")[0],
             notes: "Excel üzerinden aktarıldı (" + formattedItems.length + " Kalem).",
+            invoiceType: invoiceType,
             hasApplication: hasApplication,
             currentStep: 1,
             items: formattedItems,
@@ -3991,6 +4029,10 @@ document.addEventListener("click", function(e) {
         if (pasteInput) {
             pasteInput.value = "";
         }
+
+        // 3b. Fatura tipi seçimini sıfırla (her sipariş için yeniden seçilmeli)
+        const invTypeSel = document.getElementById("excel-import-invoice-type");
+        if (invTypeSel) invTypeSel.value = "";
 
         // 4. "Yeni Sipariş Olarak Panele Aktar" butonunu devre dışı bırak
         const applyBtn = document.getElementById("btn-apply-excel");
