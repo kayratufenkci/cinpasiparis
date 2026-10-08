@@ -143,6 +143,32 @@
                         <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs pointer-events-none"></i>
                     </button>
 
+                    <!-- Atölye İade Profili -->
+                    <button type="button" onclick="requestPasswordAndLogin('atolye_iade')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full cursor-pointer">
+                        <div class="flex items-center space-x-3 pointer-events-none">
+                            <div class="w-10 h-10 rounded-xl bg-red-100 text-red-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition"><i class="fa-solid fa-rotate-left"></i></div>
+                            <div class="text-xs font-black text-slate-900 flex items-center space-x-1.5"><span>Atölye İade </span><i class="fa-solid fa-lock text-[10px] text-amber-500"></i></div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs pointer-events-none"></i>
+                    </button>
+
+                    <!-- Atölye İlave Profili -->
+                    <button type="button" onclick="requestPasswordAndLogin('atolye_ilave')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full cursor-pointer">
+                        <div class="flex items-center space-x-3 pointer-events-none">
+                            <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                            <div class="text-xs font-black text-slate-900 flex items-center space-x-1.5"><span>Atölye İlave </span><i class="fa-solid fa-lock text-[10px] text-amber-500"></i></div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs pointer-events-none"></i>
+                    </button>
+
+                    <!-- Mağaza İlave Profili -->
+                    <button type="button" onclick="requestPasswordAndLogin('magaza_ilave')" class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group text-left w-full cursor-pointer">
+                        <div class="flex items-center space-x-3 pointer-events-none">
+                            <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-base group-hover:scale-105 transition"><i class="fa-solid fa-store"></i></div>
+                            <div class="text-xs font-black text-slate-900 flex items-center space-x-1.5"><span>Mağaza İlave </span><i class="fa-solid fa-lock text-[10px] text-amber-500"></i></div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-emerald-700 transition text-xs pointer-events-none"></i>
+                    </button>
                     <!-- Admin Profili -->
                     <button type="button" onclick="requestPasswordAndLogin('admin')" class="flex items-center justify-between p-3.5 rounded-2xl border border-emerald-900 bg-emerald-900 text-white hover:bg-emerald-950 transition group text-left w-full shadow-lg cursor-pointer">
                         <div class="flex items-center space-x-3 pointer-events-none">
@@ -544,23 +570,24 @@
                             </div>
                             <div class="text-xs text-slate-500 font-medium">Saha Sorumlusu: <strong class="text-slate-800">Sefa Usta</strong></div>
                         </div>
-                        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl text-xs text-red-950 space-y-1">
-                            <div class="font-extrabold flex items-center"><i class="fa-solid fa-shield-halved mr-1.5 text-red-600"></i> FAİK BEY ONAY KURALI:</div>
-                            <div>Faik Bey'in onayı olmadan mağazadan veya depodan hiçbir ilave ürün personele, müşteriye veya kargoya verilemez.</div>
+                        <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl text-xs text-amber-950 space-y-1">
+                            <div class="font-extrabold flex items-center"><i class="fa-solid fa-shield-halved mr-1.5 text-amber-600"></i> ONAY KURALI:</div>
+                            <div>İade edilen ürünler <strong>Atölye İade</strong> onayına düşer. İlave ürünlerde alındığı yer (Mağaza / Atölye) seçilir; talep ilgili ilave sorumlusunun onayına düşer. Onaylanmayan iade ve ilaveler muhasebeye devredilemez.</div>
+                        </div>
                         </div>
                         <div id="step3-lock-alert" class="hidden bg-slate-100 border-l-4 border-slate-500 p-3.5 rounded-r-xl text-xs text-slate-700 flex items-center space-x-2">
                             <i class="fa-solid fa-lock text-slate-500 text-sm"></i>
                             <div><strong>Saha Tamamlandı:</strong> Evraklar muhasebeye devredildiği için kilitlidir (Salt Okunur).</div>
                         </div>
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div class="border border-emerald-100 rounded-2xl p-4 bg-emerald-50/40 space-y-3">
+                        <div id="step3-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div id="step3-returns-box" class="border border-emerald-100 rounded-2xl p-4 bg-emerald-50/40 space-y-3">
                                 <div class="flex items-center justify-between border-b border-emerald-200 pb-2">
                                     <h4 class="text-xs font-extrabold text-red-800 uppercase flex items-center"><i class="fa-solid fa-rotate-left mr-1.5 text-red-600"></i> Evrak 3: İade İrsaliyesi</h4>
                                     <span class="text-[11px] text-slate-500">Artan Ürünler</span>
                                 </div>
                                 <div id="step3-returns-container" class="space-y-2"></div>
                             </div>
-                            <div class="border border-emerald-100 rounded-2xl p-4 bg-emerald-50/40 space-y-3">
+                            <div id="step3-extras-box" class="border border-emerald-100 rounded-2xl p-4 bg-emerald-50/40 space-y-3">
                                 <div class="flex items-center justify-between border-b border-emerald-200 pb-2">
                                     <h4 class="text-xs font-extrabold text-emerald-800 uppercase flex items-center"><i class="fa-solid fa-cart-plus mr-1.5 text-emerald-600"></i> Evrak 4: İlave Ürün İrsaliyesi</h4>
                                     <span class="text-[11px] text-slate-500">Müşteri Ek Talebi</span>
@@ -568,6 +595,11 @@
                                 <div id="step3-extras-container" class="space-y-2"></div>
                                 <div id="step3-add-extra-panel" class="pt-3 border-t border-emerald-200 space-y-2">
                                     <div class="grid grid-cols-12 gap-2">
+                                        <select id="step3-extra-source" class="col-span-12 text-xs font-bold p-2.5 rounded-xl border border-emerald-300 bg-white">
+                                            <option value="">-- İlave nereden alındı? (zorunlu) --</option>
+                                            <option value="magaza">Mağazadan</option>
+                                            <option value="atolye">Atölyeden</option>
+                                        </select>
                                         <select id="step3-extra-select" class="col-span-8 text-xs font-semibold p-2.5 rounded-xl border border-emerald-300 bg-white"></select>
                                         <input type="number" id="step3-extra-qty" value="1" min="1" class="col-span-4 text-xs p-2.5 rounded-xl border border-emerald-300 font-bold text-center" placeholder="Adet">
                                     </div>
@@ -615,7 +647,7 @@
                             <div class="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200">
                                 <div class="text-[10px] font-bold text-emerald-800 uppercase">4. İlave İrsaliyesi</div>
                                 <div class="text-sm font-extrabold text-emerald-900 mt-0.5" id="sum-evrak4-text">-</div>
-                                <div class="text-[11px] text-emerald-700">Faik Bey Onaylı</div>
+                                <div class="text-[11px] text-emerald-700">Mağaza / Atölye Onaylı</div>
                             </div>
                         </div>
                         <div class="overflow-x-auto border border-emerald-100 rounded-xl">
@@ -1053,6 +1085,24 @@
                 colorClass: 'bg-emerald-50 text-emerald-800 border-emerald-200', avatarBg: 'bg-emerald-100 text-emerald-700', avatarIcon: 'fa-receipt',
                 visibleSteps: [4], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: true, canSeePrices: true
             },
+            atolye_iade: {
+                roleId: 'atolye_iade', name: 'Atölye İade', title: 'Atölye İade Sorumlusu', badgeText: 'ATÖLYE İADE PANELİ',
+                dutyText: 'Saha ekibinin girdiği iade ürünleri görür ve onaylarsınız (Fiyatlar gizlidir).',
+                colorClass: 'bg-red-50 text-red-700 border-red-200', avatarBg: 'bg-red-100 text-red-700', avatarIcon: 'fa-rotate-left',
+                visibleSteps: [3], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false, canSeePrices: false
+            },
+            atolye_ilave: {
+                roleId: 'atolye_ilave', name: 'Atölye İlave', title: 'Atölye İlave Sorumlusu', badgeText: 'ATÖLYE İLAVE PANELİ',
+                dutyText: 'Yalnızca ATÖLYEDEN alınan ilave ürün taleplerini görür ve onaylarsınız (Fiyatlar gizlidir).',
+                colorClass: 'bg-teal-50 text-teal-700 border-teal-200', avatarBg: 'bg-teal-100 text-teal-700', avatarIcon: 'fa-screwdriver-wrench',
+                visibleSteps: [3], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false, canSeePrices: false
+            },
+            magaza_ilave: {
+                roleId: 'magaza_ilave', name: 'Mağaza İlave', title: 'Mağaza İlave Sorumlusu', badgeText: 'MAĞAZA İLAVE PANELİ',
+                dutyText: 'Yalnızca MAĞAZADAN alınan ilave ürün taleplerini görür ve onaylarsınız (Fiyatlar gizlidir).',
+                colorClass: 'bg-sky-50 text-sky-700 border-sky-200', avatarBg: 'bg-sky-100 text-sky-700', avatarIcon: 'fa-store',
+                visibleSteps: [3], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false, canSeePrices: false
+            },
             admin: {
                 roleId: 'admin', name: 'Sistem Yöneticisi', title: 'Admin (Tam Yetki)', badgeText: 'TAM YETKİLİ ADMIN',
                 dutyText: 'Tüm aşamaları görür; satır ve fiş silme dahil tam yetkiye sahiptir.',
@@ -1060,6 +1110,15 @@
                 visibleSteps: [1, 2, 3, 4], canCreateOrder: true, canManageCatalog: true, canDeleteOrder: true, canSeePrices: true
             }
         };
+
+        // İlave kaynağı -> onaylayacak rol eşlemesi
+        const EXTRA_SOURCE_INFO = {
+            magaza: { label: 'Mağaza', approverRole: 'magaza_ilave', cls: 'bg-sky-100 text-sky-800 border-sky-200' },
+            atolye: { label: 'Atölye', approverRole: 'atolye_ilave', cls: 'bg-teal-100 text-teal-800 border-teal-200' }
+        };
+        const SOURCE_BY_ROLE = { magaza_ilave: 'magaza', atolye_ilave: 'atolye' };
+        // Yeni rollerin giriş şifreleri (canlıya almadan önce değiştirin)
+        const NEW_ROLE_PASSWORDS = { atolye_iade: '1234', atolye_ilave: '1234', magaza_ilave: '1234' };
 
         const HARDCODED_DEFAULT_ORDERS = [
             {
@@ -2130,6 +2189,14 @@
                 } else {
                     alert("Hatalı Muhasebe şifresi!");
                 }
+            } else if (NEW_ROLE_PASSWORDS[roleKey]) {
+                const pass = prompt(USER_ROLES[roleKey].name + ' Giriş Şifresi:');
+                if (pass === null) return;
+                if (pass.trim() === NEW_ROLE_PASSWORDS[roleKey]) {
+                    loginAs(roleKey);
+                } else {
+                    alert('Hatalı ' + USER_ROLES[roleKey].name + ' şifresi!');
+                }
             } else if (roleKey === 'admin') {
                 const pass = prompt("Sistem Yöneticisi (Admin) Giriş Şifresi:");
                 if (pass === null) return;
@@ -2251,6 +2318,15 @@
                 visibleOrders = orders.filter(ord => ord.currentStep >= 3 && ord.hasApplication !== false);
                 document.getElementById("dashboard-table-title").innerText = `Saha Montaj & Uygulama Masası`;
                 document.getElementById("dashboard-table-subtitle").innerText = `Yalnızca montaj/uygulaması yapılacak işler listelenmektedir.`;
+            } else if (currentUser.roleId === 'atolye_iade') {
+                visibleOrders = orders.filter(ord => ord.currentStep >= 3 && (ord.items || []).some(i => (parseFloat(i.returnedQty) || 0) > 0));
+                document.getElementById("dashboard-table-title").innerText = `Atölye İade Onay Masası`;
+                document.getElementById("dashboard-table-subtitle").innerText = `Saha ekibinin iade girdiği siparişler listelenmektedir.`;
+            } else if (SOURCE_BY_ROLE[currentUser.roleId]) {
+                const src = SOURCE_BY_ROLE[currentUser.roleId];
+                visibleOrders = orders.filter(ord => ord.currentStep >= 3 && (ord.extras || []).some(e => e.source === src));
+                document.getElementById("dashboard-table-title").innerText = `${EXTRA_SOURCE_INFO[src].label} İlave Onay Masası`;
+                document.getElementById("dashboard-table-subtitle").innerText = `Yalnızca ${src === 'magaza' ? 'mağazadan' : 'atölyeden'} alınan ilave talepleri içeren siparişler listelenmektedir.`;
             } else if (currentUser.roleId === 'muhasebe') {
                 visibleOrders = orders.filter(ord => ord.currentStep >= 2);
                 document.getElementById("dashboard-table-title").innerText = `Muhasebe Fatura Onay Kuyruğu`;
@@ -2372,6 +2448,9 @@
                 3: { num: 3, title: "3. Saha İade & İlave" },
                 4: { num: 4, title: "4. Muhasebe Fatura & Kapanış" }
             };
+
+            if (currentUser.roleId === 'atolye_iade') stepNames[3].title = '3. İade Onayı';
+            else if (SOURCE_BY_ROLE[currentUser.roleId]) stepNames[3].title = '3. ' + EXTRA_SOURCE_INFO[SOURCE_BY_ROLE[currentUser.roleId]].label + ' İlave Onayı';
 
             currentUser.visibleSteps.forEach(stepIdx => {
                 if (stepIdx === 3 && activeOrder && activeOrder.hasApplication === false && currentUser.roleId !== 'admin') {
@@ -2802,83 +2881,156 @@
             retContainer.innerHTML = "";
             extContainer.innerHTML = "";
 
-            const isAdmin = currentUser && currentUser.roleId === 'admin';
-            const isSaha = currentUser && currentUser.roleId === 'saha';
+            const role = currentUser ? currentUser.roleId : '';
+            const isAdmin = role === 'admin';
+            const isSaha = role === 'saha';
+            const isIadeApprover = role === 'atolye_iade';
+            const mySource = SOURCE_BY_ROLE[role] || null;
             const isAtStep3 = activeOrder && activeOrder.currentStep === 3;
             const canEditSaha = isAdmin || (isSaha && isAtStep3);
+            const canApproveReturn = isAdmin || (isIadeApprover && isAtStep3);
             const showPrices = currentUser && currentUser.canSeePrices === true;
 
+            // Role göre hangi kutular görünür
+            const showReturnsBox = isAdmin || isSaha || isIadeApprover;
+            const showExtrasBox = isAdmin || isSaha || !!mySource;
+            const retBox = document.getElementById("step3-returns-box");
+            const extBox = document.getElementById("step3-extras-box");
+            if (retBox) retBox.style.display = showReturnsBox ? "" : "none";
+            if (extBox) extBox.style.display = showExtrasBox ? "" : "none";
+            const grid = document.getElementById("step3-grid");
+            if (grid) grid.className = (showReturnsBox && showExtrasBox) ? "grid grid-cols-1 lg:grid-cols-2 gap-6" : "grid grid-cols-1 gap-6";
+
             const lockAlert = document.getElementById("step3-lock-alert");
-            if (lockAlert) lockAlert.style.display = (!canEditSaha && !isAdmin) ? "flex" : "none";
+            const canApproveAnyExtra = isAdmin || (!!mySource && isAtStep3);
+            if (lockAlert) lockAlert.style.display = (!canEditSaha && !canApproveReturn && !canApproveAnyExtra && !isAdmin) ? "flex" : "none";
             const addExtPanel = document.getElementById("step3-add-extra-panel");
             if (addExtPanel) addExtPanel.style.display = canEditSaha ? "block" : "none";
             const actionBtns = document.getElementById("step3-action-buttons");
             if (actionBtns) actionBtns.style.display = canEditSaha ? "block" : "none";
 
-            if (activeOrder && activeOrder.items) {
-                activeOrder.items.forEach((item, index) => {
+            // ---- İADELER ----
+            if (showReturnsBox && activeOrder && activeOrder.items) {
+                // Atölye İade kullanıcısı yalnızca iade girilmiş kalemleri görür
+                const rows = activeOrder.items.map((item, index) => ({ item, index }))
+                    .filter(r => !isIadeApprover || (parseFloat(r.item.returnedQty) || 0) > 0);
+                if (rows.length === 0) {
+                    retContainer.innerHTML = `<div class="p-4 text-center text-slate-400 italic text-xs">Onay bekleyen iade bulunmuyor.</div>`;
+                }
+                rows.forEach(({ item, index }) => {
                     const displayName = formatProductNameWithColor(item.name, item.color);
+                    const retQty = parseFloat(item.returnedQty) || 0;
                     const div = document.createElement("div");
                     div.className = "flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 text-xs";
+                    const qtyCell = canEditSaha
+                        ? `<input type="number" min="0" max="${item.dispatchedQty}" value="${retQty}" onchange="window.updateReturnQty(${index}, this.value)" class="w-16 p-1 text-center font-bold border border-red-300 rounded bg-red-50 text-red-900">`
+                        : `<span class="font-bold text-red-800">${retQty} Adet</span>`;
+                    const approvalCell = retQty > 0
+                        ? `<label class="flex items-center space-x-1.5 text-[11px] font-bold ${item.returnApproved ? 'text-emerald-800' : 'text-amber-800'}">
+                               <input type="checkbox" ${item.returnApproved ? "checked" : ""} ${canApproveReturn ? "" : "disabled"} onchange="window.toggleReturnApproval(${index}, this.checked)" class="w-4 h-4 text-emerald-700 rounded cursor-pointer">
+                               <span>${item.returnApproved ? 'Atölye Onayladı' : 'Atölye Onayı Bekliyor'}</span>
+                           </label>`
+                        : '';
                     div.innerHTML = `
                         <div>
                             <div class="font-mono text-[10px] text-slate-400 font-bold">${item.id}</div>
                             <div class="font-bold text-slate-900">${displayName}</div>
                             <div class="text-[11px] text-slate-500">Sevk: <span class="font-bold text-amber-900">${item.dispatchedQty}</span> Adet</div>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-slate-500 font-bold">İade:</span>
-                            ${canEditSaha ? `<input type="number" min="0" max="${item.dispatchedQty}" value="${item.returnedQty || 0}" onchange="window.updateReturnQty(${index}, this.value)" class="w-16 p-1 text-center font-bold border border-red-300 rounded bg-red-50 text-red-900">` : `<span class="font-bold text-red-800">${item.returnedQty || 0} Adet</span>`}
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center space-x-2"><span class="text-slate-500 font-bold">İade:</span>${qtyCell}</div>
+                            ${approvalCell}
                         </div>
                     `;
                     retContainer.appendChild(div);
                 });
             }
 
-            if (activeOrder && activeOrder.extras) {
-                if (activeOrder.extras.length === 0) {
-                    extContainer.innerHTML = `<div class="p-4 text-center text-slate-400 italic text-xs">Henüz ilave ürün talebi açılmadı.</div>`;
-                } else {
-                    activeOrder.extras.forEach((ext, index) => {
-                        const displayName = formatProductNameWithColor(ext.name, ext.color);
-                        const div = document.createElement("div");
-                        div.className = "flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 text-xs";
-                        const priceLabel = showPrices ? ` x ${Number(parseCleanPrice(ext.price)).toLocaleString('tr-TR')} ₺` : '';
-                        div.innerHTML = `
-                            <div>
-                                <div class="font-mono text-[10px] text-slate-400 font-bold">${ext.id}</div>
-                                <div class="font-bold text-slate-900">${displayName}</div>
-                                <div class="text-[11px] text-emerald-800 font-bold">${ext.qty} Adet${priceLabel}</div>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <label class="flex items-center space-x-1.5 text-[11px] font-bold ${ext.faikApproval ? 'text-emerald-800' : 'text-amber-800'}">
-                                    <input type="checkbox" ${ext.faikApproval ? "checked" : ""} ${!canEditSaha && !isAdmin ? "disabled" : ""} onchange="window.toggleFaikApproval(${index}, this.checked)" class="w-4 h-4 text-emerald-700 rounded cursor-pointer">
-                                    <span>Faik Bey Onayı</span>
-                                </label>
-                                ${canEditSaha || isAdmin ? `<button onclick="window.removeExtraItemStep3(${index})" class="text-slate-400 hover:text-red-500 cursor-pointer ml-2"><i class="fa-solid fa-trash"></i></button>` : ''}
-                            </div>
-                        `;
-                        extContainer.appendChild(div);
-                    });
+            // ---- İLAVELER ----
+            if (showExtrasBox && activeOrder && activeOrder.extras) {
+                // İlave kullanıcıları yalnızca kendi kaynaklarının kayıtlarını görür
+                const rows = activeOrder.extras.map((ext, index) => ({ ext, index }))
+                    .filter(r => !mySource || r.ext.source === mySource);
+                if (rows.length === 0) {
+                    extContainer.innerHTML = `<div class="p-4 text-center text-slate-400 italic text-xs">${mySource ? 'Onay bekleyen ilave bulunmuyor.' : 'Henüz ilave ürün talebi açılmadı.'}</div>`;
                 }
+                rows.forEach(({ ext, index }) => {
+                    const displayName = formatProductNameWithColor(ext.name, ext.color);
+                    const div = document.createElement("div");
+                    div.className = "flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 text-xs";
+                    const priceLabel = showPrices ? ` x ${Number(parseCleanPrice(ext.price)).toLocaleString('tr-TR')} ₺` : '';
+                    const srcInfo = EXTRA_SOURCE_INFO[ext.source];
+                    const srcBadge = srcInfo
+                        ? `<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${srcInfo.cls}">${srcInfo.label}</span>`
+                        : `<span class="text-[10px] font-bold px-2 py-0.5 rounded-md border bg-slate-100 text-slate-600 border-slate-200">Kaynak yok</span>`;
+                    const canApproveThis = isAdmin || (isAtStep3 && !!mySource && ext.source === mySource);
+                    const canDelete = isAdmin || (canEditSaha && !ext.faikApproval);
+                    div.innerHTML = `
+                        <div>
+                            <div class="flex items-center space-x-2"><span class="font-mono text-[10px] text-slate-400 font-bold">${ext.id}</span>${srcBadge}</div>
+                            <div class="font-bold text-slate-900">${displayName}</div>
+                            <div class="text-[11px] text-emerald-800 font-bold">${ext.qty} Adet${priceLabel}</div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <label class="flex items-center space-x-1.5 text-[11px] font-bold ${ext.faikApproval ? 'text-emerald-800' : 'text-amber-800'}">
+                                <input type="checkbox" ${ext.faikApproval ? "checked" : ""} ${canApproveThis ? "" : "disabled"} onchange="window.toggleExtraApproval(${index}, this.checked)" class="w-4 h-4 text-emerald-700 rounded cursor-pointer">
+                                <span>${ext.faikApproval ? 'Onaylandı' : 'Onay Bekliyor'}</span>
+                            </label>
+                            ${canDelete ? `<button onclick="window.removeExtraItemStep3(${index})" class="text-slate-400 hover:text-red-500 cursor-pointer ml-2"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        </div>
+                    `;
+                    extContainer.appendChild(div);
+                });
             }
         }
 
         window.updateReturnQty = async function(index, val) {
             if (!activeOrder || !activeOrder.items[index]) return;
-            activeOrder.items[index].returnedQty = parseInt(val) || 0;
+            if (!(currentUser.roleId === 'admin' || (currentUser.roleId === 'saha' && activeOrder.currentStep === 3))) return;
+            const item = activeOrder.items[index];
+            const newQty = parseInt(val) || 0;
+            if (newQty !== (parseFloat(item.returnedQty) || 0)) item.returnApproved = false; // miktar değişince onay sıfırlanır
+            item.returnedQty = newQty;
             await syncOrderToCloud(activeOrder);
             renderStep3();
         }
 
-        window.toggleFaikApproval = async function(index, checked) {
-            if (!activeOrder || !activeOrder.extras[index]) return;
-            activeOrder.extras[index].faikApproval = checked;
+        window.toggleReturnApproval = async function(index, checked) {
+            if (!activeOrder || !activeOrder.items[index]) return;
+            const role = currentUser.roleId;
+            if (!(role === 'admin' || (role === 'atolye_iade' && activeOrder.currentStep === 3))) {
+                showToast("YETKİSİZ İŞLEM: İadeyi yalnızca Atölye İade onaylayabilir.", true);
+                renderStep3();
+                return;
+            }
+            const item = activeOrder.items[index];
+            item.returnApproved = checked;
+            item.returnApprovedBy = checked ? currentUser.name : "";
             await syncOrderToCloud(activeOrder);
             renderStep3();
+            showToast(checked ? `İade onaylandı: ${item.name}` : `İade onayı kaldırıldı: ${item.name}`);
+        }
+
+        window.toggleExtraApproval = async function(index, checked) {
+            if (!activeOrder || !activeOrder.extras[index]) return;
+            const ext = activeOrder.extras[index];
+            const role = currentUser.roleId;
+            const isOwner = SOURCE_BY_ROLE[role] && SOURCE_BY_ROLE[role] === ext.source && activeOrder.currentStep === 3;
+            if (!(role === 'admin' || isOwner)) {
+                showToast("YETKİSİZ İŞLEM: Bu ilave kaydını onaylama yetkiniz yok.", true);
+                renderStep3();
+                return;
+            }
+            ext.faikApproval = checked; // eski alan adı: fatura/irsaliye hesapları bunu kullanıyor
+            ext.approvedBy = checked ? currentUser.name : "";
+            await syncOrderToCloud(activeOrder);
+            renderStep3();
+            showToast(checked ? `İlave onaylandı: ${ext.name}` : `İlave onayı kaldırıldı: ${ext.name}`);
         }
 
         window.addExtraItemStep3 = async function() {
+            const source = document.getElementById("step3-extra-source").value;
+            if (!source) { showToast("Lütfen ilavenin alındığı yeri seçiniz (Mağaza / Atölye).", true); return; }
             const selectedKey = document.getElementById("step3-extra-select").value;
             const qty = parseInt(document.getElementById("step3-extra-qty").value) || 1;
             const p = masterProducts.find(x => x.key === selectedKey);
@@ -2891,15 +3043,23 @@
                 color: normalizeColorCode(p.color, p.name),
                 qty: qty,
                 price: parseCleanPrice(p.price),
+                source: source,
+                requestedBy: currentUser.name,
                 faikApproval: false
             });
             await syncOrderToCloud(activeOrder);
             renderStep3();
-            showToast(`İlave talep açıldı: ${p.name}`);
+            showToast(`İlave talep açıldı (${EXTRA_SOURCE_INFO[source].label} onayına gönderildi): ${p.name}`);
         }
 
         window.removeExtraItemStep3 = async function(index) {
             if (!activeOrder || !activeOrder.extras) return;
+            const ext = activeOrder.extras[index];
+            if (!ext) return;
+            if (currentUser.roleId !== 'admin' && ext.faikApproval) {
+                showToast("Onaylanmış ilave silinemez.", true);
+                return;
+            }
             activeOrder.extras.splice(index, 1);
             await syncOrderToCloud(activeOrder);
             renderStep3();
@@ -2907,10 +3067,20 @@
         }
 
         window.forwardToAccounting = async function() {
+            const pendingReturns = (activeOrder.items || []).filter(i => (parseFloat(i.returnedQty) || 0) > 0 && !i.returnApproved);
+            const pendingExtras = (activeOrder.extras || []).filter(e => !e.faikApproval);
+            if (pendingReturns.length > 0 || pendingExtras.length > 0) {
+                const parts = [];
+                if (pendingReturns.length) parts.push(`${pendingReturns.length} iade kalemi Atölye İade onayı bekliyor`);
+                if (pendingExtras.length) parts.push(`${pendingExtras.length} ilave kalemi Mağaza/Atölye onayı bekliyor`);
+                showToast("Muhasebeye devredilemez: " + parts.join(", ") + ".", true);
+                return;
+            }
+
             const c1 = confirm(`1. ONAY:\n\nSaha montajı ve uygulama tamamen bitti mi?\n\nEvraklar Muhasebeye (Gökhan) faturalandırma için devredilecektir.`);
             if (!c1) return;
 
-            const c2 = confirm(`2. KESİN ONAY:\n\nArtan iade adetleri ile Faik Bey onaylı ek talepleri tam olarak işlediğinizi onaylıyor musunuz?`);
+            const c2 = confirm(`2. KESİN ONAY:\n\nOnaylanmış iade adetleri ve ilave talepleri tam olarak işlediğinizi onaylıyor musunuz?`);
             if (!c2) return;
 
             activeOrder.currentStep = 4;
@@ -2918,7 +3088,6 @@
             showToast("Montaj tamamlandı ve dosya Muhasebeye iletildi!");
             returnToDashboard();
         }
-
         function renderStep4() {
             const tbody = document.getElementById("step4-items-tbody");
             if (!tbody || !activeOrder) return;
@@ -2988,7 +3157,7 @@
                         tr.className = "bg-emerald-50/30";
                         tr.innerHTML = `
                             <td class="p-3.5 font-bold text-slate-900">
-                                <div class="text-xs text-emerald-700 font-mono">[İlave Kalem] ${ext.id}</div>
+                                <div class="text-xs text-emerald-700 font-mono">[İlave${ext.source && EXTRA_SOURCE_INFO[ext.source] ? " - " + EXTRA_SOURCE_INFO[ext.source].label : ""}] ${ext.id}</div>
                                 <div>${displayName}</div>
                             </td>
                             <td class="p-3.5 text-center font-bold text-xs bg-emerald-100 text-emerald-900">${colorDisplayVal}</td>
