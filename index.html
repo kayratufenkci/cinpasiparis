@@ -1153,6 +1153,64 @@
         const ARCHIVE_AFTER_DAYS = 30;
         const ARCHIVE_VIEW_ROLES = ['satis', 'muhasebe', 'admin']; // arşivi görebilen roller
         let showArchive = false;
+
+        // ---- Güvenlik / doğrulama yardımcıları
+        // Kullanıcıdan gelen metni HTML'e basmadan önce kaçışla (XSS önleme)
+        function esc(v) {
+            return String(v === null || v === undefined ? '' : v)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        // Adet girişi: yalnızca [min, max] aralığında TAM SAYI kabul eder, aksi halde null döner
+        function parseQty(val, min, max) {
+            const s = String(val === null || val === undefined ? '' : val).trim().replace(',', '.');
+            if (s === '') return null;
+            const n = Number(s);
+            if (!isFinite(n) || Math.floor(n) !== n || n < min || n > max) return null;
+            return n;
+        }
+        // Faturalanacak net adet: iade 0 ile sevk edilen arasında sınırlanır (bozuk eski veriye karşı güvenlik)
+        function getNetBillableQty(item) {
+            const req = parseFloat(item.requestedQty) || 0;
+            const disp = item.dispatchedQty !== undefined ? (parseFloat(item.dispatchedQty) || 0) : req;
+            const ret = Math.min(Math.max(parseFloat(item.returnedQty) || 0, 0), disp);
+            return Math.max(0, disp - ret);
+        }
+
+        // ---- Sipariş numarası: mevcut numaralarla çakışmaz (aksi halde eski sipariş ezilirdi)
+        const reservedOrderIds = new Set();
+        function generateOrderId() {
+            const year = new Date().getFullYear();
+            const used = new Set((Array.isArray(orders) ? orders : []).map(o => o.id));
+            reservedOrderIds.forEach(id => used.add(id));
+            for (let i = 0; i < 200; i++) {
+                const id = `CNP-${year}-${Math.floor(100 + Math.random() * 900)}`;
+                if (!used.has(id)) return id;
+            }
+            for (let i = 0; i < 500; i++) {
+                const id = `CNP-${year}-${Math.floor(1000 + Math.random() * 9000)}`;
+                if (!used.has(id)) return id;
+            }
+            return `CNP-${year}-${Date.now()}`;
+        }
+        // Bulutta da kontrol eder (başka cihazda açılmış ama bu cihaza henüz inmemiş sipariş olabilir)
+        async function generateUniqueOrderId() {
+            for (let attempt = 0; attempt < 10; attempt++) {
+                const id = generateOrderId();
+                if (typeof db === 'undefined' || !db) return id;
+                try {
+                    const snap = await Promise.race([
+                        db.collection('orders').doc(id).get(),
+                        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 2500))
+                    ]);
+                    if (!snap.exists) return id;
+                    reservedOrderIds.add(id); // bulutta var, başka numara dene
+                } catch (e) {
+                    return id; // bağlantı yoksa yerel kontrol yeterli
+                }
+            }
+            return `CNP-${new Date().getFullYear()}-${Date.now()}`;
+        }
         function isOrderClosed(ord) { return !!ord && (ord.isClosed === true || ord.currentStep >= 5); }
         function isOrderArchived(ord) {
             if (!isOrderClosed(ord)) return false;
@@ -1491,7 +1549,7 @@
                 order.items.forEach(item => {
                     const requested = parseFloat(item.requestedQty) || 0;
                     const dispatched = item.dispatchedQty !== undefined ? (parseFloat(item.dispatchedQty) || 0) : requested;
-                    const returned = parseFloat(item.returnedQty) || 0;
+                    const returned = Math.min(Math.max(parseFloat(item.returnedQty) || 0, 0), dispatched);
                     const netQty = Math.max(0, dispatched - returned);
                     const unitPrice = parseCleanPrice(item.price);
                     subtotal += netQty * unitPrice;
@@ -1500,7 +1558,7 @@
             if (order.extras && Array.isArray(order.extras)) {
                 order.extras.forEach(ext => {
                     if (ext.faikApproval) {
-                        const qty = parseFloat(ext.qty) || 0;
+                        const qty = Math.max(0, parseFloat(ext.qty) || 0);
                         const price = parseCleanPrice(ext.price);
                         subtotal += qty * price;
                     }
@@ -1846,6 +1904,7 @@
         }
 
         function processRawExcelRows(rows) {
+            window.__excelSkippedRows = 0;
             parsedExcelItems = [];
             if (!rows || rows.length === 0) return;
 
@@ -1948,8 +2007,10 @@
                 let rawQty = cols[qtyCol] !== undefined ? cols[qtyCol] : 1;
                 let rawPrice = cols[priceCol] !== undefined ? cols[priceCol] : 0;
 
-                let qty = parseFloat(String(rawQty).replace(/[^0-9,.-]/g, '').replace(',', '.')) || 1;
+                const parsedQty = parseFloat(String(rawQty).replace(/[^0-9,.-]/g, '').replace(',', '.'));
+                let qty = isNaN(parsedQty) ? 1 : parsedQty;
                 let price = parseCleanPrice(rawPrice);
+                if (qty <= 0 || price < 0) { window.__excelSkippedRows = (window.__excelSkippedRows || 0) + 1; continue; }
 
                 let productName = (explicitName && explicitName !== '' && explicitName !== 'nan') ? explicitName : '';
                 
@@ -1994,7 +2055,9 @@
             }
 
             if (parsedExcelItems.length === 0) {
-                showToast("Geçerli ürün satırı okunamadı!", true);
+                showToast(window.__excelSkippedRows > 0
+                    ? `Geçerli ürün satırı okunamadı! (${window.__excelSkippedRows} satır geçersiz adet veya fiyat nedeniyle atlandı)`
+                    : "Geçerli ürün satırı okunamadı!", true);
                 return;
             }
 
@@ -2010,9 +2073,9 @@
                 
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-                    <td class="p-2 font-mono font-bold text-slate-700">${item.id}</td>
-                    <td class="p-2 font-medium text-slate-900">${item.name}</td>
-                    <td class="p-2 text-center font-bold text-emerald-800 bg-emerald-50">${colorDisplayVal}</td>
+                    <td class="p-2 font-mono font-bold text-slate-700">${esc(item.id)}</td>
+                    <td class="p-2 font-medium text-slate-900">${esc(item.name)}</td>
+                    <td class="p-2 text-center font-bold text-emerald-800 bg-emerald-50">${esc(colorDisplayVal)}</td>
                     <td class="p-2 text-center font-bold">${item.requestedQty} Adet</td>
                     <td class="p-2 text-right font-bold">${Number(item.price).toLocaleString('tr-TR')} ₺</td>
                 `;
@@ -2023,7 +2086,9 @@
             document.getElementById("excel-preview-count").innerText = `${parsedExcelItems.length} Kalem Ürün`;
             document.getElementById("excel-preview-total").innerText = `Toplam: ${previewTotal.toLocaleString('tr-TR')} ₺`;
             updateExcelApplyButton();
-            showToast(`${parsedExcelItems.length} kalem ürün başarıyla okundu!`);
+            showToast(window.__excelSkippedRows > 0
+                ? `${parsedExcelItems.length} kalem okundu, ${window.__excelSkippedRows} satır geçersiz adet/fiyat nedeniyle atlandı!`
+                : `${parsedExcelItems.length} kalem ürün başarıyla okundu!`, window.__excelSkippedRows > 0);
         }
 
         function updateExcelApplyButton() {
@@ -2049,7 +2114,7 @@
             const hasAppSelect = document.getElementById("excel-import-has-application");
             const hasApplication = hasAppSelect ? (hasAppSelect.value === "true") : true;
 
-            const newId = "CNP-2026-" + String(Math.floor(100 + Math.random() * 900));
+            const newId = generateOrderId();
             
             const formattedItems = parsedExcelItems.map(i => ({
                 id: i.id,
@@ -2092,7 +2157,7 @@
             (activeOrder.items || []).forEach(item => {
                 const requested = item.requestedQty || 0;
                 const dispatched = item.dispatchedQty !== undefined ? item.dispatchedQty : requested;
-                const returned = item.returnedQty || 0;
+                const returned = Math.min(Math.max(parseFloat(item.returnedQty) || 0, 0), parseFloat(dispatched) || 0);
                 const netQty = Math.max(0, dispatched - returned);
                 const unitPrice = parseCleanPrice(item.price);
                 const priceVI = Number((unitPrice * 1.20).toFixed(2));
@@ -2161,7 +2226,7 @@
             (activeOrder.items || []).forEach(item => {
                 const requested = item.requestedQty || 0;
                 const dispatched = item.dispatchedQty !== undefined ? item.dispatchedQty : requested;
-                const returned = item.returnedQty || 0;
+                const returned = Math.min(Math.max(parseFloat(item.returnedQty) || 0, 0), parseFloat(dispatched) || 0);
                 const netQty = Math.max(0, dispatched - returned);
                 const unitPrice = parseCleanPrice(item.price);
                 const priceVI = Number((unitPrice * 1.20).toFixed(2));
@@ -2445,10 +2510,10 @@
                 const totalAmount = calculateOrderTotal(ord);
 
                 tr.innerHTML = `
-                    <td class="p-4 font-mono font-bold text-slate-900">${ord.id}</td>
-                    <td class="p-4 font-bold text-slate-800">${ord.customer}${ord.invoiceType ? `<div class="mt-1"><span class="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-extrabold px-2 py-0.5 rounded-md"><i class="fa-solid fa-file-invoice mr-1"></i>${ord.invoiceType}</span></div>` : ""}</td>
-                    <td class="p-4 font-medium text-slate-600">${ord.salesRep || "Satış Ekibi"}</td>
-                    <td class="p-4 text-xs font-medium text-slate-500">${ord.date || "-"}</td>
+                    <td class="p-4 font-mono font-bold text-slate-900">${esc(ord.id)}</td>
+                    <td class="p-4 font-bold text-slate-800">${esc(ord.customer)}${ord.invoiceType ? `<div class="mt-1"><span class="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-extrabold px-2 py-0.5 rounded-md"><i class="fa-solid fa-file-invoice mr-1"></i>${esc(ord.invoiceType)}</span></div>` : ""}</td>
+                    <td class="p-4 font-medium text-slate-600">${esc(ord.salesRep || "Satış Ekibi")}</td>
+                    <td class="p-4 text-xs font-medium text-slate-500">${esc(ord.date || "-")}</td>
                     <td class="p-4">${appBadge}</td>
                     <td class="p-4">${badge}</td>
                     ${showPrices ? `<td class="p-4 text-right font-black text-emerald-800 whitespace-nowrap">${Number(totalAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺</td>` : ''}
@@ -2456,7 +2521,7 @@
                         <div class="inline-flex items-center space-x-1.5">
                             <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-emerald-700 hover:text-white transition cursor-pointer">Aç <i class="fa-solid fa-chevron-right ml-1 pointer-events-none"></i></button>
                             ${canDeleteOrder && !isArchivedLockedForUser(ord) ? `
-                            <button type="button" onclick="deleteOrderWithDoubleConfirm('${ord.id}', event)" class="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition cursor-pointer" title="Fişi Çift Onayla Sil">
+                            <button type="button" data-id="${esc(ord.id)}" onclick="deleteOrderWithDoubleConfirm(this.dataset.id, event)" class="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition cursor-pointer" title="Fişi Çift Onayla Sil">
                                 <i class="fa-solid fa-trash-can pointer-events-none"></i>
                             </button>
                             ` : ''}
@@ -2609,9 +2674,9 @@
         window.formatProductNameWithColor = function(name, color) {
             const normColor = normalizeColorCode(color, name);
             if (normColor) {
-                return `${name} <span class="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 text-xs">[${getColorNameFromCode(normColor)}]</span>`;
+                return `${esc(name)} <span class="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 text-xs">[${getColorNameFromCode(normColor)}]</span>`;
             }
-            return name;
+            return esc(name);
         }
 
         function renderStep1() {
@@ -2648,11 +2713,11 @@
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td class="p-3.5 font-bold text-slate-900">
-                            <div class="text-xs text-slate-400 font-mono">${item.id || 'ÖZEL'}</div>
+                            <div class="text-xs text-slate-400 font-mono">${esc(item.id || 'ÖZEL')}</div>
                             <div>${displayName}</div>
                         </td>
                         <td class="p-3.5 text-center">
-                            ${canEdit ? `<input type="text" value="${normColor}" placeholder="Renk Kodu" onchange="window.updateStep1Color(${index}, this.value)" class="w-20 text-center font-bold border border-emerald-400 bg-emerald-50 text-emerald-950 rounded p-1 text-xs">` : `<span class="font-bold text-xs bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded">${colorDisplayVal}</span>`}
+                            ${canEdit ? `<input type="text" value="${esc(normColor)}" placeholder="Renk Kodu" onchange="window.updateStep1Color(${index}, this.value)" class="w-20 text-center font-bold border border-emerald-400 bg-emerald-50 text-emerald-950 rounded p-1 text-xs">` : `<span class="font-bold text-xs bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded">${esc(colorDisplayVal)}</span>`}
                         </td>
                         <td class="p-3.5 text-center">
                             ${canEdit ? `<input type="number" min="1" value="${item.requestedQty}" onchange="window.updateStep1Qty(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold">${item.requestedQty} Adet</span>`}
@@ -2743,7 +2808,9 @@
             const selectedKey = document.getElementById("step1-select-product").value;
             const customPrice = parseCleanPrice(document.getElementById("step1-catalog-price").value);
             const customColor = document.getElementById("step1-catalog-color").value.trim();
-            const qty = parseInt(document.getElementById("step1-catalog-qty").value) || 1;
+            const qty = parseQty(document.getElementById("step1-catalog-qty").value, 1, 100000);
+            if (qty === null) { showToast("Adet en az 1 olan bir tam sayı olmalıdır.", true); return; }
+            if (customPrice < 0) { showToast("Birim fiyat negatif olamaz.", true); return; }
             
             const p = masterProducts.find(x => x.key === selectedKey);
             if (!p) { showToast("Lütfen bir ürün seçin.", true); return; }
@@ -2773,7 +2840,9 @@
             const name = document.getElementById("manual-name").value.trim();
             const color = normalizeColorCode(document.getElementById("manual-color").value.trim(), name);
             const price = parseCleanPrice(document.getElementById("manual-price").value);
-            const qty = parseInt(document.getElementById("manual-qty").value) || 1;
+            const qty = parseQty(document.getElementById("manual-qty").value, 1, 100000);
+            if (qty === null) { showToast("Adet en az 1 olan bir tam sayı olmalıdır.", true); return; }
+            if (price < 0) { showToast("Fiyat negatif olamaz.", true); return; }
             const saveMaster = document.getElementById("chk-save-to-master").checked;
             if (!name) { showToast("Lütfen ürün adını yazınız.", true); return; }
 
@@ -2812,14 +2881,18 @@
         }
 
         window.updateStep1Qty = async function(index, val) {
-            activeOrder.items[index].requestedQty = parseInt(val) || 1;
-            activeOrder.items[index].dispatchedQty = parseInt(val) || 1;
+            const q = parseQty(val, 1, 100000);
+            if (q === null) { showToast("Adet en az 1 olan bir tam sayı olmalıdır.", true); renderStep1(); return; }
+            activeOrder.items[index].requestedQty = q;
+            activeOrder.items[index].dispatchedQty = q;
             await syncOrderToCloud(activeOrder);
             renderStep1();
         }
 
         window.updateStep1Price = async function(index, val) {
-            activeOrder.items[index].price = parseCleanPrice(val);
+            const pr = parseCleanPrice(val);
+            if (pr < 0) { showToast("Birim fiyat negatif olamaz.", true); renderStep1(); return; }
+            activeOrder.items[index].price = pr;
             await syncOrderToCloud(activeOrder);
             renderStep1();
         }
@@ -2856,16 +2929,16 @@
                             <input type="checkbox" ${item.checked ? "checked" : ""} ${!canEditWarehouse ? "disabled" : ""} onchange="window.toggleCheckStep2(${index}, this.checked)" class="w-4 h-4 text-emerald-700 rounded cursor-pointer">
                         </td>
                         <td class="p-3.5 font-bold text-slate-900">
-                            <div class="inline-block px-1.5 py-0.5 mb-0.5 bg-slate-100 rounded text-slate-600 font-mono text-xs font-black tracking-wider border border-slate-200">${item.id || 'ÖZEL'}</div>
+                            <div class="inline-block px-1.5 py-0.5 mb-0.5 bg-slate-100 rounded text-slate-600 font-mono text-xs font-black tracking-wider border border-slate-200">${esc(item.id || 'ÖZEL')}</div>
                             <div class="text-sm font-extrabold text-slate-900">${displayName}</div>
                         </td>
-                        <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${colorDisplayVal}</td>
+                        <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${esc(colorDisplayVal)}</td>
                         <td class="p-3.5 text-center font-bold text-slate-500">${item.requestedQty} Adet</td>
                         <td class="p-3.5 text-center">
                             ${canEditWarehouse ? `<input type="number" min="0" value="${item.dispatchedQty}" onchange="window.updateStep2Dispatched(${index}, this.value)" class="w-16 text-center font-bold border border-slate-300 rounded p-1">` : `<span class="font-bold text-amber-900">${item.dispatchedQty} Adet</span>`}
                         </td>
                         <td class="p-3.5">
-                            ${canEditWarehouse ? `<input type="text" value="${item.warehouseNote || ""}" onchange="window.updateStep2Note(${index}, this.value)" placeholder="İkame / Not..." class="w-full text-xs p-1.5 border border-slate-300 rounded bg-white">` : `<span class="text-xs text-slate-600">${item.warehouseNote || "-"}</span>`}
+                            ${canEditWarehouse ? `<input type="text" value="${esc(item.warehouseNote || "")}" onchange="window.updateStep2Note(${index}, this.value)" placeholder="İkame / Not..." class="w-full text-xs p-1.5 border border-slate-300 rounded bg-white">` : `<span class="text-xs text-slate-600">${esc(item.warehouseNote || "-")}</span>`}
                         </td>
                         ${canEditWarehouse ? `<td class="p-3.5 text-center"><button onclick="window.removeItemStep2(${index})" class="text-slate-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>` : ''}
                     `;
@@ -2925,7 +2998,8 @@
         window.addItemFromDepo = async function() {
             const selectedKey = document.getElementById("depo-select-product").value;
             const customColor = document.getElementById("depo-add-color").value.trim();
-            const qty = parseInt(document.getElementById("depo-add-qty").value) || 1;
+            const qty = parseQty(document.getElementById("depo-add-qty").value, 1, 100000);
+            if (qty === null) { showToast("Adet en az 1 olan bir tam sayı olmalıdır.", true); return; }
             const p = masterProducts.find(x => x.key === selectedKey);
             if (!p) { showToast("Lütfen bir ürün seçin.", true); return; }
 
@@ -2956,7 +3030,12 @@
         }
 
         window.toggleCheckStep2 = async function(index, chk) { activeOrder.items[index].checked = chk; await syncOrderToCloud(activeOrder); }
-        window.updateStep2Dispatched = async function(index, val) { activeOrder.items[index].dispatchedQty = parseInt(val) || 0; await syncOrderToCloud(activeOrder); }
+        window.updateStep2Dispatched = async function(index, val) {
+            const q = parseQty(val, 0, 100000);
+            if (q === null) { showToast("Fiili sevk adedi 0 veya daha büyük bir tam sayı olmalıdır.", true); renderStep2(); return; }
+            activeOrder.items[index].dispatchedQty = q;
+            await syncOrderToCloud(activeOrder);
+        }
         window.updateStep2Note = async function(index, val) { activeOrder.items[index].warehouseNote = val; await syncOrderToCloud(activeOrder); }
 
         window.forwardFromWarehouse = async function() {
@@ -3071,15 +3150,15 @@
                         : '';
                     div.innerHTML = `
                         <div class="space-y-2">
-                            <div class="text-sm font-black text-slate-900">${item.name}</div>
+                            <div class="text-sm font-black text-slate-900">${esc(item.name)}</div>
                             <div class="flex flex-wrap items-center gap-2">
                                 <span class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white">
                                     <span class="text-[10px] font-bold uppercase tracking-wide text-slate-300">Ürün Kodu</span>
-                                    <span class="font-mono text-base font-black">${item.id}</span>
+                                    <span class="font-mono text-base font-black">${esc(item.id)}</span>
                                 </span>
                                 <span class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-950 border border-emerald-300">
                                     <span class="text-[10px] font-bold uppercase tracking-wide text-emerald-700">Renk Kodu</span>
-                                    <span class="font-mono text-base font-black">${retColor || "-"}</span>
+                                    <span class="font-mono text-base font-black">${esc(retColor || "-")}</span>
                                     ${retColor ? `<span class="text-xs font-bold">${getColorNameFromCode(retColor)}</span>` : ""}
                                 </span>
                             </div>
@@ -3117,15 +3196,15 @@
                     div.innerHTML = `
                         <div class="space-y-2">
                             <div class="flex items-center space-x-2">${srcBadge}</div>
-                            <div class="text-sm font-black text-slate-900">${ext.name}</div>
+                            <div class="text-sm font-black text-slate-900">${esc(ext.name)}</div>
                             <div class="flex flex-wrap items-center gap-2">
                                 <span class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white">
                                     <span class="text-[10px] font-bold uppercase tracking-wide text-slate-300">Ürün Kodu</span>
-                                    <span class="font-mono text-base font-black">${ext.id}</span>
+                                    <span class="font-mono text-base font-black">${esc(ext.id)}</span>
                                 </span>
                                 <span class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-950 border border-emerald-300">
                                     <span class="text-[10px] font-bold uppercase tracking-wide text-emerald-700">Renk Kodu</span>
-                                    <span class="font-mono text-base font-black">${extColor || "-"}</span>
+                                    <span class="font-mono text-base font-black">${esc(extColor || "-")}</span>
                                     ${extColor ? `<span class="text-xs font-bold">${getColorNameFromCode(extColor)}</span>` : ""}
                                 </span>
                             </div>
@@ -3148,7 +3227,13 @@
             if (!activeOrder || !activeOrder.items[index]) return;
             if (!(currentUser.roleId === 'admin' || (currentUser.roleId === 'saha' && activeOrder.currentStep === 3 && !activeOrder.sahaDone))) return;
             const item = activeOrder.items[index];
-            const newQty = parseInt(val) || 0;
+            const maxRet = parseFloat(item.dispatchedQty) || 0;
+            const newQty = parseQty(val, 0, maxRet);
+            if (newQty === null) {
+                showToast(`İade adedi 0 ile sevk edilen miktar (${maxRet}) arasında tam sayı olmalıdır.`, true);
+                renderStep3();
+                return;
+            }
             if (newQty !== (parseFloat(item.returnedQty) || 0)) item.returnApproved = false; // miktar değişince onay sıfırlanır
             item.returnedQty = newQty;
             await syncOrderToCloud(activeOrder);
@@ -3221,7 +3306,8 @@
             const source = document.getElementById("step3-extra-source").value;
             if (!source) { showToast("Lütfen ilavenin alındığı yeri seçiniz (Mağaza / Atölye).", true); return; }
             const selectedKey = document.getElementById("step3-extra-select").value;
-            const qty = parseInt(document.getElementById("step3-extra-qty").value) || 1;
+            const qty = parseQty(document.getElementById("step3-extra-qty").value, 1, 100000);
+            if (qty === null) { showToast("İlave adedi en az 1 olan bir tam sayı olmalıdır.", true); return; }
             const p = masterProducts.find(x => x.key === selectedKey);
             if (!p) { showToast("Lütfen ürün seçiniz.", true); return; }
 
@@ -3305,7 +3391,7 @@
                 activeOrder.items.forEach((item, index) => {
                     const req = parseFloat(item.requestedQty) || 0;
                     const disp = item.dispatchedQty !== undefined ? (parseFloat(item.dispatchedQty) || 0) : req;
-                    const ret = parseFloat(item.returnedQty) || 0;
+                    const ret = Math.min(Math.max(parseFloat(item.returnedQty) || 0, 0), disp);
                     const net = Math.max(0, disp - ret);
                     const pr = parseCleanPrice(item.price);
                     const lineTotal = net * pr;
@@ -3322,10 +3408,10 @@
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td class="p-3.5 font-bold text-slate-900">
-                            <div class="text-xs text-slate-400 font-mono">${item.id}</div>
+                            <div class="text-xs text-slate-400 font-mono">${esc(item.id)}</div>
                             <div>${displayName}</div>
                         </td>
-                        <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${colorDisplayVal}</td>
+                        <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${esc(colorDisplayVal)}</td>
                         <td class="p-3.5 text-center font-medium">${req}</td>
                         <td class="p-3.5 text-center font-medium">${disp}</td>
                         <td class="p-3.5 text-center text-red-700 font-bold">${ret}</td>
@@ -3344,7 +3430,7 @@
             if (activeOrder.extras) {
                 activeOrder.extras.forEach((ext, extIndex) => {
                     if (ext.faikApproval) {
-                        const qty = parseFloat(ext.qty) || 0;
+                        const qty = Math.max(0, parseFloat(ext.qty) || 0);
                         const pr = parseCleanPrice(ext.price);
                         const lineTotal = qty * pr;
                         sumEvrak4 += lineTotal;
@@ -3358,10 +3444,10 @@
                         tr.className = "bg-emerald-50/30";
                         tr.innerHTML = `
                             <td class="p-3.5 font-bold text-slate-900">
-                                <div class="text-xs text-emerald-700 font-mono">[İlave${ext.source && EXTRA_SOURCE_INFO[ext.source] ? " - " + EXTRA_SOURCE_INFO[ext.source].label : ""}] ${ext.id}</div>
+                                <div class="text-xs text-emerald-700 font-mono">[İlave${ext.source && EXTRA_SOURCE_INFO[ext.source] ? " - " + EXTRA_SOURCE_INFO[ext.source].label : ""}] ${esc(ext.id)}</div>
                                 <div>${displayName}</div>
                             </td>
-                            <td class="p-3.5 text-center font-bold text-xs bg-emerald-100 text-emerald-900">${colorDisplayVal}</td>
+                            <td class="p-3.5 text-center font-bold text-xs bg-emerald-100 text-emerald-900">${esc(colorDisplayVal)}</td>
                             <td class="p-3.5 text-center text-slate-400">-</td>
                             <td class="p-3.5 text-center text-slate-400">-</td>
                             <td class="p-3.5 text-center text-slate-400">-</td>
@@ -3499,9 +3585,9 @@
                 const pr = parseCleanPrice(p.price);
                 tr.innerHTML = `
                     <td class="p-3 text-center"><input type="checkbox" value="${idx}" class="catalog-row-checkbox w-4 h-4 text-emerald-700 rounded cursor-pointer"></td>
-                    <td class="p-3 font-mono font-bold text-slate-900">${p.id}</td>
-                    <td class="p-3 font-medium">${p.name}</td>
-                    <td class="p-3 text-emerald-900 font-bold bg-emerald-50 text-center">${colorDisplay}</td>
+                    <td class="p-3 font-mono font-bold text-slate-900">${esc(p.id)}</td>
+                    <td class="p-3 font-medium">${esc(p.name)}</td>
+                    <td class="p-3 text-emerald-900 font-bold bg-emerald-50 text-center">${esc(colorDisplay)}</td>
                     <td class="p-3 text-right font-bold text-emerald-800">${Number(pr).toLocaleString('tr-TR')} ₺</td>
                     <td class="p-3 text-center"><button type="button" onclick="window.removeProductByIndex(${idx})" class="text-slate-400 hover:text-red-500 cursor-pointer"><i class="fa-solid fa-trash"></i></button></td>
                 `;
@@ -3575,13 +3661,13 @@
                 let sub = 0;
                 if (ord.items) {
                     ord.items.forEach(i => {
-                        const netQty = Math.max(0, i.dispatchedQty - (i.returnedQty || 0));
+                        const netQty = getNetBillableQty(i);
                         sub += netQty * parseCleanPrice(i.price);
                     });
                 }
                 if (ord.extras) {
                     ord.extras.forEach(ext => {
-                        if (ext.faikApproval) sub += (ext.qty || 0) * parseCleanPrice(ext.price);
+                        if (ext.faikApproval) sub += Math.max(0, parseFloat(ext.qty) || 0) * parseCleanPrice(ext.price);
                     });
                 }
                 totalRevenue += sub * 1.20;
@@ -3612,13 +3698,13 @@
                     let sub = 0;
                     if (ord.items) {
                         ord.items.forEach(i => {
-                            const netQty = Math.max(0, i.dispatchedQty - (i.returnedQty || 0));
+                            const netQty = getNetBillableQty(i);
                             sub += netQty * parseCleanPrice(i.price);
                         });
                     }
                     if (ord.extras) {
                         ord.extras.forEach(ext => {
-                            if (ext.faikApproval) sub += (ext.qty || 0) * parseCleanPrice(ext.price);
+                            if (ext.faikApproval) sub += Math.max(0, parseFloat(ext.qty) || 0) * parseCleanPrice(ext.price);
                         });
                     }
                     repRev += sub * 1.20;
@@ -3786,7 +3872,7 @@ document.addEventListener("click", function(e) {
     const btnOnclick = btn.getAttribute("onclick") || "";
 
     // 2. "Nebim / Excel Fişi Çek" butonu tıklandıysa
-    if (btnText.includes("Nebim") || btnText.includes("Excel") || btnId === "btn-header-import-excel" || btnOnclick.includes("openExcelImportModal")) {
+    if (btnId === "btn-header-import-excel" || btnOnclick.includes("openExcelImportModal")) {
         e.preventDefault();
         e.stopPropagation();
         const m = document.getElementById("modal-excel-import");
@@ -3798,7 +3884,7 @@ document.addEventListener("click", function(e) {
     }
 
     // 3. "Yeni Sipariş" butonu tıklandıysa
-    else if (btnText.includes("Yeni Sipariş") || btnId === "btn-header-new-order" || btnOnclick.includes("createNewOrderModal")) {
+    else if (btnId === "btn-header-new-order" || btnOnclick.includes("createNewOrderModal")) {
         e.preventDefault();
         e.stopPropagation();
         const m = document.getElementById("modal-new-order");
@@ -3812,7 +3898,7 @@ document.addEventListener("click", function(e) {
     }
 
     // 4. "Katalog" butonu tıklandıysa
-    else if (btnText.includes("Katalog") || btnId === "btn-header-catalog" || btnOnclick.includes("openCatalogModal")) {
+    else if (btnId === "btn-header-catalog" || btnOnclick.includes("openCatalogModal")) {
         e.preventDefault();
         e.stopPropagation();
         const m = document.getElementById("modal-catalog");
@@ -3834,7 +3920,7 @@ document.addEventListener("click", function(e) {
             return;
         }
 
-        const newId = "CNP-2026-" + Math.floor(100 + Math.random() * 900);
+        const newId = generateOrderId();
         const repSelect = document.getElementById("new-sales-rep");
         let rep = (typeof currentUser !== 'undefined' && currentUser && currentUser.name) ? currentUser.name : (repSelect ? repSelect.value : "Orhan Özen");
 
@@ -3888,7 +3974,9 @@ document.addEventListener("click", function(e) {
 };
   // ================= BAŞKA CİHAZLARDA KİLİTLENMEYİ ÖNLEYEN KESİN ÇÖZÜM =================
 (function() {
-    window.saveNewOrder = function() {
+    window.saveNewOrder = async function() {
+        if (window.__savingOrder) return; // çift tıklamada iki sipariş açılmasın
+        window.__savingOrder = true;
         try {
             var custEl = document.getElementById("new-cust-name");
             var custVal = custEl ? custEl.value.trim() : "";
@@ -3899,7 +3987,7 @@ document.addEventListener("click", function(e) {
                 return;
             }
 
-            var newId = "CNP-2026-" + Math.floor(100 + Math.random() * 900);
+            var newId = await generateUniqueOrderId();
             
             var repSelect = document.getElementById("new-sales-rep");
             var repVal = "Orhan Özen";
@@ -3978,6 +4066,8 @@ document.addEventListener("click", function(e) {
         } catch(err) {
             console.error("Cihaz başlatma hatası:", err);
             alert("Hata: " + err.message);
+        } finally {
+            window.__savingOrder = false;
         }
     };
 
@@ -4124,7 +4214,9 @@ window.applyExcelImportToOrder = async function() {
         const custName = prompt("Müşteri / Proje Adı giriniz:", "Yeni Excel Projesi");
         if (!custName || !custName.trim()) return;
 
-        const newId = "CNP-2026-" + Math.floor(100 + Math.random() * 900);
+        if (window.__importingOrder) return; // çift tıklamada iki sipariş açılmasın
+        window.__importingOrder = true;
+        const newId = await generateUniqueOrderId();
         const hasAppSelect = document.getElementById("excel-import-has-application");
         const hasApplication = hasAppSelect ? (hasAppSelect.value === "true") : true;
 
@@ -4212,6 +4304,8 @@ window.applyExcelImportToOrder = async function() {
     } catch(err) {
         console.error("Excel aktarım hatası:", err);
         alert("Aktarma sırasında hata oluştu: " + err.message);
+    } finally {
+        window.__importingOrder = false;
     }
 };
 
