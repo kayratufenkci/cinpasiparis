@@ -279,7 +279,12 @@
                                 <p class="text-xs text-emerald-300">Şirket genel cirosu ve temsilci bazlı ciro dökümü</p>
                             </div>
                         </div>
-                        <span class="bg-emerald-800 text-emerald-200 text-xs font-bold px-3 py-1 rounded-full border border-emerald-700">Yönetim Modu</span>
+                        <div class="flex items-center space-x-2">
+                            <button type="button" onclick="downloadBackup()" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl border border-emerald-600 transition flex items-center space-x-1.5 cursor-pointer" title="Tüm siparişleri Excel ve JSON olarak indirir">
+                                <i class="fa-solid fa-download pointer-events-none"></i><span class="pointer-events-none">Yedek İndir (Excel + JSON)</span>
+                            </button>
+                            <span class="bg-emerald-800 text-emerald-200 text-xs font-bold px-3 py-1 rounded-full border border-emerald-700">Yönetim Modu</span>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="admin-kpi-cards"></div>
@@ -308,9 +313,15 @@
                             <h2 class="text-base font-extrabold text-slate-900" id="dashboard-table-title">Dosyalar</h2>
                             <p class="text-xs text-slate-500" id="dashboard-table-subtitle">İlgili dosyanın üzerine tıklayarak işlem ekranına geçebilirsiniz.</p>
                         </div>
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <label id="archive-toggle-wrap" class="hidden items-center space-x-2 text-xs font-bold text-slate-600 cursor-pointer whitespace-nowrap">
+                            <input type="checkbox" id="archive-toggle" onchange="toggleArchiveView(this.checked)" class="w-4 h-4 text-emerald-700 rounded cursor-pointer">
+                            <span><i class="fa-solid fa-box-archive mr-1 text-slate-400"></i>Arşivi göster</span>
+                        </label>
                         <div class="relative">
                             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
                             <input type="text" id="search-input" onkeyup="filterOrders()" placeholder="Dosya veya müşteri ara..." class="text-xs pl-9 pr-4 py-2.5 rounded-xl border border-emerald-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 w-full sm:w-72">
+                        </div>
                         </div>
                     </div>
 
@@ -348,6 +359,7 @@
                                 <span class="text-xs font-bold text-slate-500" id="detail-order-date">-</span>
                                 <span class="text-[10px] font-black px-2 py-0.5 rounded-md" id="detail-order-application-badge">-</span>
                                 <span class="hidden text-[10px] font-black px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200" id="detail-order-invoice-badge"></span>
+                                <span class="hidden text-[10px] font-black px-2 py-0.5 rounded-md bg-slate-200 text-slate-700 border border-slate-300" id="detail-order-archive-badge"><i class="fa-solid fa-box-archive mr-1"></i>Arşiv</span>
                             </div>
                             <h2 class="text-lg font-black text-slate-900 mt-1" id="detail-customer-name">-</h2>
                         </div>
@@ -368,6 +380,11 @@
                             <span class="pointer-events-none">Yazdır</span>
                         </button>
                     </div>
+                </div>
+
+                <div id="detail-archive-banner" class="hidden bg-slate-100 border-l-4 border-slate-500 p-3.5 rounded-r-xl text-xs text-slate-700 items-center space-x-2">
+                    <i class="fa-solid fa-box-archive text-slate-500 text-sm"></i>
+                    <div><strong>Arşivlenmiş Sipariş:</strong> Bu fiş kapandıktan sonra 30 günden fazla geçtiği için arşive alınmıştır. Yalnızca görüntüleyebilirsiniz; değişiklik yetkisi yöneticidedir.</div>
                 </div>
 
                 <div class="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm overflow-x-auto" id="stepper-nav-bar">
@@ -1131,6 +1148,21 @@
         };
         const SOURCE_BY_ROLE = { magaza_ilave: 'magaza', atolye_ilave: 'atolye' };
         const APPROVER_ROLES = ['atolye_iade', 'atolye_ilave', 'magaza_ilave']; // yalnızca onay ekranı gören roller
+
+        // ---- Arşiv: kapanan siparişler 30 gün sonra arşive düşer (silinmez, aranınca bulunur)
+        const ARCHIVE_AFTER_DAYS = 30;
+        const ARCHIVE_VIEW_ROLES = ['satis', 'muhasebe', 'admin']; // arşivi görebilen roller
+        let showArchive = false;
+        function isOrderClosed(ord) { return !!ord && (ord.isClosed === true || ord.currentStep >= 5); }
+        function isOrderArchived(ord) {
+            if (!isOrderClosed(ord)) return false;
+            const t = Date.parse(ord.closedAt || ord.date); // eski kapalı fişlerde kapanış tarihi yok, açılış tarihi esas alınır
+            if (isNaN(t)) return false;
+            return (Date.now() - t) > ARCHIVE_AFTER_DAYS * 86400000;
+        }
+        // Arşivdeki fişi yalnızca admin değiştirebilir
+        function isArchivedLockedForUser(ord) { return isOrderArchived(ord) && !(currentUser && currentUser.roleId === 'admin'); }
+        window.toggleArchiveView = function(checked) { showArchive = !!checked; renderOrderList(); };
         // Yeni rollerin giriş şifreleri (canlıya almadan önce değiştirin)
         const NEW_ROLE_PASSWORDS = { atolye_iade: '1234', atolye_ilave: '1234', magaza_ilave: '1234' };
 
@@ -1223,6 +1255,10 @@
 
             const targetOrder = orders.find(o => o.id === orderId);
             if (!targetOrder) return;
+            if (isArchivedLockedForUser(targetOrder)) {
+                showToast("Arşivlenmiş fiş yalnızca Admin tarafından silinebilir.", true);
+                return;
+            }
 
             const orderLabel = `${targetOrder.id} - ${targetOrder.customer}`;
 
@@ -2359,6 +2395,25 @@
                 document.getElementById("dashboard-table-subtitle").innerText = `Sistemde kayıtlı olan tüm birimlere ait aktif dosyalar.`;
             }
 
+            // Arşiv: yetkili roller anahtarla ya da arama yaparak görür, diğerleri hiç görmez
+            const canSeeArchive = ARCHIVE_VIEW_ROLES.includes(currentUser.roleId);
+            const archToggleWrap = document.getElementById("archive-toggle-wrap");
+            if (archToggleWrap) archToggleWrap.style.display = canSeeArchive ? "flex" : "none";
+            const archToggle = document.getElementById("archive-toggle");
+            if (archToggle) archToggle.checked = showArchive;
+            const searchBox = document.getElementById("search-input");
+            const hasSearch = !!(searchBox && searchBox.value.trim());
+            let archivedHidden = 0;
+            if (!(canSeeArchive && (showArchive || hasSearch))) {
+                const before = visibleOrders.length;
+                visibleOrders = visibleOrders.filter(o => !isOrderArchived(o));
+                archivedHidden = before - visibleOrders.length;
+            }
+            if (canSeeArchive && archivedHidden > 0) {
+                const sub = document.getElementById("dashboard-table-subtitle");
+                if (sub) sub.innerText += `  (${archivedHidden} arşivlenmiş fiş gizli. "Arşivi göster" ile ya da arama yaparak ulaşabilirsiniz.)`;
+            }
+
             const showPrices = currentUser.canSeePrices === true;
             const thPrice = document.getElementById("th-order-price");
             if (thPrice) thPrice.style.display = showPrices ? "table-cell" : "none";
@@ -2381,6 +2436,7 @@
                 else if (ord.currentStep === 3) badge = `<span class="bg-purple-100 text-purple-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-truck-ramp-box mr-1"></i> ${ord.sahaDone ? "3. Onaylar Bekleniyor" : "3. Saha Onaylı"}</span>`;
                 else if (ord.currentStep === 4) badge = `<span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-receipt mr-1"></i> 4. Muhasebede Bekliyor</span>`;
                 else badge = `<span class="bg-slate-900 text-white text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-check-double text-emerald-400 mr-1"></i> Fatura Kesildi (Kapandı)</span>`;
+                if (isOrderArchived(ord)) badge += ` <span class="bg-slate-200 text-slate-700 border border-slate-300 text-[10px] font-extrabold px-2 py-0.5 rounded-md"><i class="fa-solid fa-box-archive mr-1"></i>Arşiv</span>`;
 
                 const appBadge = ord.hasApplication !== false 
                     ? `<span class="bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-extrabold px-2 py-0.5 rounded-md"><i class="fa-solid fa-helmet-safety mr-1"></i> Uygulama Var</span>` 
@@ -2399,7 +2455,7 @@
                     <td class="p-4 text-right">
                         <div class="inline-flex items-center space-x-1.5">
                             <button class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold hover:bg-emerald-700 hover:text-white transition cursor-pointer">Aç <i class="fa-solid fa-chevron-right ml-1 pointer-events-none"></i></button>
-                            ${canDeleteOrder ? `
+                            ${canDeleteOrder && !isArchivedLockedForUser(ord) ? `
                             <button type="button" onclick="deleteOrderWithDoubleConfirm('${ord.id}', event)" class="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition cursor-pointer" title="Fişi Çift Onayla Sil">
                                 <i class="fa-solid fa-trash-can pointer-events-none"></i>
                             </button>
@@ -2409,6 +2465,7 @@
                 `;
                 tbody.appendChild(tr);
             });
+            if (hasSearch) applyOrderSearchFilter();
         }
 
         function openOrderDetail(orderId) {
@@ -2441,6 +2498,15 @@
                 } else {
                     invBadge.classList.add("hidden");
                 }
+            }
+
+            const archived = isOrderArchived(activeOrder);
+            const archBadge = document.getElementById("detail-order-archive-badge");
+            if (archBadge) archBadge.classList.toggle("hidden", !archived);
+            const archBanner = document.getElementById("detail-archive-banner");
+            if (archBanner) {
+                archBanner.classList.toggle("hidden", !isArchivedLockedForUser(activeOrder));
+                archBanner.style.display = isArchivedLockedForUser(activeOrder) ? "flex" : "none";
             }
 
             const appBadge = document.getElementById("detail-order-application-badge");
@@ -3232,7 +3298,8 @@
 
             const isAdmin = currentUser && currentUser.roleId === 'admin';
             const isMuhasebe = currentUser && currentUser.roleId === 'muhasebe';
-            const canDeleteRow = isAdmin || isMuhasebe;
+            const archLocked = isArchivedLockedForUser(activeOrder);
+            const canDeleteRow = (isAdmin || isMuhasebe) && !archLocked;
 
             if (activeOrder.items) {
                 activeOrder.items.forEach((item, index) => {
@@ -3324,11 +3391,12 @@
             document.getElementById("final-grandtotal").innerText = grand.toLocaleString('tr-TR', {minimumFractionDigits: 2}) + " ₺";
 
             const actionBtns = document.getElementById("step4-action-buttons");
-            if (actionBtns) actionBtns.style.display = (isAdmin || isMuhasebe) ? "block" : "none";
+            if (actionBtns) actionBtns.style.display = ((isAdmin || isMuhasebe) && !archLocked) ? "block" : "none";
         }
 
         window.removeStep4Item = async function(index) {
             if (!activeOrder || !activeOrder.items || !activeOrder.items[index]) return;
+            if (isArchivedLockedForUser(activeOrder)) { showToast("Arşivlenmiş fişte değişiklik yapılamaz.", true); return; }
             const item = activeOrder.items[index];
             if (!confirm(`"${item.name}" satırını bu fişten tamamen çıkarmak istediğinize emin misiniz?`)) return;
 
@@ -3340,6 +3408,7 @@
 
         window.removeStep4Extra = async function(extIndex) {
             if (!activeOrder || !activeOrder.extras || !activeOrder.extras[extIndex]) return;
+            if (isArchivedLockedForUser(activeOrder)) { showToast("Arşivlenmiş fişte değişiklik yapılamaz.", true); return; }
             const ext = activeOrder.extras[extIndex];
             if (!confirm(`"${ext.name}" ilave ürün satırını silmek istediğinize emin misiniz?`)) return;
 
@@ -3351,6 +3420,7 @@
 
         window.finalizeAndCloseOrder = async function() {
             if (!activeOrder) return;
+            if (isArchivedLockedForUser(activeOrder)) { showToast("Arşivlenmiş fişte değişiklik yapılamaz.", true); return; }
             const c1 = confirm(`1. ONAY:\n\n"${activeOrder.id} - ${activeOrder.customer}" dosyasını faturalandırmak istediğinize emin misiniz?`);
             if (!c1) return;
 
@@ -3359,6 +3429,7 @@
 
             activeOrder.currentStep = 5;
             activeOrder.isClosed = true;
+            activeOrder.closedAt = new Date().toISOString(); // arşiv süresi bu tarihten başlar
             await syncOrderToCloud(activeOrder);
             showToast(`Sipariş #${activeOrder.id} başarıyla faturalandırıldı ve kapatıldı!`);
             returnToDashboard();
@@ -3565,12 +3636,109 @@
             });
         }
 
-        window.filterOrders = function() {
+        function applyOrderSearchFilter() {
             const q = document.getElementById("search-input").value.toLowerCase();
             const rows = document.querySelectorAll("#orders-table-body tr");
             rows.forEach(r => { r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none"; });
         }
+        window.filterOrders = function() {
+            renderOrderList(); // arama yapılınca arşiv de taranır
+            applyOrderSearchFilter();
+        }
 
+        // ================= YEDEK İNDİR (YALNIZCA ADMİN) =================
+        function getOrderStatusLabel(o) {
+            if (isOrderClosed(o)) return "Kapandı (Faturalandı)";
+            if (o.currentStep === 1) return "Satış Formunda";
+            if (o.currentStep === 2) return "Depoda";
+            if (o.currentStep === 3) return o.sahaDone ? "Saha Bitti, Onaylar Bekleniyor" : "Sahada";
+            if (o.currentStep === 4) return "Muhasebede Bekliyor";
+            return String(o.currentStep || "");
+        }
+
+        function triggerFileDownload(blob, fileName) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 2000);
+        }
+
+        window.downloadBackup = function() {
+            if (!currentUser || currentUser.roleId !== 'admin') {
+                showToast("YETKİSİZ İŞLEM: Yedek yalnızca Admin tarafından alınabilir.", true);
+                return;
+            }
+            if (!Array.isArray(orders) || orders.length === 0) {
+                showToast("Yedeklenecek sipariş bulunamadı.", true);
+                return;
+            }
+
+            const now = new Date();
+            const pad = n => String(n).padStart(2, "0");
+            const stamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+
+            // 1) Excel: "Siparişler" ve "Kalemler" sayfaları
+            const orderRows = orders.map(o => ({
+                "İş No": o.id,
+                "Müşteri / Proje": o.customer,
+                "Satış Uzmanı": o.salesRep || "",
+                "Açılış Tarihi": o.date || "",
+                "Kapanış Tarihi": o.closedAt ? String(o.closedAt).slice(0, 10) : "",
+                "Fatura Tipi": o.invoiceType || "",
+                "Durum": getOrderStatusLabel(o),
+                "Arşiv": isOrderArchived(o) ? "Evet" : "Hayır",
+                "Uygulama": o.hasApplication !== false ? "Var" : "Yok (Sadece Teslimat)",
+                "Toplam (KDV Dahil, ₺)": Number(calculateOrderTotal(o).toFixed(2)),
+                "Not": o.notes || ""
+            }));
+
+            const itemRows = [];
+            orders.forEach(o => {
+                (o.items || []).forEach(i => {
+                    itemRows.push({
+                        "İş No": o.id, "Müşteri / Proje": o.customer, "Tür": "Sipariş Kalemi",
+                        "Ürün Kodu": i.id, "Ürün Adı": i.name, "Renk Kodu": normalizeColorCode(i.color, i.name),
+                        "Talep Adedi": parseFloat(i.requestedQty) || 0, "Sevk Adedi": parseFloat(i.dispatchedQty) || 0,
+                        "İade Adedi": parseFloat(i.returnedQty) || 0, "İlave Adedi": "",
+                        "Birim Fiyat (₺)": parseCleanPrice(i.price),
+                        "Kaynak": "", "Onay": (parseFloat(i.returnedQty) || 0) > 0 ? (i.returnApproved ? "İade onaylı" : "İade onay bekliyor") : "",
+                        "Depo Notu": i.warehouseNote || ""
+                    });
+                });
+                (o.extras || []).forEach(e => {
+                    itemRows.push({
+                        "İş No": o.id, "Müşteri / Proje": o.customer, "Tür": "İlave",
+                        "Ürün Kodu": e.id, "Ürün Adı": e.name, "Renk Kodu": normalizeColorCode(e.color, e.name),
+                        "Talep Adedi": "", "Sevk Adedi": "", "İade Adedi": "", "İlave Adedi": parseFloat(e.qty) || 0,
+                        "Birim Fiyat (₺)": parseCleanPrice(e.price),
+                        "Kaynak": EXTRA_SOURCE_INFO[e.source] ? EXTRA_SOURCE_INFO[e.source].label : "", "Onay": e.faikApproval ? "Onaylı" : "Onay bekliyor",
+                        "Depo Notu": ""
+                    });
+                });
+            });
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(orderRows), "Siparişler");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(itemRows.length ? itemRows : [{ "Bilgi": "Kalem yok" }]), "Kalemler");
+            XLSX.writeFile(wb, `CINPA_YEDEK_${stamp}.xlsx`);
+
+            // 2) JSON: tüm veri birebir (ileride geri yükleme için)
+            const payload = {
+                yedekTarihi: now.toISOString(),
+                alan: currentUser.name,
+                siparisSayisi: orders.length,
+                siparisler: orders
+            };
+            setTimeout(() => {
+                triggerFileDownload(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }), `CINPA_YEDEK_${stamp}.json`);
+            }, 500);
+
+            showToast(`Yedek indiriliyor: ${orders.length} sipariş (Excel + JSON).`);
+        };
         window.sendWhatsAppNotification = function() {
             if (!activeOrder) return;
             const text = `Sayın İlgili, ${activeOrder.customer} projesine ait ${activeOrder.id} kodlu sipariş işlemi güncellenmiştir. Durum: ${activeOrder.currentStep}. Aşama.`;
