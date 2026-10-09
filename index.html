@@ -2992,7 +2992,8 @@
                     const displayName = formatProductNameWithColor(item.name, item.color);
                     const retQty = parseFloat(item.returnedQty) || 0;
                     const div = document.createElement("div");
-                    div.className = "flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 text-xs";
+                    div.className = "flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-white border border-slate-200 text-xs";
+                    const retColor = normalizeColorCode(item.color, item.name);
                     const qtyCell = canEditSaha
                         ? `<input type="number" min="0" max="${item.dispatchedQty}" value="${retQty}" onchange="window.updateReturnQty(${index}, this.value)" class="w-16 p-1 text-center font-bold border border-red-300 rounded bg-red-50 text-red-900">`
                         : `<span class="font-bold text-red-800">${retQty} Adet</span>`;
@@ -3003,10 +3004,20 @@
                            </label>`
                         : '';
                     div.innerHTML = `
-                        <div>
-                            <div class="font-mono text-[10px] text-slate-400 font-bold">${item.id}</div>
-                            <div class="font-bold text-slate-900">${displayName}</div>
-                            <div class="text-[11px] text-slate-500">Sevk: <span class="font-bold text-amber-900">${item.dispatchedQty}</span> Adet</div>
+                        <div class="space-y-2">
+                            <div class="text-sm font-black text-slate-900">${item.name}</div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white">
+                                    <span class="text-[10px] font-bold uppercase tracking-wide text-slate-300">Ürün Kodu</span>
+                                    <span class="font-mono text-base font-black">${item.id}</span>
+                                </span>
+                                <span class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-950 border border-emerald-300">
+                                    <span class="text-[10px] font-bold uppercase tracking-wide text-emerald-700">Renk Kodu</span>
+                                    <span class="font-mono text-base font-black">${retColor || "-"}</span>
+                                    ${retColor ? `<span class="text-xs font-bold">${getColorNameFromCode(retColor)}</span>` : ""}
+                                </span>
+                            </div>
+                            <div class="text-xs text-slate-500 font-semibold">Sevk: <span class="font-black text-amber-900 text-sm">${item.dispatchedQty}</span> Adet</div>
                         </div>
                         <div class="flex items-center space-x-3">
                             <div class="flex items-center space-x-2"><span class="text-slate-500 font-bold">İade:</span>${qtyCell}</div>
