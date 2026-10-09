@@ -577,7 +577,7 @@
                         </div>
                         <div id="step3-lock-alert" class="hidden bg-slate-100 border-l-4 border-slate-500 p-3.5 rounded-r-xl text-xs text-slate-700 flex items-center space-x-2">
                             <i class="fa-solid fa-lock text-slate-500 text-sm"></i>
-                            <div><strong>Saha Tamamlandı:</strong> Evraklar muhasebeye devredildiği için kilitlidir (Salt Okunur).</div>
+                            <div id="step3-lock-text"><strong>Saha Tamamlandı:</strong> Evraklar muhasebeye devredildiği için kilitlidir (Salt Okunur).</div>
                         </div>
                         <div id="step3-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div id="step3-returns-box" class="border border-emerald-100 rounded-2xl p-4 bg-emerald-50/40 space-y-3">
@@ -608,10 +608,10 @@
                             </div>
                         </div>
                         <div id="step3-footer" class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-emerald-100 gap-4">
-                            <div class="text-xs text-slate-500"><i class="fa-solid fa-clipboard-check mr-1 text-slate-400"></i> Montaj tamamlandıktan sonra tüm evraklar birleşir.</div>
+                            <div class="text-xs text-slate-500"><i class="fa-solid fa-clipboard-check mr-1 text-slate-400"></i> Montajı bitirince iade/ilave kilitlenir. Tüm onaylar tamamlanınca dosya otomatik muhasebeye gider.</div>
                             <div id="step3-action-buttons">
                                 <button type="button" onclick="forwardToAccounting()" class="px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2 cursor-pointer">
-                                    <i class="fa-solid fa-file-invoice-dollar pointer-events-none"></i><span class="pointer-events-none">Montajı Bitir & Muhasebeye (Gökhan) Gönder</span>
+                                    <i class="fa-solid fa-file-invoice-dollar pointer-events-none"></i><span class="pointer-events-none">Montajı Bitir (Onaylar Bitince Muhasebeye Otomatik Gider)</span>
                                 </button>
                             </div>
                         </div>
@@ -2378,7 +2378,7 @@
                 let badge = "";
                 if (ord.currentStep === 1) badge = `<span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-file-signature mr-1"></i> 1. Satış Formunda</span>`;
                 else if (ord.currentStep === 2) badge = `<span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-boxes-packing mr-1"></i> 2. Depo Onaylı / Sevk</span>`;
-                else if (ord.currentStep === 3) badge = `<span class="bg-purple-100 text-purple-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-truck-ramp-box mr-1"></i> 3. Saha Onaylı</span>`;
+                else if (ord.currentStep === 3) badge = `<span class="bg-purple-100 text-purple-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-truck-ramp-box mr-1"></i> ${ord.sahaDone ? "3. Onaylar Bekleniyor" : "3. Saha Onaylı"}</span>`;
                 else if (ord.currentStep === 4) badge = `<span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-receipt mr-1"></i> 4. Muhasebede Bekliyor</span>`;
                 else badge = `<span class="bg-slate-900 text-white text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-check-double text-emerald-400 mr-1"></i> Fatura Kesildi (Kapandı)</span>`;
 
@@ -2926,7 +2926,8 @@
             const isIadeApprover = role === 'atolye_iade';
             const mySource = SOURCE_BY_ROLE[role] || null;
             const isAtStep3 = activeOrder && activeOrder.currentStep === 3;
-            const canEditSaha = isAdmin || (isSaha && isAtStep3);
+            const sahaDone = !!(activeOrder && activeOrder.sahaDone);
+            const canEditSaha = isAdmin || (isSaha && isAtStep3 && !sahaDone);
             const canApproveReturn = isAdmin || (isIadeApprover && isAtStep3);
             const showPrices = currentUser && currentUser.canSeePrices === true;
 
@@ -2968,6 +2969,12 @@
             const lockAlert = document.getElementById("step3-lock-alert");
             const canApproveAnyExtra = isAdmin || (!!mySource && isAtStep3);
             if (lockAlert) lockAlert.style.display = (!canEditSaha && !canApproveReturn && !canApproveAnyExtra && !isAdmin) ? "flex" : "none";
+            const lockText = document.getElementById("step3-lock-text");
+            if (lockText) {
+                lockText.innerHTML = (sahaDone && isAtStep3)
+                    ? `<strong>Montaj Bitirildi:</strong> İade ve ilave onayları bekleniyor. Son onay geldiğinde dosya otomatik olarak muhasebeye geçecek (Salt Okunur).`
+                    : `<strong>Saha Tamamlandı:</strong> Evraklar muhasebeye devredildiği için kilitlidir (Salt Okunur).`;
+            }
             const addExtPanel = document.getElementById("step3-add-extra-panel");
             if (addExtPanel) addExtPanel.style.display = canEditSaha ? "block" : "none";
             const actionBtns = document.getElementById("step3-action-buttons");
@@ -3062,7 +3069,7 @@
 
         window.updateReturnQty = async function(index, val) {
             if (!activeOrder || !activeOrder.items[index]) return;
-            if (!(currentUser.roleId === 'admin' || (currentUser.roleId === 'saha' && activeOrder.currentStep === 3))) return;
+            if (!(currentUser.roleId === 'admin' || (currentUser.roleId === 'saha' && activeOrder.currentStep === 3 && !activeOrder.sahaDone))) return;
             const item = activeOrder.items[index];
             const newQty = parseInt(val) || 0;
             if (newQty !== (parseFloat(item.returnedQty) || 0)) item.returnApproved = false; // miktar değişince onay sıfırlanır
@@ -3080,11 +3087,16 @@
                 return;
             }
             const item = activeOrder.items[index];
+            if (checked && !confirm(`İADE ONAYI\n\n${item.id} - ${item.name}\nİade adedi: ${parseFloat(item.returnedQty) || 0}\n\nBu iadeyi onaylıyor musunuz?`)) {
+                renderStep3(); // işaret kutusunu eski haline döndür
+                return;
+            }
             item.returnApproved = checked;
             item.returnApprovedBy = checked ? currentUser.name : "";
             await syncOrderToCloud(activeOrder);
             renderStep3();
             showToast(checked ? `İade onaylandı: ${item.name}` : `İade onayı kaldırıldı: ${item.name}`);
+            if (checked) await autoForwardIfReady();
         }
 
         window.toggleExtraApproval = async function(index, checked) {
@@ -3097,11 +3109,35 @@
                 renderStep3();
                 return;
             }
+            if (checked && !confirm(`İLAVE ONAYI\n\n${ext.id} - ${ext.name}\nRenk Kodu: ${normalizeColorCode(ext.color, ext.name) || "-"}\nAdet: ${ext.qty}\n\nBu ilaveyi onaylıyor musunuz?`)) {
+                renderStep3(); // işaret kutusunu eski haline döndür
+                return;
+            }
             ext.faikApproval = checked; // eski alan adı: fatura/irsaliye hesapları bunu kullanıyor
             ext.approvedBy = checked ? currentUser.name : "";
             await syncOrderToCloud(activeOrder);
             renderStep3();
             showToast(checked ? `İlave onaylandı: ${ext.name}` : `İlave onayı kaldırıldı: ${ext.name}`);
+            if (checked) await autoForwardIfReady();
+        }
+
+        // Saha "Montajı Bitir" dediyse ve bekleyen onay kalmadıysa dosya otomatik muhasebeye geçer
+        function getPendingApprovals(order) {
+            return {
+                returns: (order.items || []).filter(i => (parseFloat(i.returnedQty) || 0) > 0 && !i.returnApproved),
+                extras: (order.extras || []).filter(e => !e.faikApproval)
+            };
+        }
+
+        async function autoForwardIfReady() {
+            if (!activeOrder || activeOrder.currentStep !== 3 || !activeOrder.sahaDone) return;
+            const pend = getPendingApprovals(activeOrder);
+            if (pend.returns.length > 0 || pend.extras.length > 0) return;
+            activeOrder.currentStep = 4;
+            const saved = await syncOrderToCloud(activeOrder);
+            if (saved === false) { activeOrder.currentStep = 3; return; }
+            showToast("Tüm onaylar tamamlandı, dosya otomatik olarak Muhasebeye iletildi!");
+            returnToDashboard();
         }
 
         window.addExtraItemStep3 = async function() {
@@ -3112,6 +3148,7 @@
             const p = masterProducts.find(x => x.key === selectedKey);
             if (!p) { showToast("Lütfen ürün seçiniz.", true); return; }
 
+            if (currentUser.roleId !== 'admin' && activeOrder.sahaDone) { showToast("Montaj bitirildi, ilave eklenemez.", true); return; }
             if (!activeOrder.extras) activeOrder.extras = [];
             activeOrder.extras.push({
                 id: p.id,
@@ -3137,32 +3174,41 @@
                 showToast("Onaylanmış ilave silinemez.", true);
                 return;
             }
+            if (currentUser.roleId !== 'admin' && activeOrder.sahaDone) {
+                showToast("Montaj bitirildi, ilave silinemez.", true);
+                return;
+            }
             activeOrder.extras.splice(index, 1);
             await syncOrderToCloud(activeOrder);
             renderStep3();
             showToast("İlave ürün talebi silindi.");
+            await autoForwardIfReady();
         }
 
         window.forwardToAccounting = async function() {
-            const pendingReturns = (activeOrder.items || []).filter(i => (parseFloat(i.returnedQty) || 0) > 0 && !i.returnApproved);
-            const pendingExtras = (activeOrder.extras || []).filter(e => !e.faikApproval);
-            if (pendingReturns.length > 0 || pendingExtras.length > 0) {
-                const parts = [];
-                if (pendingReturns.length) parts.push(`${pendingReturns.length} iade kalemi Atölye İade onayı bekliyor`);
-                if (pendingExtras.length) parts.push(`${pendingExtras.length} ilave kalemi Mağaza/Atölye onayı bekliyor`);
-                showToast("Muhasebeye devredilemez: " + parts.join(", ") + ".", true);
+            if (activeOrder.sahaDone && activeOrder.currentStep === 3) {
+                showToast("Montaj zaten bitirildi, onaylar bekleniyor.", true);
                 return;
             }
+            const pend = getPendingApprovals(activeOrder);
+            const pendCount = pend.returns.length + pend.extras.length;
+            const pendNote = pendCount > 0
+                ? `\n\nOnay bekleyen ${pendCount} kalem var. Son onay geldiğinde dosya otomatik olarak muhasebeye geçecek.`
+                : `\n\nBekleyen onay yok, dosya hemen muhasebeye (Gökhan) geçecek.`;
 
-            const c1 = confirm(`1. ONAY:\n\nSaha montajı ve uygulama tamamen bitti mi?\n\nEvraklar Muhasebeye (Gökhan) faturalandırma için devredilecektir.`);
+            const c1 = confirm(`1. ONAY:\n\nSaha montajı ve uygulama tamamen bitti mi?\n\nBundan sonra iade ve ilave ekleyemez veya değiştiremezsiniz.${pendNote}`);
             if (!c1) return;
 
-            const c2 = confirm(`2. KESİN ONAY:\n\nOnaylanmış iade adetleri ve ilave talepleri tam olarak işlediğinizi onaylıyor musunuz?`);
+            const c2 = confirm(`2. KESİN ONAY:\n\nTüm iade ve ilave kalemlerini eksiksiz girdiğinizi onaylıyor musunuz?\n\nBu işlem geri alınamaz.`);
             if (!c2) return;
 
-            activeOrder.currentStep = 4;
-            await syncOrderToCloud(activeOrder);
-            showToast("Montaj tamamlandı ve dosya Muhasebeye iletildi!");
+            activeOrder.sahaDone = true;
+            activeOrder.sahaDoneBy = currentUser.name;
+            activeOrder.sahaDoneAt = new Date().toISOString();
+            if (pendCount === 0) activeOrder.currentStep = 4;
+            const saved = await syncOrderToCloud(activeOrder);
+            if (saved === false) { activeOrder.sahaDone = false; activeOrder.currentStep = 3; renderStep3(); return; }
+            showToast(pendCount === 0 ? "Montaj tamamlandı ve dosya Muhasebeye iletildi!" : "Montaj bitirildi. Onaylar tamamlanınca dosya otomatik muhasebeye gidecek.");
             returnToDashboard();
         }
         function renderStep4() {
