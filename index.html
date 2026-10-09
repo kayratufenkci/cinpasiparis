@@ -3021,7 +3021,8 @@
                 rows.forEach(({ ext, index }) => {
                     const displayName = formatProductNameWithColor(ext.name, ext.color);
                     const div = document.createElement("div");
-                    div.className = "flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 text-xs";
+                    div.className = "flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-white border border-slate-200 text-xs";
+                    const extColor = normalizeColorCode(ext.color, ext.name);
                     const priceLabel = showPrices ? ` x ${Number(parseCleanPrice(ext.price)).toLocaleString('tr-TR')} ₺` : '';
                     const srcInfo = EXTRA_SOURCE_INFO[ext.source];
                     const srcBadge = srcInfo
@@ -3030,10 +3031,21 @@
                     const canApproveThis = isAdmin || (isAtStep3 && !!mySource && ext.source === mySource);
                     const canDelete = isAdmin || (canEditSaha && !ext.faikApproval);
                     div.innerHTML = `
-                        <div>
-                            <div class="flex items-center space-x-2"><span class="font-mono text-[10px] text-slate-400 font-bold">${ext.id}</span>${srcBadge}</div>
-                            <div class="font-bold text-slate-900">${displayName}</div>
-                            <div class="text-[11px] text-emerald-800 font-bold">${ext.qty} Adet${priceLabel}</div>
+                        <div class="space-y-2">
+                            <div class="flex items-center space-x-2">${srcBadge}</div>
+                            <div class="text-sm font-black text-slate-900">${ext.name}</div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white">
+                                    <span class="text-[10px] font-bold uppercase tracking-wide text-slate-300">Ürün Kodu</span>
+                                    <span class="font-mono text-base font-black">${ext.id}</span>
+                                </span>
+                                <span class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-950 border border-emerald-300">
+                                    <span class="text-[10px] font-bold uppercase tracking-wide text-emerald-700">Renk Kodu</span>
+                                    <span class="font-mono text-base font-black">${extColor || "-"}</span>
+                                    ${extColor ? `<span class="text-xs font-bold">${getColorNameFromCode(extColor)}</span>` : ""}
+                                </span>
+                            </div>
+                            <div class="text-sm text-emerald-800 font-black">${ext.qty} Adet${priceLabel}</div>
                         </div>
                         <div class="flex items-center space-x-2">
                             <label class="flex items-center space-x-1.5 text-[11px] font-bold ${ext.faikApproval ? 'text-emerald-800' : 'text-amber-800'}">
