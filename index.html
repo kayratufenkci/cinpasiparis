@@ -4246,6 +4246,9 @@ window.applyExcelImportToOrder = async function() {
             alert("Lütfen önce geçerli bir Excel dosyası seçiniz!");
             return;
         }
+        // Kalemleri HEMEN kopyala: düğmeye basınca pencereyi temizleyen zamanlayıcı (forceClearExcelModal)
+        // bir sonraki beklemede parsedExcelItems listesini boşaltıyordu
+        const itemsSnapshot = parsedExcelItems.slice();
 
         const invSelect = document.getElementById("excel-import-invoice-type");
         const invoiceType = invSelect ? invSelect.value : "";
@@ -4271,7 +4274,7 @@ window.applyExcelImportToOrder = async function() {
         }
 
         // Excel kalemlerini kalıcı ve eksiksiz klonla
-        const formattedItems = parsedExcelItems.map(function(i) {
+        const formattedItems = itemsSnapshot.map(function(i) {
             return {
                 id: String(i.id || '').trim(),
                 name: String(i.name || i.id || '').trim(),
