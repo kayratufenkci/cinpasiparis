@@ -1177,6 +1177,24 @@
             return Math.max(0, disp - ret);
         }
 
+        // ---- Katalog durumu: yeni bilgisayarda katalog buluttan inene kadar fiş okunursa ad/fiyat boş gelirdi
+        let catalogState = 'loading'; // loading | ready | failed
+        async function waitForCatalog(maxMs) {
+            const t0 = Date.now();
+            while (catalogState === 'loading' && Date.now() - t0 < maxMs) {
+                await new Promise(r => setTimeout(r, 250));
+            }
+            return catalogState === 'ready';
+        }
+        async function runExcelImport(rows) {
+            if (catalogState !== 'ready') {
+                showToast("Ürün kataloğu yükleniyor, lütfen bekleyin...");
+                const ok = await waitForCatalog(30000);
+                if (!ok && !confirm("Ürün kataloğu bu bilgisayara yüklenemedi.\n\nDevam ederseniz ürün adları ve fiyatlar BOŞ gelebilir.\n\nYine de fişi okumak istiyor musunuz?")) return;
+            }
+            processRawExcelRows(rows);
+        }
+
         // ---- Sipariş numarası: mevcut numaralarla çakışmaz (aksi halde eski sipariş ezilirdi)
         const reservedOrderIds = new Set();
         function generateOrderId() {
@@ -1349,34 +1367,52 @@
 
         // ================= CANLI BULUT KATALOG SENKRONİZASYONU (İPTAL FİLTRELİ) =================
         function listenToCatalogCloud() {
-            if (!db) return;
+            if (!db) { if (catalogState === 'loading') catalogState = 'failed'; return; }
             try {
                 db.collection("cinpa_catalog_v2").doc("meta").onSnapshot(async (metaDoc) => {
-                    if (metaDoc && metaDoc.exists) {
+                    if (!metaDoc || !metaDoc.exists) {
+                        if (catalogState === 'loading') catalogState = 'ready'; // bulutta katalog yok, beklenecek bir şey yok
+                        return;
+                    }
+                    try {
                         const meta = metaDoc.data();
                         const totalChunks = meta.totalChunks || 0;
                         if (totalChunks > 0) {
+                            // Parçaları sırayla değil aynı anda indir (yeni bilgisayarda çok daha hızlı)
+                            const chunkDocs = await Promise.all(
+                                Array.from({ length: totalChunks }, (_, i) => db.collection("cinpa_catalog_v2").doc(`chunk_${i}`).get())
+                            );
                             let loadedItems = [];
-                            for (let i = 0; i < totalChunks; i++) {
-                                const cDoc = await db.collection("cinpa_catalog_v2").doc(`chunk_${i}`).get();
+                            chunkDocs.forEach(cDoc => {
                                 if (cDoc.exists && cDoc.data().items) {
                                     loadedItems.push(...cDoc.data().items);
                                 }
-                            }
+                            });
                             if (loadedItems.length > 0) {
                                 masterProducts = loadedItems.filter(p => {
                                     const check = `${p.id || ''} ${p.name || ''}`.toUpperCase();
                                     return !check.includes('İPTAL') && !check.includes('IPTAL');
                                 });
                                 saveCatalogToLocalDBOnly(masterProducts);
+                                catalogState = 'ready';
                                 renderCatalogTable();
                                 updateHeaderBadgeCounts();
                                 populateProductSelects();
+                            } else if (catalogState === 'loading') {
+                                catalogState = 'failed';
                             }
+                        } else if (catalogState === 'loading') {
+                            catalogState = 'ready';
                         }
+                    } catch (err) {
+                        console.warn("Katalog bulutdan indirilemedi:", err);
+                        if (catalogState === 'loading') catalogState = 'failed';
+                        updateHeaderBadgeCounts();
                     }
                 }, (err) => {
                     console.warn("Katalog bulut dinleme hatası:", err);
+                    if (catalogState === 'loading') catalogState = 'failed';
+                    updateHeaderBadgeCounts();
                 });
             } catch(e) {
                 console.warn("Katalog listener başlatılamadı:", e);
@@ -1684,6 +1720,7 @@
                             map.set(k, { key: k, id: rawId, name: rawName, color: normalizeColorCode(p.color, p.name), price: parseCleanPrice(p.price) });
                         });
                         masterProducts = Array.from(map.values());
+                        catalogState = 'ready';
                     } else if (masterProducts.length === 0) {
                         masterProducts = [
                             { key: "0109024_1001", id: "0109024", name: "YUCCA BUSH", color: "1001", price: 860 },
@@ -1854,6 +1891,7 @@
 
                     if (newProducts.length > 0) {
                         masterProducts = newProducts;
+                        catalogState = 'ready';
                         await saveCatalogToDB(masterProducts);
                         renderCatalogTable();
                         updateHeaderBadgeCounts();
@@ -1884,7 +1922,7 @@
                     const workbook = XLSX.read(data, { type: 'array' });
                     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
-                    processRawExcelRows(jsonData);
+                    runExcelImport(jsonData).catch(err => showToast("Excel okunurken hata oluştu: " + err.message, true));
                 } catch(err) {
                     showToast("Excel dosyası okunurken hata oluştu: " + err.message, true);
                 }
@@ -1900,11 +1938,12 @@
                 return;
             }
             const rows = text.split(/\r?\n/).map(row => row.split('\t'));
-            processRawExcelRows(rows);
+            runExcelImport(rows).catch(err => showToast("Veri okunurken hata oluştu: " + err.message, true));
         }
 
         function processRawExcelRows(rows) {
             window.__excelSkippedRows = 0;
+            window.__excelNotFound = 0;
             parsedExcelItems = [];
             if (!rows || rows.length === 0) return;
 
@@ -2036,6 +2075,8 @@
                         if (!productName) productName = found.name;
                         if (!finalColor && found.color) finalColor = normalizeColorCode(found.color, found.name);
                         if (price === 0 && found.price > 0) price = parseCleanPrice(found.price);
+                    } else {
+                        window.__excelNotFound++;
                     }
                 }
 
@@ -2086,9 +2127,12 @@
             document.getElementById("excel-preview-count").innerText = `${parsedExcelItems.length} Kalem Ürün`;
             document.getElementById("excel-preview-total").innerText = `Toplam: ${previewTotal.toLocaleString('tr-TR')} ₺`;
             updateExcelApplyButton();
-            showToast(window.__excelSkippedRows > 0
-                ? `${parsedExcelItems.length} kalem okundu, ${window.__excelSkippedRows} satır geçersiz adet/fiyat nedeniyle atlandı!`
-                : `${parsedExcelItems.length} kalem ürün başarıyla okundu!`, window.__excelSkippedRows > 0);
+            const warns = [];
+            if (window.__excelSkippedRows > 0) warns.push(`${window.__excelSkippedRows} satır geçersiz adet/fiyat nedeniyle atlandı`);
+            if (window.__excelNotFound > 0) warns.push(`${window.__excelNotFound} kalem katalogda bulunamadı (ad/fiyat boş olabilir)`);
+            showToast(warns.length
+                ? `${parsedExcelItems.length} kalem okundu. ${warns.join(', ')}!`
+                : `${parsedExcelItems.length} kalem ürün başarıyla okundu!`, warns.length > 0);
         }
 
         function updateExcelApplyButton() {
@@ -3640,7 +3684,7 @@
 
         function updateHeaderBadgeCounts() {
             const badge = document.getElementById("cat-count-badge");
-            if (badge) badge.innerText = masterProducts.length;
+            if (badge) badge.innerText = (catalogState === 'loading') ? 'yükleniyor…' : masterProducts.length;
             const lbl = document.getElementById("master-count-label");
             if (lbl) lbl.innerText = masterProducts.length;
         }
