@@ -586,7 +586,6 @@
                                 <span id="step3-badge" class="bg-purple-100 text-purple-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">Evrak 3 & 4: Saha Uygulama</span>
                                 <h3 id="step3-title" class="text-lg font-black text-slate-900 mt-1">Saha Mal Kabul, İade ve Ek Talep</h3>
                             </div>
-                            <div id="step3-owner" class="text-xs text-slate-500 font-medium">Saha Sorumlusu: <strong class="text-slate-800">Sefa Usta</strong></div>
                         </div>
                         <div id="step3-rule-box" class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl text-xs text-amber-950 space-y-1">
                             <div class="font-extrabold flex items-center"><i class="fa-solid fa-shield-halved mr-1.5 text-amber-600"></i> ONAY KURALI:</div>
@@ -1104,7 +1103,7 @@
                 visibleSteps: [2], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false, canSeePrices: false
             },
             saha: {
-                roleId: 'saha', name: 'Sefa Usta', title: 'Saha & Uygulama Ekibi', badgeText: 'SAHA MOBİL PANELİ',
+                roleId: 'saha', name: 'Saha Ekibi', title: 'Saha & Uygulama', badgeText: 'SAHA MOBİL PANELİ',
                 dutyText: 'Yalnızca UYGULAMASI / MONTAJI yapılacak olan işleri görürsünüz (Fiyatlar gizlidir).',
                 colorClass: 'bg-purple-50 text-purple-700 border-purple-200', avatarBg: 'bg-purple-100 text-purple-700', avatarIcon: 'fa-helmet-safety',
                 visibleSteps: [3], canCreateOrder: false, canManageCatalog: false, canDeleteOrder: false, canSeePrices: false
@@ -2355,7 +2354,7 @@
                     alert("Hatalı Depocu şifresi!");
                 }
             } else if (roleKey === 'saha') {
-                const pass = prompt("Saha Ekibi (Sefa Usta) Giriş Şifresi:");
+                const pass = prompt("Saha Ekibi Giriş Şifresi:");
                 if (pass === null) return;
                 if (pass.trim() === "1") {
                     loginAs('saha');
@@ -3100,7 +3099,7 @@
             const c1 = confirm(`1. ONAY:\n\nDepo sayımı ve kolileme tamamlandı mı?\n\nBu fiş için Sevk İrsaliyesi kesilecek.`);
             if (!c1) return;
 
-            const targetText = (activeOrder.hasApplication !== false) ? "Saha Ekibine (Sefa Usta)" : "doğrudan Muhasebeye (Gökhan)";
+            const targetText = (activeOrder.hasApplication !== false) ? "Saha Ekibine" : "doğrudan Muhasebeye (Gökhan)";
             const c2 = confirm(`2. KESİN ONAY:\n\nÜrünlerin fiziki olarak araca yüklendiğini ve sevk miktarını onaylıyor musunuz?\n\nEvrak ${targetText} devredilecektir.`);
             if (!c2) return;
 
