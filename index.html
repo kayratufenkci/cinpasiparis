@@ -1177,6 +1177,20 @@
             return Math.max(0, disp - ret);
         }
 
+        // ---- Onay ekranında yazılan (henüz onaylanmamış) adet: bulut güncellemesiyle ekran yenilense de kaybolmaz
+        window.__apprQty = {};
+        function apprKey(kind, index) { return `${activeOrder ? activeOrder.id : ""}|${kind}|${index}`; }
+        window.setApprQty = function(kind, index, val) { window.__apprQty[apprKey(kind, index)] = val; };
+        // Kalemler değişince (adet düzeltildi / ilave eklendi-silindi) eski yazılmış adetler geçersizdir
+        function clearApprQty(kind) {
+            const prefix = `${activeOrder ? activeOrder.id : ""}|${kind}|`;
+            Object.keys(window.__apprQty).forEach(k => { if (k.startsWith(prefix)) delete window.__apprQty[k]; });
+        }
+        function getApprQty(kind, index, fallback) {
+            const v = window.__apprQty[apprKey(kind, index)];
+            return v === undefined ? fallback : v;
+        }
+
         // ---- Katalog durumu: yeni bilgisayarda katalog buluttan inene kadar fiş okunursa ad/fiyat boş gelirdi
         let catalogState = 'loading'; // loading | ready | failed
         async function waitForCatalog(maxMs) {
@@ -2486,7 +2500,7 @@
                 document.getElementById("dashboard-table-title").innerText = `Saha Montaj & Uygulama Masası`;
                 document.getElementById("dashboard-table-subtitle").innerText = `Yalnızca montaj/uygulaması yapılacak işler listelenmektedir.`;
             } else if (currentUser.roleId === 'atolye_iade') {
-                visibleOrders = orders.filter(ord => ord.currentStep >= 3 && (ord.items || []).some(i => (parseFloat(i.returnedQty) || 0) > 0));
+                visibleOrders = orders.filter(ord => ord.currentStep >= 3 && (ord.items || []).some(i => (parseFloat(i.returnedQty) || 0) > 0 || (parseFloat(i.returnedQtyReported) || 0) > 0));
                 document.getElementById("dashboard-table-title").innerText = `Atölye İade Onay Masası`;
                 document.getElementById("dashboard-table-subtitle").innerText = `Saha ekibinin iade girdiği siparişler listelenmektedir.`;
             } else if (SOURCE_BY_ROLE[currentUser.roleId]) {
@@ -3173,7 +3187,7 @@
             if (showReturnsBox && activeOrder && activeOrder.items) {
                 // Atölye İade kullanıcısı yalnızca iade girilmiş kalemleri görür
                 const rows = activeOrder.items.map((item, index) => ({ item, index }))
-                    .filter(r => !isIadeApprover || (parseFloat(r.item.returnedQty) || 0) > 0);
+                    .filter(r => !isIadeApprover || (parseFloat(r.item.returnedQty) || 0) > 0 || (parseFloat(r.item.returnedQtyReported) || 0) > 0);
                 if (rows.length === 0) {
                     retContainer.innerHTML = `<div class="p-4 text-center text-slate-400 italic text-xs">Onay bekleyen iade bulunmuyor.</div>`;
                 }
@@ -3183,10 +3197,18 @@
                     const div = document.createElement("div");
                     div.className = "flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-white border border-slate-200 text-xs";
                     const retColor = normalizeColorCode(item.color, item.name);
-                    const qtyCell = canEditSaha
+                    const retReported = item.returnedQtyReported !== undefined ? (parseFloat(item.returnedQtyReported) || 0) : null;
+                    const showApproval = retQty > 0 || (retReported !== null && retReported > 0);
+                    // Onaylayan, onay vermeden önce sahanın girdiği adedi düzeltebilir
+                    const canEditApproveQty = canApproveReturn && !canEditSaha && !item.returnApproved && showApproval;
+                    const diffNote = (retReported !== null && retReported !== retQty)
+                        ? `<div class="text-[11px] font-bold text-amber-700">Saha girişi: ${retReported} → Atölye onayı: ${retQty}</div>` : "";
+                    const qtyCell = canEditApproveQty
+                        ? `<div class="flex items-center space-x-1.5"><span class="text-[11px] text-slate-500 font-semibold">Saha girişi: ${retReported !== null ? retReported : retQty}</span><input type="number" id="appr-ret-${index}" min="0" max="${item.dispatchedQty}" value="${esc(getApprQty("r", index, retQty))}" oninput="window.setApprQty('r', ${index}, this.value)" title="Atölyenin gerçekte aldığı adet" class="w-20 p-1.5 text-center font-black border-2 border-red-400 rounded bg-white text-red-900"></div>`
+                        : canEditSaha
                         ? `<input type="number" min="0" max="${item.dispatchedQty}" value="${retQty}" onchange="window.updateReturnQty(${index}, this.value)" class="w-16 p-1 text-center font-bold border border-red-300 rounded bg-red-50 text-red-900">`
                         : `<span class="font-bold text-red-800">${retQty} Adet</span>`;
-                    const approvalCell = retQty > 0
+                    const approvalCell = showApproval
                         ? `<label class="flex items-center space-x-1.5 text-[11px] font-bold ${item.returnApproved ? 'text-emerald-800' : 'text-amber-800'}">
                                <input type="checkbox" ${item.returnApproved ? "checked" : ""} ${canApproveReturn ? "" : "disabled"} onchange="window.toggleReturnApproval(${index}, this.checked)" class="w-4 h-4 text-emerald-700 rounded cursor-pointer">
                                <span>${item.returnApproved ? 'Atölye Onayladı' : 'Atölye Onayı Bekliyor'}</span>
@@ -3209,7 +3231,7 @@
                             <div class="text-xs text-slate-500 font-semibold">Sevk: <span class="font-black text-amber-900 text-sm">${item.dispatchedQty}</span> Adet</div>
                         </div>
                         <div class="flex items-center space-x-3">
-                            <div class="flex items-center space-x-2"><span class="text-slate-500 font-bold">İade:</span>${qtyCell}</div>
+                            <div class="space-y-1"><div class="flex items-center space-x-2"><span class="text-slate-500 font-bold">İade:</span>${qtyCell}</div>${diffNote}</div>
                             ${approvalCell}
                         </div>
                     `;
@@ -3237,6 +3259,13 @@
                         : `<span class="text-[10px] font-bold px-2 py-0.5 rounded-md border bg-slate-100 text-slate-600 border-slate-200">Kaynak yok</span>`;
                     const canApproveThis = isAdmin || (isAtStep3 && !!mySource && ext.source === mySource);
                     const canDelete = isAdmin || (canEditSaha && !ext.faikApproval);
+                    const extReported = ext.qtyReported !== undefined ? (parseFloat(ext.qtyReported) || 0) : null;
+                    const canEditExtQty = canApproveThis && !ext.faikApproval;
+                    const extDiffNote = (extReported !== null && extReported !== (parseFloat(ext.qty) || 0))
+                        ? `<div class="text-[11px] font-bold text-amber-700">Saha girişi: ${extReported} → Onaylanan: ${ext.qty}</div>` : "";
+                    const extQtyBlock = canEditExtQty
+                        ? `<div class="flex items-center flex-wrap gap-2"><span class="text-[11px] text-slate-500 font-semibold">Saha girişi: ${extReported !== null ? extReported : ext.qty}</span><input type="number" id="appr-ext-${index}" min="0" value="${esc(getApprQty("e", index, ext.qty))}" oninput="window.setApprQty('e', ${index}, this.value)" title="Gerçekte verilen adet" class="w-20 p-1.5 text-center font-black border-2 border-emerald-400 rounded bg-white text-emerald-900"><span class="text-sm text-emerald-800 font-black">Adet${priceLabel}</span></div>`
+                        : `<div class="text-sm text-emerald-800 font-black">${ext.qty} Adet${priceLabel}</div>`;
                     div.innerHTML = `
                         <div class="space-y-2">
                             <div class="flex items-center space-x-2">${srcBadge}</div>
@@ -3252,7 +3281,8 @@
                                     ${extColor ? `<span class="text-xs font-bold">${getColorNameFromCode(extColor)}</span>` : ""}
                                 </span>
                             </div>
-                            <div class="text-sm text-emerald-800 font-black">${ext.qty} Adet${priceLabel}</div>
+                            ${extQtyBlock}
+                            ${extDiffNote}
                         </div>
                         <div class="flex items-center space-x-2">
                             <label class="flex items-center space-x-1.5 text-[11px] font-bold ${ext.faikApproval ? 'text-emerald-800' : 'text-amber-800'}">
@@ -3279,6 +3309,8 @@
                 return;
             }
             if (newQty !== (parseFloat(item.returnedQty) || 0)) item.returnApproved = false; // miktar değişince onay sıfırlanır
+            delete item.returnedQtyReported; // sahanın yeni girişi esas alınır
+            clearApprQty("r");
             item.returnedQty = newQty;
             await syncOrderToCloud(activeOrder);
             renderStep3();
@@ -3293,9 +3325,27 @@
                 return;
             }
             const item = activeOrder.items[index];
-            if (checked && !confirm(`İADE ONAYI\n\n${item.id} - ${item.name}\nİade adedi: ${parseFloat(item.returnedQty) || 0}\n\nBu iadeyi onaylıyor musunuz?`)) {
-                renderStep3(); // işaret kutusunu eski haline döndür
-                return;
+            const origQty = parseFloat(item.returnedQty) || 0;
+            const sahaQty = item.returnedQtyReported !== undefined ? (parseFloat(item.returnedQtyReported) || 0) : origQty;
+            let newQty = origQty;
+            if (checked) {
+                const inp = document.getElementById("appr-ret-" + index);
+                const raw = inp ? inp.value : getApprQty("r", index, origQty);
+                newQty = parseQty(raw, 0, parseFloat(item.dispatchedQty) || 0);
+                if (newQty === null) {
+                    showToast(`Onaylanan iade adedi 0 ile sevk edilen miktar (${parseFloat(item.dispatchedQty) || 0}) arasında tam sayı olmalıdır.`, true);
+                    renderStep3();
+                    return;
+                }
+                const changeNote = newQty !== sahaQty ? `\nSaha girişi: ${sahaQty}  →  Onaylanacak: ${newQty}` : `\nİade adedi: ${newQty}`;
+                const zeroNote = newQty === 0 ? "\n\nDİKKAT: 0 yazdınız, bu iade hiç alınmamış sayılacak." : "";
+                if (!confirm(`İADE ONAYI\n\n${item.id} - ${item.name}${changeNote}${zeroNote}\n\nBu iadeyi onaylıyor musunuz?`)) {
+                    renderStep3(); // işaret kutusunu eski haline döndür
+                    return;
+                }
+                if (item.returnedQtyReported === undefined) item.returnedQtyReported = origQty; // sahanın ilk girişi saklanır
+                item.returnedQty = newQty;
+                delete window.__apprQty[apprKey("r", index)];
             }
             item.returnApproved = checked;
             item.returnApprovedBy = checked ? currentUser.name : "";
@@ -3315,9 +3365,26 @@
                 renderStep3();
                 return;
             }
-            if (checked && !confirm(`İLAVE ONAYI\n\n${ext.id} - ${ext.name}\nRenk Kodu: ${normalizeColorCode(ext.color, ext.name) || "-"}\nAdet: ${ext.qty}\n\nBu ilaveyi onaylıyor musunuz?`)) {
-                renderStep3(); // işaret kutusunu eski haline döndür
-                return;
+            if (checked) {
+                const origQty = parseFloat(ext.qty) || 0;
+                const sahaQty = ext.qtyReported !== undefined ? (parseFloat(ext.qtyReported) || 0) : origQty;
+                const inp = document.getElementById("appr-ext-" + index);
+                const raw = inp ? inp.value : getApprQty("e", index, origQty);
+                const newQty = parseQty(raw, 0, 100000);
+                if (newQty === null) {
+                    showToast("Onaylanan ilave adedi 0 veya daha büyük bir tam sayı olmalıdır.", true);
+                    renderStep3();
+                    return;
+                }
+                const changeNote = newQty !== sahaQty ? `\nSaha girişi: ${sahaQty}  →  Onaylanacak: ${newQty}` : `\nAdet: ${newQty}`;
+                const zeroNote = newQty === 0 ? "\n\nDİKKAT: 0 yazdınız, bu ilave verilmemiş sayılacak ve faturaya girmeyecek." : "";
+                if (!confirm(`İLAVE ONAYI\n\n${ext.id} - ${ext.name}\nRenk Kodu: ${normalizeColorCode(ext.color, ext.name) || "-"}${changeNote}${zeroNote}\n\nBu ilaveyi onaylıyor musunuz?`)) {
+                    renderStep3(); // işaret kutusunu eski haline döndür
+                    return;
+                }
+                if (ext.qtyReported === undefined) ext.qtyReported = origQty; // sahanın ilk girişi saklanır
+                ext.qty = newQty;
+                delete window.__apprQty[apprKey("e", index)];
             }
             ext.faikApproval = checked; // eski alan adı: fatura/irsaliye hesapları bunu kullanıyor
             ext.approvedBy = checked ? currentUser.name : "";
@@ -3357,6 +3424,7 @@
 
             if (currentUser.roleId !== 'admin' && activeOrder.sahaDone) { showToast("Montaj bitirildi, ilave eklenemez.", true); return; }
             if (!activeOrder.extras) activeOrder.extras = [];
+            clearApprQty("e");
             activeOrder.extras.push({
                 id: p.id,
                 name: p.name,
@@ -3386,6 +3454,7 @@
                 return;
             }
             activeOrder.extras.splice(index, 1);
+            clearApprQty("e");
             await syncOrderToCloud(activeOrder);
             renderStep3();
             showToast("İlave ürün talebi silindi.");
@@ -3458,7 +3527,7 @@
                         <td class="p-3.5 text-center font-bold text-xs bg-emerald-50 text-emerald-900">${esc(colorDisplayVal)}</td>
                         <td class="p-3.5 text-center font-medium">${req}</td>
                         <td class="p-3.5 text-center font-medium">${disp}</td>
-                        <td class="p-3.5 text-center text-red-700 font-bold">${ret}</td>
+                        <td class="p-3.5 text-center text-red-700 font-bold">${ret}${(item.returnedQtyReported !== undefined && (parseFloat(item.returnedQtyReported) || 0) !== ret) ? `<div class="text-[10px] font-semibold text-amber-700">saha: ${esc(item.returnedQtyReported)}</div>` : ""}</td>
                         <td class="p-3.5 text-center text-slate-400">-</td>
                         <td class="p-3.5 text-center font-black bg-emerald-50 text-emerald-900">${net}</td>
                         <td class="p-3.5 text-right font-medium">${Number(pr).toLocaleString('tr-TR')} ₺</td>
@@ -3495,7 +3564,7 @@
                             <td class="p-3.5 text-center text-slate-400">-</td>
                             <td class="p-3.5 text-center text-slate-400">-</td>
                             <td class="p-3.5 text-center text-slate-400">-</td>
-                            <td class="p-3.5 text-center text-emerald-800 font-bold">${qty}</td>
+                            <td class="p-3.5 text-center text-emerald-800 font-bold">${qty}${(ext.qtyReported !== undefined && (parseFloat(ext.qtyReported) || 0) !== qty) ? `<div class="text-[10px] font-semibold text-amber-700">saha: ${esc(ext.qtyReported)}</div>` : ""}</td>
                             <td class="p-3.5 text-center font-black bg-emerald-100 text-emerald-950">${qty}</td>
                             <td class="p-3.5 text-right font-medium">${Number(pr).toLocaleString('tr-TR')} ₺</td>
                             <td class="p-3.5 text-right font-bold text-emerald-900">${Number(lineTotal).toLocaleString('tr-TR')} ₺</td>
@@ -3833,7 +3902,7 @@
                         "İş No": o.id, "Müşteri / Proje": o.customer, "Tür": "Sipariş Kalemi",
                         "Ürün Kodu": i.id, "Ürün Adı": i.name, "Renk Kodu": normalizeColorCode(i.color, i.name),
                         "Talep Adedi": parseFloat(i.requestedQty) || 0, "Sevk Adedi": parseFloat(i.dispatchedQty) || 0,
-                        "İade Adedi": parseFloat(i.returnedQty) || 0, "İlave Adedi": "",
+                        "İade Adedi": parseFloat(i.returnedQty) || 0, "İlave Adedi": "", "Saha Girişi (Adet)": i.returnedQtyReported !== undefined ? i.returnedQtyReported : "",
                         "Birim Fiyat (₺)": parseCleanPrice(i.price),
                         "Kaynak": "", "Onay": (parseFloat(i.returnedQty) || 0) > 0 ? (i.returnApproved ? "İade onaylı" : "İade onay bekliyor") : "",
                         "Depo Notu": i.warehouseNote || ""
@@ -3843,7 +3912,7 @@
                     itemRows.push({
                         "İş No": o.id, "Müşteri / Proje": o.customer, "Tür": "İlave",
                         "Ürün Kodu": e.id, "Ürün Adı": e.name, "Renk Kodu": normalizeColorCode(e.color, e.name),
-                        "Talep Adedi": "", "Sevk Adedi": "", "İade Adedi": "", "İlave Adedi": parseFloat(e.qty) || 0,
+                        "Talep Adedi": "", "Sevk Adedi": "", "İade Adedi": "", "İlave Adedi": parseFloat(e.qty) || 0, "Saha Girişi (Adet)": e.qtyReported !== undefined ? e.qtyReported : "",
                         "Birim Fiyat (₺)": parseCleanPrice(e.price),
                         "Kaynak": EXTRA_SOURCE_INFO[e.source] ? EXTRA_SOURCE_INFO[e.source].label : "", "Onay": e.faikApproval ? "Onaylı" : "Onay bekliyor",
                         "Depo Notu": ""
